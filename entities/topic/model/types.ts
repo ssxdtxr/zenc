@@ -1,0 +1,32 @@
+export type SubtopicStatus = "needs_work" | "learning" | "good" | "expert"
+
+export type OverallLevel = "beginner" | "intermediate" | "advanced" | "expert"
+
+export type Subtopic = {
+  name: string
+  status: SubtopicStatus
+  recommendation: string
+}
+
+export type SessionRecord = {
+  id: string
+  date: string
+  score: number
+  total: number
+  overallLevel: OverallLevel
+  summary: string
+  subtopics: Subtopic[]
+  strengths: string[]
+  toStudyMore: string[]
+  toStudyDeeper: string[]
+}
+
+export type Topic = {
+  id: string
+  name: string
+  createdAt: string
+  lastSessionAt: string | null
+  sessions: SessionRecord[]
+  currentSubtopics: Subtopic[]
+  overallLevel: OverallLevel | null
+}
