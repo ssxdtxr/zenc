@@ -33,8 +33,8 @@ export const TopicCard = ({ topic, onClick, onDelete }: Props) => {
         boxShadow: "var(--shadow)",
         border: "1.5px solid var(--border)",
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "var(--shadow-lg)"; e.currentTarget.style.borderColor = "var(--border-strong)" }}
-      onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "var(--shadow)"; e.currentTarget.style.borderColor = "var(--border)" }}
+      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "var(--shadow-lg)" }}
+      onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "var(--shadow)" }}
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="min-w-0">

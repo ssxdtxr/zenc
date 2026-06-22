@@ -32,10 +32,10 @@ export const Dashboard = () => {
       <header
         className="sticky top-0 z-10 px-5 py-4 flex items-center justify-between"
         style={{
-          background: "rgba(245,243,255,0.8)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          borderBottom: "1px solid var(--border)",
+          background: "rgba(255,255,255,0.92)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderBottom: "1px solid rgba(0,0,0,0.06)",
         }}
       >
         <div className="flex items-center gap-2.5">

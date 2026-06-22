@@ -18,6 +18,7 @@ type SavedSession = {
   correctCount: number
   allGaps: string[]
   pendingAnalysis: { messages: Message[]; correct: number } | null
+  focusSubtopics?: string[]
 }
 
 type TutorSession = {
@@ -44,7 +45,7 @@ type Props = {
 }
 
 export const useTutorSession = ({ topicId, topicName, focusSubtopics, onComplete }: Props): TutorSession => {
-  const storageKey = `zerc_session_${topicId}${focusSubtopics ? "_focused" : ""}`
+  const storageKey = `zerc_session_${topicId}`
 
   const [sessionState, setSessionState] = useState<SessionState>("session")
   const [answer, setAnswer] = useState("")
@@ -77,6 +78,7 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, onComplete
       const data: SavedSession = {
         messages: msgs, currentResponse: response, sessionState: state,
         questionCount: qCount, correctCount: cCount, allGaps: gaps, pendingAnalysis: pending,
+        focusSubtopics,
       }
       localStorage.setItem(storageKey, JSON.stringify(data))
     } catch {}

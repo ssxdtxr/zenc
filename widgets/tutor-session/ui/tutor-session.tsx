@@ -48,7 +48,7 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, onComplete, o
       {focusSubtopics && focusSubtopics.length > 0 && (
         <div
           className="px-3 py-2 rounded-2xl text-xs font-medium flex items-center gap-2"
-          style={{ background: "var(--violet-light)", color: "var(--violet)", border: "1px solid rgba(124,58,237,0.2)" }}
+          style={{ background: "var(--violet-light)", color: "var(--violet)", border: "1px solid var(--border)" }}
         >
           <span>🎯</span>
           <span>Фокус: {focusSubtopics.join(" · ")}</span>

@@ -24,8 +24,8 @@ export const ChoiceForm = ({ options, selected, loading, error, onSelect, onSubm
             className="w-full text-left p-4 rounded-2xl transition-all active:scale-[0.98] flex items-start gap-3"
             style={{
               background: isSelected ? "var(--violet-light)" : "var(--surface-2)",
-              border: `1.5px solid ${isSelected ? "rgba(124,58,237,0.35)" : "var(--border)"}`,
-              boxShadow: isSelected ? "0 0 0 3px rgba(124,58,237,0.08)" : "none",
+              border: `1.5px solid ${isSelected ? "var(--violet)" : "var(--border)"}`,
+              boxShadow: isSelected ? "0 0 0 3px var(--violet-light)" : "none",
             }}
           >
             <span

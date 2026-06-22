@@ -15,7 +15,7 @@ export const Input = ({ className, ...props }: Props) => (
     }}
     onFocus={(e) => {
       e.currentTarget.style.borderColor = "var(--violet)"
-      e.currentTarget.style.boxShadow = "0 0 0 3px rgba(124,58,237,0.12), var(--shadow-sm)"
+      e.currentTarget.style.boxShadow = "0 0 0 3px var(--violet-light), var(--shadow-sm)"
     }}
     onBlur={(e) => {
       e.currentTarget.style.borderColor = "var(--border)"

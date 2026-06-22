@@ -13,9 +13,23 @@ type Props = { id: string }
 export const TopicPage = ({ id }: Props) => {
   const router = useRouter()
   const [topic, setTopic] = useState<Topic | null>(null)
-  const [inSession, setInSession] = useState(false)
+  const [inSession, setInSession] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`zerc_session_${id}`)
+      if (!saved) return false
+      const data = JSON.parse(saved)
+      return !!(data.currentResponse && data.questionCount > 0)
+    } catch { return false }
+  })
   const [sessionKey, setSessionKey] = useState(0)
-  const [focusSubtopics, setFocusSubtopics] = useState<string[] | undefined>(undefined)
+  const [focusSubtopics, setFocusSubtopics] = useState<string[] | undefined>(() => {
+    try {
+      const saved = localStorage.getItem(`zerc_session_${id}`)
+      if (!saved) return undefined
+      const data = JSON.parse(saved)
+      return data.focusSubtopics ?? undefined
+    } catch { return undefined }
+  })
   const [loading, setLoading] = useState(true)
 
   const loadTopic = useCallback(async () => {
@@ -38,22 +52,19 @@ export const TopicPage = ({ id }: Props) => {
     await loadTopic()
   }
 
-  const clearSavedSession = (focused?: boolean) => {
-    try {
-      localStorage.removeItem(`zerc_session_${id}`)
-      if (focused) localStorage.removeItem(`zerc_session_${id}_focused`)
-    } catch {}
+  const clearSavedSession = () => {
+    try { localStorage.removeItem(`zerc_session_${id}`) } catch {}
   }
 
   const startNewSession = () => {
-    clearSavedSession(true)
+    clearSavedSession()
     setFocusSubtopics(undefined)
     setSessionKey((k) => k + 1)
     setInSession(true)
   }
 
   const startFocusedSession = () => {
-    clearSavedSession(true)
+    clearSavedSession()
     const weak = topic?.currentSubtopics
       .filter((s) => s.status === "needs_work" || s.status === "learning")
       .map((s) => s.name) ?? []
@@ -78,10 +89,10 @@ export const TopicPage = ({ id }: Props) => {
       <header
         className="sticky top-0 z-10 px-5 py-4 flex items-center gap-3"
         style={{
-          background: "rgba(245,243,255,0.85)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          borderBottom: "1px solid var(--border)",
+          background: "rgba(255,255,255,0.92)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderBottom: "1px solid rgba(0,0,0,0.06)",
         }}
       >
         <button
@@ -119,7 +130,7 @@ export const TopicPage = ({ id }: Props) => {
                   className="w-full py-3 px-4 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                   style={{
                     background: "var(--violet-light)",
-                    border: "1.5px solid rgba(124,58,237,0.25)",
+                    border: "1.5px solid var(--border)",
                     color: "var(--violet)",
                   }}
                 >

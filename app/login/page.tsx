@@ -37,7 +37,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-dvh flex items-center justify-center px-5" style={{ background: "var(--bg)" }}>
-      <div className="w-full max-w-sm space-y-6">
+      <div className="w-full max-w-sm space-y-6 p-7 rounded-3xl" style={{ background: "var(--surface)", boxShadow: "var(--shadow-lg)" }}>
         <div className="text-center space-y-1">
           <div
             className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-lg mx-auto"

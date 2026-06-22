@@ -18,7 +18,7 @@ export const SessionResults = ({ topicName, results, onNewSession, onBack }: Pro
       {/* Score hero */}
       <div
         className="p-5 rounded-3xl space-y-3"
-        style={{ background: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)", border: "1.5px solid rgba(124,58,237,0.2)" }}
+        style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow)" }}
       >
         <div className="flex items-end justify-between">
           <div>
@@ -34,7 +34,7 @@ export const SessionResults = ({ topicName, results, onNewSession, onBack }: Pro
             {levelCfg.label}
           </span>
         </div>
-        <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(124,58,237,0.15)" }}>
+        <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "var(--surface-2)" }}>
           <div className="h-full rounded-full" style={{ width: `${pct}%`, background: "linear-gradient(90deg, #7c3aed, #a855f7)" }} />
         </div>
         <p className="text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>{results.summary}</p>
@@ -90,7 +90,7 @@ export const SessionResults = ({ topicName, results, onNewSession, onBack }: Pro
       )}
 
       {results.toStudyDeeper.length > 0 && (
-        <div className="p-4 rounded-3xl space-y-2" style={{ background: "var(--violet-light)", border: "1.5px solid rgba(124,58,237,0.2)" }}>
+        <div className="p-4 rounded-3xl space-y-2" style={{ background: "var(--violet-light)", border: "1px solid var(--border)" }}>
           <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--violet)" }}>Углубить до эксперта</p>
           {results.toStudyDeeper.map((s, i) => (
             <p key={i} className="text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>— {s}</p>
