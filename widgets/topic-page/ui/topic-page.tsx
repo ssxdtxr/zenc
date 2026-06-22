@@ -160,23 +160,46 @@ export const TopicPage = ({ id }: Props) => {
                   {topic.currentSubtopics.map((s) => {
                     const cfg = SUBTOPIC_STATUS_CONFIG[s.status]
                     return (
-                      <button
+                      <div
                         key={s.name}
-                        onClick={() => router.push(`/topic/${id}/subtopic/${encodeURIComponent(s.name)}`)}
-                        className="w-full flex items-start justify-between gap-3 p-3 rounded-2xl text-left transition-all active:scale-[0.98]"
+                        className="rounded-2xl overflow-hidden"
                         style={{ background: cfg.bg, border: `1px solid ${cfg.border}` }}
                       >
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold" style={{ color: cfg.color }}>{s.name}</p>
-                          {s.recommendation && (
-                            <p className="text-xs mt-0.5 leading-relaxed" style={{ color: "var(--text-2)" }}>{s.recommendation}</p>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
-                          <span className="text-xs font-medium" style={{ color: cfg.color }}>{cfg.label}</span>
-                          <span className="text-xs" style={{ color: cfg.color }}>→</span>
-                        </div>
-                      </button>
+                        {/* Header — кликабельный переход к теории */}
+                        <button
+                          onClick={() => router.push(`/topic/${id}/subtopic/${encodeURIComponent(s.name)}`)}
+                          className="w-full flex items-start justify-between gap-3 p-3 text-left transition-all active:scale-[0.98]"
+                        >
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold" style={{ color: cfg.color }}>{s.name}</p>
+                            {s.recommendation && (
+                              <p className="text-xs mt-0.5 leading-relaxed" style={{ color: "var(--text-2)" }}>{s.recommendation}</p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
+                            <span className="text-xs font-medium" style={{ color: cfg.color }}>{cfg.label}</span>
+                            <span className="text-xs" style={{ color: cfg.color }}>→</span>
+                          </div>
+                        </button>
+
+                        {/* Definitions */}
+                        {s.definitions.length > 0 && (
+                          <div
+                            className="px-3 pb-3 space-y-2"
+                            style={{ borderTop: `1px solid ${cfg.border}` }}
+                          >
+                            <p className="text-xs font-bold uppercase tracking-wider pt-2.5" style={{ color: cfg.color, opacity: 0.7 }}>
+                              Определения
+                            </p>
+                            {s.definitions.map((d) => (
+                              <div key={d.term} className="space-y-0.5">
+                                <p className="text-xs font-semibold" style={{ color: cfg.color }}>{d.term}</p>
+                                <p className="text-xs leading-relaxed" style={{ color: "var(--text-2)" }}>{d.definition}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     )
                   })}
                 </div>
@@ -222,6 +245,8 @@ export const TopicPage = ({ id }: Props) => {
               topicId={id}
               topicName={topic.name}
               focusSubtopics={focusSubtopics}
+              previousSubtopics={topic.currentSubtopics}
+              overallLevel={topic.overallLevel}
               onComplete={handleSessionComplete}
               onBack={() => router.push("/")}
               onNewSession={startNewSession}

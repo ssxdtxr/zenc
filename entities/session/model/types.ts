@@ -10,6 +10,7 @@ export type Message = {
 export type QuestionType = "text" | "choice"
 
 export type TutorResponse = {
+  theory: string | null
   question: string
   questionType: QuestionType
   options: string[] | null

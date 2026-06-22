@@ -153,7 +153,7 @@ export const Dashboard = () => {
               key={topic.id}
               topic={topic}
               onClick={() => router.push(`/topic/${topic.id}`)}
-              onDelete={(e) => { e.stopPropagation(); deleteTopic(topic.id) }}
+              onDelete={() => deleteTopic(topic.id)}
             />
           ))}
         </div>

@@ -24,6 +24,7 @@ export const AnswerForm = ({ value, loading, error, textareaRef, onChange, onSub
       placeholder="Напиши свой ответ..."
       rows={4}
     />
+    
     <div className="flex items-center justify-between">
       <span className="text-xs" style={{ color: "var(--text-3)" }}>⌘ Enter</span>
       <Button onClick={onSubmit} disabled={!value.trim() || loading}>

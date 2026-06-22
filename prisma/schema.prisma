@@ -44,6 +44,7 @@ model TopicSubtopic {
   name           String
   status         String
   recommendation String @db.Text
+  definitions    Json   @default("[]")
   topic          Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@unique([topicId, name])

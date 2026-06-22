@@ -13,17 +13,19 @@ type Props = {
   topicId: string
   topicName: string
   focusSubtopics?: string[]
+  previousSubtopics?: { name: string; status: string }[]
+  overallLevel?: string | null
   onComplete: (results: Omit<SessionRecord, "id" | "date">) => void
   onBack: () => void
   onNewSession: () => void
 }
 
-export const TutorSession = ({ topicId, topicName, focusSubtopics, onComplete, onBack, onNewSession }: Props) => {
+export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubtopics, overallLevel, onComplete, onBack, onNewSession }: Props) => {
   const {
     sessionState, answer, loading, error,
     questionCount, correctCount, currentResponse, results, textareaRef,
     setAnswer, submitAnswer, nextQuestion,
-  } = useTutorSession({ topicId, topicName, focusSubtopics, onComplete })
+  } = useTutorSession({ topicId, topicName, focusSubtopics, previousSubtopics, overallLevel, onComplete })
 
   const diffInfo = currentResponse ? DIFFICULTY_CONFIG[currentResponse.difficulty] : null
   const isChoice = currentResponse?.questionType === "choice" && !!currentResponse.options?.length

@@ -1,0 +1,1 @@
+ALTER TABLE "TopicSubtopic" ADD COLUMN IF NOT EXISTS "definitions" JSONB NOT NULL DEFAULT '[]';

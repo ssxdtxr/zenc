@@ -19,12 +19,15 @@ const SYSTEM_PROMPT = `Ты — адаптивный тьютор-эксперт
 - "text" — для концептуальных, объяснительных или аналитических вопросов, где нужно развёрнуто ответить своими словами.
 Чередуй типы, не используй "choice" два раза подряд при открытых темах.
 
+ВАЖНО: задавай только теоретические вопросы — на понимание концепций, определений, принципов работы. НЕ просить писать код, НЕ просить реализовывать функции. Вопросы должны проверять теоретическое знание, а не навык программирования.
+
 Формат ответа — СТРОГО JSON без markdown:
 {
+  "theory": null,
   "evaluation": "оценка последнего ответа (null для первого вопроса)",
   "explanation": "объяснение/обучающий момент (null для первого вопроса)",
   "isCorrect": true/false/null,
-  "question": "следующий вопрос для пользователя",
+  "question": "теоретический вопрос",
   "questionType": "text" или "choice",
   "options": ["вариант А", "вариант Б", "вариант В", "вариант Г"] (только для questionType=choice, иначе null),
   "difficulty": "basic/intermediate/advanced",
@@ -33,20 +36,29 @@ const SYSTEM_PROMPT = `Ты — адаптивный тьютор-эксперт
 
 export async function POST(req: NextRequest) {
   try {
-    const { topic, messages, questionNumber, focusSubtopics } = await req.json()
+    const { topic, messages, questionNumber, focusSubtopics, previousSubtopics, overallLevel } = await req.json()
     const conversationMessages: Message[] = messages ?? []
     const hasFocus = Array.isArray(focusSubtopics) && focusSubtopics.length > 0
+    const hasPrevious = Array.isArray(previousSubtopics) && previousSubtopics.length > 0
 
     const systemPrompt = hasFocus
       ? SYSTEM_PROMPT + `\n\nВАЖНО: это целенаправленная тренировка слабых мест. Все 10 вопросов должны быть посвящены ТОЛЬКО этим подтемам: ${focusSubtopics.join(", ")}. Не отклоняйся на другие аспекты темы. Начни с самой слабой подтемы и проработай каждую глубоко.`
       : SYSTEM_PROMPT
 
+    let firstMessage: string
+    if (hasFocus) {
+      firstMessage = `Тема: "${topic}". Целенаправленная тренировка слабых мест: ${focusSubtopics.join(", ")}. Задай первый вопрос по одной из этих подтем.`
+    } else if (hasPrevious) {
+      const levelNote = overallLevel ? ` Текущий уровень пользователя: ${overallLevel}.` : ""
+      const covered = previousSubtopics.map((s: { name: string; status: string }) => `${s.name} (${s.status})`).join(", ")
+      firstMessage = `Тема: "${topic}".${levelNote} В предыдущих сессиях уже разбирались: ${covered}. Начни новую сессию — задай вопрос по подтеме, которая ещё не проработана или требует углубления. Не повторяй вопросы из предыдущих сессий.`
+    } else {
+      firstMessage = `Тема для изучения: "${topic}". Начни с первого диагностического вопроса, чтобы понять мой текущий уровень знаний по этой теме.`
+    }
+
     const apiMessages =
       conversationMessages.length === 0
-        ? [{ role: "user" as const, content: hasFocus
-            ? `Тема: "${topic}". Мне нужна целенаправленная тренировка по слабым местам: ${focusSubtopics.join(", ")}. Начни с первого вопроса по одной из этих подтем.`
-            : `Тема для изучения: "${topic}". Начни с первого диагностического вопроса, чтобы понять мой текущий уровень знаний по этой теме.`
-          }]
+        ? [{ role: "user" as const, content: firstMessage }]
         : conversationMessages
 
     const response = await client.messages.create({
@@ -62,7 +74,7 @@ export async function POST(req: NextRequest) {
     try {
       parsed = extractJson(rawContent) as typeof parsed
     } catch {
-      parsed = { evaluation: null, explanation: null, isCorrect: null, question: rawContent, questionType: "text", options: null, difficulty: "basic", knowledgeGaps: [] }
+      parsed = { theory: null, evaluation: null, explanation: null, isCorrect: null, question: rawContent, questionType: "text", options: null, difficulty: "basic", knowledgeGaps: [] }
     }
 
     return NextResponse.json({ ...parsed, questionNumber: questionNumber ?? 1, assistantMessage: rawContent })

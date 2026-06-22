@@ -41,10 +41,12 @@ type Props = {
   topicId: string
   topicName: string
   focusSubtopics?: string[]
+  previousSubtopics?: { name: string; status: string }[]
+  overallLevel?: string | null
   onComplete: (results: Omit<SessionRecord, "id" | "date">) => void
 }
 
-export const useTutorSession = ({ topicId, topicName, focusSubtopics, onComplete }: Props): TutorSession => {
+export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSubtopics, overallLevel, onComplete }: Props): TutorSession => {
   const storageKey = `zerc_session_${topicId}`
 
   const [sessionState, setSessionState] = useState<SessionState>("session")
@@ -118,7 +120,7 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, onComplete
     setLoading(true)
     setError(null)
     try {
-      const data = await fetchTutorResponse({ topic: topicName, messages: [], questionNumber: 1, focusSubtopics })
+      const data = await fetchTutorResponse({ topic: topicName, messages: [], questionNumber: 1, focusSubtopics, previousSubtopics, overallLevel })
       setCurrentResponse(data)
       setMessages([{ role: "assistant", content: data.assistantMessage }])
       setQuestionCount(1)

@@ -5,6 +5,8 @@ type RequestPayload = {
   messages: Message[]
   questionNumber: number
   focusSubtopics?: string[]
+  previousSubtopics?: { name: string; status: string }[]
+  overallLevel?: string | null
 }
 
 export const fetchTutorResponse = async (payload: RequestPayload): Promise<TutorResponse> => {

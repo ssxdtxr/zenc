@@ -2,10 +2,16 @@ export type SubtopicStatus = "needs_work" | "learning" | "good" | "expert"
 
 export type OverallLevel = "beginner" | "intermediate" | "advanced" | "expert"
 
+export type SubtopicDefinition = {
+  term: string
+  definition: string
+}
+
 export type Subtopic = {
   name: string
   status: SubtopicStatus
   recommendation: string
+  definitions: SubtopicDefinition[]
 }
 
 export type SessionRecord = {
@@ -21,29 +27,18 @@ export type SessionRecord = {
   toStudyDeeper: string[]
 }
 
-export type TheorySection = {
-  heading: string
-  body: string
-  code: string | null
-}
-
-export type LiteratureType = "book" | "docs" | "article" | "course" | "video"
-
-export type LiteratureItem = {
-  title: string
-  author: string | null
-  type: LiteratureType
-  url: string | null
-  description: string
+export type TheoryDefinition = {
+  term: string
+  definition: string
 }
 
 export type TheoryContent = {
   title: string
-  intro: string
-  sections: TheorySection[]
+  mainIdea: string
+  watchOut: string
+  definitions: TheoryDefinition[]
   keyPoints: string[]
-  practiceIdeas: string[]
-  literature: LiteratureItem[]
+  codeExample: string | null
 }
 
 export type GlossaryTerm = {

@@ -32,8 +32,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       results.subtopics.map((s) =>
         prisma.topicSubtopic.upsert({
           where: { topicId_name: { topicId, name: s.name } },
-          update: { status: s.status, recommendation: s.recommendation },
-          create: { topicId, name: s.name, status: s.status, recommendation: s.recommendation },
+          update: { status: s.status, recommendation: s.recommendation, definitions: s.definitions ?? [] },
+          create: { topicId, name: s.name, status: s.status, recommendation: s.recommendation, definitions: s.definitions ?? [] },
         })
       )
     )
