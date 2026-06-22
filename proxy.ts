@@ -1,18 +1,24 @@
 import { NextRequest, NextResponse } from "next/server"
+import { verifyToken } from "@/lib/jwt"
 
-export function proxy(req: NextRequest) {
-  const res = NextResponse.next()
-  if (!req.cookies.get("zerc_uid")) {
-    res.cookies.set("zerc_uid", crypto.randomUUID(), {
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 365,
-    })
+const PUBLIC_PATHS = ["/login", "/register", "/api/auth/login", "/api/auth/register"]
+
+export async function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl
+
+  const isPublic = PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))
+  if (isPublic) return NextResponse.next()
+
+  const token = req.cookies.get("zerc_token")?.value
+  const payload = token ? await verifyToken(token) : null
+
+  if (!payload) {
+    return NextResponse.redirect(new URL("/login", req.url))
   }
-  return res
+
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|icons|sw\\.js|manifest\\.webmanifest).*)"],
+  matcher: ["/((?!_next/static|_next/image|icons|sw\\.js|manifest\\.webmanifest|favicon\\.ico).*)"],
 }

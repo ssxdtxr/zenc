@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 import { TopicCard } from "@/features/topic-card/ui/topic-card"
 import { Button } from "@/shared/ui/button"
 import { Input } from "@/shared/ui/input"
@@ -9,6 +10,16 @@ import { useDashboard } from "../model/use-dashboard"
 export const Dashboard = () => {
   const router = useRouter()
   const { topics, newTopicName, creating, loading, error, setNewTopicName, setCreating, createTopic, deleteTopic, reload } = useDashboard()
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch("/api/auth/me").then(r => r.json()).then(d => setUserEmail(d.user?.email ?? null))
+  }, [])
+
+  const logout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" })
+    router.push("/login")
+  }
 
   const handleCreate = () => {
     const id = createTopic()
@@ -36,7 +47,19 @@ export const Dashboard = () => {
           </div>
           <span className="font-semibold text-sm" style={{ color: "var(--text)" }}>Zerc</span>
         </div>
-        <Button size="sm" onClick={() => setCreating(true)}>+ Тема</Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" onClick={() => setCreating(true)}>+ Тема</Button>
+          {userEmail && (
+            <button
+              onClick={logout}
+              className="text-xs px-3 py-2 rounded-xl font-medium transition-all active:scale-[0.98]"
+              style={{ color: "var(--text-3)", background: "var(--surface)", border: "1px solid var(--border)" }}
+              title={userEmail}
+            >
+              Выйти
+            </button>
+          )}
+        </div>
       </header>
 
       <main className="px-5 pb-10">

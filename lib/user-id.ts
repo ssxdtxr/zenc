@@ -1,18 +1,13 @@
 import { cookies } from "next/headers"
-import { prisma } from "./prisma"
+import { verifyToken } from "./jwt"
 
 export async function getOrCreateUserId(): Promise<string> {
   const cookieStore = await cookies()
-  const uid = cookieStore.get("zerc_uid")?.value
+  const token = cookieStore.get("zerc_token")?.value
+  if (!token) throw new Error("Не авторизован")
 
-  if (!uid) throw new Error("No user ID cookie")
+  const payload = await verifyToken(token)
+  if (!payload) throw new Error("Невалидный токен")
 
-  // Upsert user so FK constraints work
-  await prisma.user.upsert({
-    where: { id: uid },
-    update: {},
-    create: { id: uid },
-  })
-
-  return uid
+  return payload.sub
 }
