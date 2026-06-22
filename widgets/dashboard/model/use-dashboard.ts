@@ -2,40 +2,44 @@
 
 import { useState, useEffect, useCallback } from "react"
 import type { Topic } from "@/entities/topic/model/types"
-import { storage } from "@/shared/lib/storage"
+import { apiClient } from "@/shared/lib/api-client"
 
 export const useDashboard = () => {
   const [topics, setTopics] = useState<Topic[]>([])
   const [newTopicName, setNewTopicName] = useState("")
   const [creating, setCreating] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-  const load = useCallback(() => setTopics(storage.getTopics()), [])
+  const load = useCallback(async () => {
+    try {
+      setTopics(await apiClient.getTopics())
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => { load() }, [load])
 
-  const createTopic = () => {
+  const createTopic = async (): Promise<string | undefined> => {
     const name = newTopicName.trim()
     if (!name) return
-    const topic: Topic = {
-      id: crypto.randomUUID(),
-      name,
-      createdAt: new Date().toISOString(),
-      lastSessionAt: null,
-      sessions: [],
-      currentSubtopics: [],
-      overallLevel: null,
+    try {
+      const topic = await apiClient.createTopic(name)
+      setTopics((prev) => [topic, ...prev])
+      setNewTopicName("")
+      setCreating(false)
+      return topic.id
+    } catch (e) {
+      console.error(e)
     }
-    storage.saveTopic(topic)
-    setTopics(storage.getTopics())
-    setNewTopicName("")
-    setCreating(false)
-    return topic.id
   }
 
-  const deleteTopic = (id: string) => {
-    storage.deleteTopic(id)
-    setTopics(storage.getTopics())
+  const deleteTopic = async (id: string) => {
+    await apiClient.deleteTopic(id)
+    setTopics((prev) => prev.filter((t) => t.id !== id))
   }
 
-  return { topics, newTopicName, creating, setNewTopicName, setCreating, createTopic, deleteTopic }
+  return { topics, newTopicName, creating, loading, setNewTopicName, setCreating, createTopic, deleteTopic }
 }

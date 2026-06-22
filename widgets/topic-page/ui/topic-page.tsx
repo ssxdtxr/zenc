@@ -6,7 +6,7 @@ import type { Topic, SessionRecord } from "@/entities/topic/model/types"
 import { OVERALL_LEVEL_CONFIG, SUBTOPIC_STATUS_CONFIG } from "@/entities/topic/config"
 import { TutorSession } from "@/widgets/tutor-session/ui/tutor-session"
 import { Button } from "@/shared/ui/button"
-import { storage } from "@/shared/lib/storage"
+import { apiClient } from "@/shared/lib/api-client"
 
 type Props = { id: string }
 
@@ -15,27 +15,26 @@ export const TopicPage = ({ id }: Props) => {
   const [topic, setTopic] = useState<Topic | null>(null)
   const [inSession, setInSession] = useState(false)
   const [sessionKey, setSessionKey] = useState(0)
+  const [loading, setLoading] = useState(true)
 
-  const loadTopic = useCallback(() => {
-    const t = storage.getTopicById(id)
-    if (!t) router.push("/")
-    else setTopic(t)
+  const loadTopic = useCallback(async () => {
+    try {
+      const t = await apiClient.getTopicById(id)
+      if (!t) router.push("/")
+      else setTopic(t)
+    } catch {
+      router.push("/")
+    } finally {
+      setLoading(false)
+    }
   }, [id, router])
 
   useEffect(() => { loadTopic() }, [loadTopic])
 
-  const handleSessionComplete = (results: Omit<SessionRecord, "id" | "date">) => {
+  const handleSessionComplete = async (results: Omit<SessionRecord, "id" | "date">) => {
     if (!topic) return
-    const record: SessionRecord = { ...results, id: crypto.randomUUID(), date: new Date().toISOString() }
-    const updated: Topic = {
-      ...topic,
-      lastSessionAt: record.date,
-      sessions: [record, ...topic.sessions],
-      currentSubtopics: record.subtopics,
-      overallLevel: record.overallLevel,
-    }
-    storage.saveTopic(updated)
-    setTopic(updated)
+    await apiClient.saveSession(id, results)
+    await loadTopic()
   }
 
   const startNewSession = () => {
@@ -43,18 +42,19 @@ export const TopicPage = ({ id }: Props) => {
     setInSession(true)
   }
 
-  if (!topic) return (
+  if (loading) return (
     <div className="min-h-dvh flex items-center justify-center" style={{ background: "var(--bg)" }}>
       <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "var(--violet)" }} />
     </div>
   )
+
+  if (!topic) return null
 
   const levelCfg = topic.overallLevel ? OVERALL_LEVEL_CONFIG[topic.overallLevel] : null
   const lastSession = topic.sessions[0] ?? null
 
   return (
     <div className="min-h-dvh" style={{ background: "var(--bg)" }}>
-      {/* Header */}
       <header
         className="sticky top-0 z-10 px-5 py-4 flex items-center gap-3"
         style={{
@@ -66,15 +66,15 @@ export const TopicPage = ({ id }: Props) => {
       >
         <button
           onClick={() => inSession ? setInSession(false) : router.push("/")}
-          className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors"
+          className="w-8 h-8 rounded-xl flex items-center justify-center"
           style={{ background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text-2)", boxShadow: "var(--shadow-sm)" }}
         >
           ←
         </button>
-        <span className="font-semibold flex-1 truncate" style={{ color: "var(--text)" }}>{topic.name}</span>
+        <span className="font-semibold flex-1 truncate text-sm" style={{ color: "var(--text)" }}>{topic.name}</span>
         {levelCfg && (
           <span
-            className="text-xs font-semibold px-2.5 py-1 rounded-full"
+            className="text-xs font-semibold px-2.5 py-1 rounded-full shrink-0"
             style={{ color: levelCfg.color, background: levelCfg.bg, border: `1px solid ${levelCfg.border}` }}
           >
             {levelCfg.label}
@@ -85,17 +85,12 @@ export const TopicPage = ({ id }: Props) => {
       <main className="px-5 py-6 pb-10 space-y-4">
         {!inSession && (
           <>
-            {/* Start CTA */}
             <Button size="lg" onClick={startNewSession}>
               {lastSession ? "Новая сессия →" : "Начать первую сессию →"}
             </Button>
 
-            {/* Last session */}
             {lastSession && (
-              <div
-                className="p-4 rounded-3xl space-y-2"
-                style={{ background: "var(--surface)", boxShadow: "var(--shadow)", border: "1.5px solid var(--border)" }}
-              >
+              <div className="p-4 rounded-3xl space-y-2" style={{ background: "var(--surface)", boxShadow: "var(--shadow)", border: "1.5px solid var(--border)" }}>
                 <div className="flex justify-between items-center">
                   <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>Последняя сессия</p>
                   <span className="text-sm font-bold" style={{ color: "var(--violet)" }}>{lastSession.score}/{lastSession.total}</span>
@@ -104,20 +99,20 @@ export const TopicPage = ({ id }: Props) => {
               </div>
             )}
 
-            {/* Subtopics */}
             {topic.currentSubtopics.length > 0 && (
-              <div
-                className="p-4 rounded-3xl space-y-3"
-                style={{ background: "var(--surface)", boxShadow: "var(--shadow)", border: "1.5px solid var(--border)" }}
-              >
-                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>Карта знаний</p>
+              <div className="p-4 rounded-3xl space-y-3" style={{ background: "var(--surface)", boxShadow: "var(--shadow)", border: "1.5px solid var(--border)" }}>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>Карта знаний</p>
+                  <p className="text-xs" style={{ color: "var(--text-3)" }}>нажми → читай теорию</p>
+                </div>
                 <div className="space-y-2">
                   {topic.currentSubtopics.map((s) => {
                     const cfg = SUBTOPIC_STATUS_CONFIG[s.status]
                     return (
-                      <div
+                      <button
                         key={s.name}
-                        className="flex items-start justify-between gap-3 p-3 rounded-2xl"
+                        onClick={() => router.push(`/topic/${id}/subtopic/${encodeURIComponent(s.name)}`)}
+                        className="w-full flex items-start justify-between gap-3 p-3 rounded-2xl text-left transition-all active:scale-[0.98]"
                         style={{ background: cfg.bg, border: `1px solid ${cfg.border}` }}
                       >
                         <div className="min-w-0">
@@ -126,20 +121,19 @@ export const TopicPage = ({ id }: Props) => {
                             <p className="text-xs mt-0.5 leading-relaxed" style={{ color: "var(--text-2)" }}>{s.recommendation}</p>
                           )}
                         </div>
-                        <span className="text-xs font-medium shrink-0 pt-0.5" style={{ color: cfg.color }}>{cfg.label}</span>
-                      </div>
+                        <div className="flex items-center gap-1.5 shrink-0 pt-0.5">
+                          <span className="text-xs font-medium" style={{ color: cfg.color }}>{cfg.label}</span>
+                          <span className="text-xs" style={{ color: cfg.color }}>→</span>
+                        </div>
+                      </button>
                     )
                   })}
                 </div>
               </div>
             )}
 
-            {/* History */}
             {topic.sessions.length > 1 && (
-              <div
-                className="p-4 rounded-3xl"
-                style={{ background: "var(--surface)", boxShadow: "var(--shadow)", border: "1.5px solid var(--border)" }}
-              >
+              <div className="p-4 rounded-3xl" style={{ background: "var(--surface)", boxShadow: "var(--shadow)", border: "1.5px solid var(--border)" }}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "var(--text-3)" }}>История</p>
                 <div className="space-y-1">
                   {topic.sessions.slice(0, 5).map((s) => (
@@ -157,10 +151,7 @@ export const TopicPage = ({ id }: Props) => {
         )}
 
         {inSession && (
-          <div
-            className="p-5 rounded-3xl"
-            style={{ background: "var(--surface)", boxShadow: "var(--shadow-lg)", border: "1.5px solid var(--border)" }}
-          >
+          <div className="p-5 rounded-3xl" style={{ background: "var(--surface)", boxShadow: "var(--shadow-lg)", border: "1.5px solid var(--border)" }}>
             <TutorSession
               key={sessionKey}
               topicName={topic.name}

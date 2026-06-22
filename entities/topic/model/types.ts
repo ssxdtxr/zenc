@@ -21,6 +21,31 @@ export type SessionRecord = {
   toStudyDeeper: string[]
 }
 
+export type TheorySection = {
+  heading: string
+  body: string
+  code: string | null
+}
+
+export type LiteratureType = "book" | "docs" | "article" | "course" | "video"
+
+export type LiteratureItem = {
+  title: string
+  author: string | null
+  type: LiteratureType
+  url: string | null
+  description: string
+}
+
+export type TheoryContent = {
+  title: string
+  intro: string
+  sections: TheorySection[]
+  keyPoints: string[]
+  practiceIdeas: string[]
+  literature: LiteratureItem[]
+}
+
 export type Topic = {
   id: string
   name: string

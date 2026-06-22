@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  topics    Topic[]
+}
+
+model Topic {
+  id            String          @id @default(cuid())
+  userId        String
+  name          String
+  createdAt     DateTime        @default(now())
+  lastSessionAt DateTime?
+  overallLevel  String?
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessions      Session[]
+  subtopics     TopicSubtopic[]
+}
+
+model TopicSubtopic {
+  id             String @id @default(cuid())
+  topicId        String
+  name           String
+  status         String
+  recommendation String @db.Text
+  topic          Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([topicId, name])
+}
+
+model Session {
+  id            String   @id @default(cuid())
+  topicId       String
+  date          DateTime @default(now())
+  score         Int
+  total         Int
+  overallLevel  String
+  summary       String   @db.Text
+  strengths     Json
+  toStudyMore   Json
+  toStudyDeeper Json
+  topic         Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+}
+
+// Global theory cache — one entry per (topicName + subtopicName + level)
+// Saves Anthropic API calls: generate once, reuse forever
+model TheoryCache {
+  id           String   @id @default(cuid())
+  cacheKey     String   @unique
+  topicName    String
+  subtopicName String
+  userLevel    String
+  content      Json
+  createdAt    DateTime @default(now())
+
+  @@index([topicName, subtopicName, userLevel])
+}

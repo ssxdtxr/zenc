@@ -22,9 +22,12 @@ export const TopicCard = ({ topic, onClick, onDelete }: Props) => {
   const hasSession = topic.sessions.length > 0
 
   return (
-    <button
+    <div
       onClick={onClick}
-      className="w-full text-left p-4 rounded-3xl transition-all active:scale-[0.98]"
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === "Enter" && onClick()}
+      className="w-full text-left p-4 rounded-3xl transition-all active:scale-[0.98] cursor-pointer"
       style={{
         background: "var(--surface)",
         boxShadow: "var(--shadow)",
@@ -87,6 +90,6 @@ export const TopicCard = ({ topic, onClick, onDelete }: Props) => {
       {!hasSession && (
         <p className="text-sm font-medium mt-2" style={{ color: "var(--violet)" }}>Начать →</p>
       )}
-    </button>
+    </div>
   )
 }
