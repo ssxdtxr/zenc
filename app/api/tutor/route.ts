@@ -33,18 +33,26 @@ const SYSTEM_PROMPT = `Ты — адаптивный тьютор-эксперт
 
 export async function POST(req: NextRequest) {
   try {
-    const { topic, messages, questionNumber } = await req.json()
+    const { topic, messages, questionNumber, focusSubtopics } = await req.json()
     const conversationMessages: Message[] = messages ?? []
+    const hasFocus = Array.isArray(focusSubtopics) && focusSubtopics.length > 0
+
+    const systemPrompt = hasFocus
+      ? SYSTEM_PROMPT + `\n\nВАЖНО: это целенаправленная тренировка слабых мест. Все 10 вопросов должны быть посвящены ТОЛЬКО этим подтемам: ${focusSubtopics.join(", ")}. Не отклоняйся на другие аспекты темы. Начни с самой слабой подтемы и проработай каждую глубоко.`
+      : SYSTEM_PROMPT
 
     const apiMessages =
       conversationMessages.length === 0
-        ? [{ role: "user" as const, content: `Тема для изучения: "${topic}". Начни с первого диагностического вопроса, чтобы понять мой текущий уровень знаний по этой теме.` }]
+        ? [{ role: "user" as const, content: hasFocus
+            ? `Тема: "${topic}". Мне нужна целенаправленная тренировка по слабым местам: ${focusSubtopics.join(", ")}. Начни с первого вопроса по одной из этих подтем.`
+            : `Тема для изучения: "${topic}". Начни с первого диагностического вопроса, чтобы понять мой текущий уровень знаний по этой теме.`
+          }]
         : conversationMessages
 
     const response = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 1024,
-      system: SYSTEM_PROMPT,
+      system: systemPrompt,
       messages: apiMessages,
     })
 

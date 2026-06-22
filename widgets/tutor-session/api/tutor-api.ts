@@ -4,6 +4,7 @@ type RequestPayload = {
   topic: string
   messages: Message[]
   questionNumber: number
+  focusSubtopics?: string[]
 }
 
 export const fetchTutorResponse = async (payload: RequestPayload): Promise<TutorResponse> => {

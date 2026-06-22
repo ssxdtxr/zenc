@@ -28,10 +28,11 @@ type TutorSession = {
 
 type Props = {
   topicName: string
+  focusSubtopics?: string[]
   onComplete: (results: Omit<SessionRecord, "id" | "date">) => void
 }
 
-export const useTutorSession = ({ topicName, onComplete }: Props): TutorSession => {
+export const useTutorSession = ({ topicName, focusSubtopics, onComplete }: Props): TutorSession => {
   const [sessionState, setSessionState] = useState<SessionState>("session")
   const [answer, setAnswer] = useState("")
   const [messages, setMessages] = useState<Message[]>([])
@@ -61,7 +62,7 @@ export const useTutorSession = ({ topicName, onComplete }: Props): TutorSession 
     setLoading(true)
     setError(null)
     try {
-      const data = await fetchTutorResponse({ topic: topicName, messages: [], questionNumber: 1 })
+      const data = await fetchTutorResponse({ topic: topicName, messages: [], questionNumber: 1, focusSubtopics })
       setCurrentResponse(data)
       setMessages([{ role: "assistant", content: data.assistantMessage }])
       setQuestionCount(1)
@@ -128,6 +129,7 @@ export const useTutorSession = ({ topicName, onComplete }: Props): TutorSession 
         topic: topicName,
         messages: updatedMessages,
         questionNumber: nextNum,
+        focusSubtopics,
       })
 
       const newCorrect = data.isCorrect ? correctCount + 1 : correctCount

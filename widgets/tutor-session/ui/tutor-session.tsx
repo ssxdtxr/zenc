@@ -10,17 +10,18 @@ import { MAX_QUESTIONS, useTutorSession } from "../model/use-tutor-session"
 
 type Props = {
   topicName: string
+  focusSubtopics?: string[]
   onComplete: (results: Omit<SessionRecord, "id" | "date">) => void
   onBack: () => void
   onNewSession: () => void
 }
 
-export const TutorSession = ({ topicName, onComplete, onBack, onNewSession }: Props) => {
+export const TutorSession = ({ topicName, focusSubtopics, onComplete, onBack, onNewSession }: Props) => {
   const {
     sessionState, answer, loading, error,
     questionCount, correctCount, currentResponse, results, textareaRef,
     setAnswer, submitAnswer, nextQuestion,
-  } = useTutorSession({ topicName, onComplete })
+  } = useTutorSession({ topicName, focusSubtopics, onComplete })
 
   const diffInfo = currentResponse ? DIFFICULTY_CONFIG[currentResponse.difficulty] : null
   const isChoice = currentResponse?.questionType === "choice" && !!currentResponse.options?.length
@@ -41,6 +42,17 @@ export const TutorSession = ({ topicName, onComplete, onBack, onNewSession }: Pr
 
   return (
     <div className="space-y-6">
+      {/* Focus indicator */}
+      {focusSubtopics && focusSubtopics.length > 0 && (
+        <div
+          className="px-3 py-2 rounded-2xl text-xs font-medium flex items-center gap-2"
+          style={{ background: "var(--violet-light)", color: "var(--violet)", border: "1px solid rgba(124,58,237,0.2)" }}
+        >
+          <span>🎯</span>
+          <span>Фокус: {focusSubtopics.join(" · ")}</span>
+        </div>
+      )}
+
       {/* Progress */}
       <div className="space-y-2">
         <div className="flex justify-between text-xs" style={{ color: "var(--text-3)" }}>

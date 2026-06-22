@@ -15,6 +15,7 @@ export const TopicPage = ({ id }: Props) => {
   const [topic, setTopic] = useState<Topic | null>(null)
   const [inSession, setInSession] = useState(false)
   const [sessionKey, setSessionKey] = useState(0)
+  const [focusSubtopics, setFocusSubtopics] = useState<string[] | undefined>(undefined)
   const [loading, setLoading] = useState(true)
 
   const loadTopic = useCallback(async () => {
@@ -38,6 +39,16 @@ export const TopicPage = ({ id }: Props) => {
   }
 
   const startNewSession = () => {
+    setFocusSubtopics(undefined)
+    setSessionKey((k) => k + 1)
+    setInSession(true)
+  }
+
+  const startFocusedSession = () => {
+    const weak = topic?.currentSubtopics
+      .filter((s) => s.status === "needs_work" || s.status === "learning")
+      .map((s) => s.name) ?? []
+    setFocusSubtopics(weak)
     setSessionKey((k) => k + 1)
     setInSession(true)
   }
@@ -88,6 +99,26 @@ export const TopicPage = ({ id }: Props) => {
             <Button size="lg" onClick={startNewSession}>
               {lastSession ? "Новая сессия →" : "Начать первую сессию →"}
             </Button>
+
+            {(() => {
+              const weakCount = topic.currentSubtopics.filter(
+                (s) => s.status === "needs_work" || s.status === "learning"
+              ).length
+              return weakCount > 0 ? (
+                <button
+                  onClick={startFocusedSession}
+                  className="w-full py-3 px-4 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                  style={{
+                    background: "var(--violet-light)",
+                    border: "1.5px solid rgba(124,58,237,0.25)",
+                    color: "var(--violet)",
+                  }}
+                >
+                  <span>🎯</span>
+                  <span>Тренировать слабые места · {weakCount}</span>
+                </button>
+              ) : null
+            })()}
 
             {lastSession && (
               <div className="p-4 rounded-3xl space-y-2" style={{ background: "var(--surface)", boxShadow: "var(--shadow)", border: "1.5px solid var(--border)" }}>
@@ -169,6 +200,7 @@ export const TopicPage = ({ id }: Props) => {
             <TutorSession
               key={sessionKey}
               topicName={topic.name}
+              focusSubtopics={focusSubtopics}
               onComplete={handleSessionComplete}
               onBack={() => router.push("/")}
               onNewSession={startNewSession}
