@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk"
 import { NextRequest, NextResponse } from "next/server"
 import type { Message, TutorResponse } from "@/entities/session/model/types"
+import { extractJson } from "@/lib/extract-json"
 
 const client = new Anthropic()
 
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     let parsed: Omit<TutorResponse, "questionNumber" | "assistantMessage">
     try {
-      parsed = JSON.parse(rawContent.replace(/^```json\n?/, "").replace(/\n?```$/, "").trim())
+      parsed = extractJson(rawContent) as typeof parsed
     } catch {
       parsed = { evaluation: null, explanation: null, isCorrect: null, question: rawContent, questionType: "text", options: null, difficulty: "basic", knowledgeGaps: [] }
     }
@@ -59,6 +60,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ...parsed, questionNumber: questionNumber ?? 1, assistantMessage: rawContent })
   } catch (err) {
     console.error("Tutor API error:", err)
-    return NextResponse.json({ error: "Failed to get response" }, { status: 500 })
+    if (err instanceof Anthropic.APIError) {
+      if (err.status === 529) return NextResponse.json({ error: "Anthropic перегружен — попробуй через минуту" }, { status: 503 })
+      if (err.status === 429) return NextResponse.json({ error: "Превышен лимит запросов — подожди немного" }, { status: 429 })
+      const msg = err.message.toLowerCase()
+      if (err.status === 402 || msg.includes("credit") || msg.includes("billing") || msg.includes("balance")) {
+        return NextResponse.json({ error: "На аккаунте Anthropic закончились средства — пополни баланс" }, { status: 402 })
+      }
+    }
+    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })
   }
 }

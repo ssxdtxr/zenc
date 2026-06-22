@@ -46,6 +46,11 @@ export type TheoryContent = {
   literature: LiteratureItem[]
 }
 
+export type GlossaryTerm = {
+  term: string
+  definition: string
+}
+
 export type Topic = {
   id: string
   name: string
@@ -54,4 +59,5 @@ export type Topic = {
   sessions: SessionRecord[]
   currentSubtopics: Subtopic[]
   overallLevel: OverallLevel | null
+  glossary: GlossaryTerm[]
 }

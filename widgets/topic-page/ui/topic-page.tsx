@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import type { Topic, SessionRecord } from "@/entities/topic/model/types"
+import type { GlossaryTerm, Topic, SessionRecord } from "@/entities/topic/model/types"
 import { OVERALL_LEVEL_CONFIG, SUBTOPIC_STATUS_CONFIG } from "@/entities/topic/config"
 import { TutorSession } from "@/widgets/tutor-session/ui/tutor-session"
 import { Button } from "@/shared/ui/button"
@@ -31,7 +31,7 @@ export const TopicPage = ({ id }: Props) => {
 
   useEffect(() => { loadTopic() }, [loadTopic])
 
-  const handleSessionComplete = async (results: Omit<SessionRecord, "id" | "date">) => {
+  const handleSessionComplete = async (results: Omit<SessionRecord, "id" | "date"> & { glossary?: GlossaryTerm[] }) => {
     if (!topic) return
     await apiClient.saveSession(id, results)
     await loadTopic()
@@ -128,6 +128,20 @@ export const TopicPage = ({ id }: Props) => {
                       </button>
                     )
                   })}
+                </div>
+              </div>
+            )}
+
+            {topic.glossary.length > 0 && (
+              <div className="p-4 rounded-3xl space-y-3" style={{ background: "var(--surface)", boxShadow: "var(--shadow)", border: "1.5px solid var(--border)" }}>
+                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>Глоссарий</p>
+                <div className="space-y-3">
+                  {topic.glossary.map((g) => (
+                    <div key={g.term} className="space-y-0.5">
+                      <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{g.term}</p>
+                      <p className="text-sm leading-relaxed" style={{ color: "var(--text-2)" }}>{g.definition}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

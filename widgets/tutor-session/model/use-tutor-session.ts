@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import type { RefObject } from "react"
 import type { Message, TutorResponse } from "@/entities/session/model/types"
-import type { SessionRecord } from "@/entities/topic/model/types"
+import type { GlossaryTerm, SessionRecord } from "@/entities/topic/model/types"
 import { fetchTutorResponse } from "../api/tutor-api"
 
 export type SessionState = "session" | "feedback" | "analyzing" | "results"
@@ -44,6 +44,7 @@ export const useTutorSession = ({ topicName, onComplete }: Props): TutorSession 
   const [results, setResults] = useState<Omit<SessionRecord, "id" | "date"> | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const initialized = useRef(false)
+  const pendingAnalysis = useRef<{ messages: Message[]; correct: number } | null>(null)
 
   useEffect(() => {
     if (initialized.current) return
@@ -74,20 +75,25 @@ export const useTutorSession = ({ topicName, onComplete }: Props): TutorSession 
   const analyzeSession = async (finalMessages: Message[], finalCorrect: number) => {
     setSessionState("analyzing")
     try {
-      const res = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          topic: topicName,
-          messages: finalMessages,
-          score: finalCorrect,
-          total: MAX_QUESTIONS,
-        }),
-      })
+      let res: Response
+      try {
+        res = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            topic: topicName,
+            messages: finalMessages,
+            score: finalCorrect,
+            total: MAX_QUESTIONS,
+          }),
+        })
+      } catch {
+        throw new Error("Нет подключения к интернету")
+      }
       const data = await res.json()
       if (!res.ok || data.error) throw new Error(data.error)
 
-      const sessionResults: Omit<SessionRecord, "id" | "date"> = {
+      const sessionResults: Omit<SessionRecord, "id" | "date"> & { glossary: GlossaryTerm[] } = {
         score: finalCorrect,
         total: MAX_QUESTIONS,
         overallLevel: data.overallLevel,
@@ -96,12 +102,13 @@ export const useTutorSession = ({ topicName, onComplete }: Props): TutorSession 
         strengths: data.strengths ?? [],
         toStudyMore: data.toStudyMore ?? [],
         toStudyDeeper: data.toStudyDeeper ?? [],
+        glossary: data.glossary ?? [],
       }
       setResults(sessionResults)
       setSessionState("results")
       onComplete(sessionResults)
-    } catch {
-      setError("Не удалось проанализировать сессию")
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Не удалось проанализировать сессию")
       setSessionState("feedback")
     }
   }
@@ -135,11 +142,9 @@ export const useTutorSession = ({ topicName, onComplete }: Props): TutorSession 
       }
 
       if (isLastQuestion) {
-        setSessionState("feedback")
-        setTimeout(() => analyzeSession(finalMessages, newCorrect), 100)
-      } else {
-        setSessionState("feedback")
+        pendingAnalysis.current = { messages: finalMessages, correct: newCorrect }
       }
+      setSessionState("feedback")
     } catch (e) {
       setError(e instanceof Error ? e.message : "Не удалось получить ответ")
     } finally {
@@ -148,6 +153,12 @@ export const useTutorSession = ({ topicName, onComplete }: Props): TutorSession 
   }
 
   const nextQuestion = () => {
+    if (pendingAnalysis.current) {
+      const { messages, correct } = pendingAnalysis.current
+      pendingAnalysis.current = null
+      analyzeSession(messages, correct)
+      return
+    }
     setQuestionCount((c) => c + 1)
     setSessionState("session")
   }

@@ -8,7 +8,7 @@ import { useDashboard } from "../model/use-dashboard"
 
 export const Dashboard = () => {
   const router = useRouter()
-  const { topics, newTopicName, creating, setNewTopicName, setCreating, createTopic, deleteTopic } = useDashboard()
+  const { topics, newTopicName, creating, loading, error, setNewTopicName, setCreating, createTopic, deleteTopic, reload } = useDashboard()
 
   const handleCreate = () => {
     const id = createTopic()
@@ -73,8 +73,38 @@ export const Dashboard = () => {
           </div>
         )}
 
+        {/* Error banner */}
+        {error && (
+          <div
+            className="mb-5 px-4 py-3 rounded-2xl flex items-center justify-between gap-3 text-sm"
+            style={{ background: "#fef2f2", border: "1.5px solid rgba(220,38,38,0.2)", color: "#dc2626" }}
+          >
+            <span>{error}</span>
+            <button
+              onClick={reload}
+              className="font-semibold shrink-0 underline underline-offset-2"
+              style={{ color: "#dc2626" }}
+            >
+              Повторить
+            </button>
+          </div>
+        )}
+
+        {/* Skeleton while loading */}
+        {loading && (
+          <div className="space-y-3">
+            {[0, 1].map((i) => (
+              <div
+                key={i}
+                className="rounded-3xl animate-pulse"
+                style={{ background: "var(--surface)", height: 80 }}
+              />
+            ))}
+          </div>
+        )}
+
         {/* Empty state */}
-        {topics.length === 0 && !creating && (
+        {!loading && topics.length === 0 && !creating && !error && (
           <div
             className="mt-2 p-6 rounded-3xl text-center space-y-4"
             style={{ background: "var(--surface)", boxShadow: "var(--shadow)" }}
@@ -95,7 +125,7 @@ export const Dashboard = () => {
 
         {/* Topics list */}
         <div className="space-y-3">
-          {topics.map((topic) => (
+          {!loading && topics.map((topic) => (
             <TopicCard
               key={topic.id}
               topic={topic}

@@ -9,12 +9,19 @@ export const useDashboard = () => {
   const [newTopicName, setNewTopicName] = useState("")
   const [creating, setCreating] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
+    setLoading(true)
+    setError(null)
     try {
       setTopics(await apiClient.getTopics())
     } catch (e) {
-      console.error(e)
+      if (e instanceof TypeError) {
+        setError("Нет подключения к интернету")
+      } else {
+        setError(e instanceof Error ? e.message : "Не удалось загрузить темы")
+      }
     } finally {
       setLoading(false)
     }
@@ -41,5 +48,5 @@ export const useDashboard = () => {
     setTopics((prev) => prev.filter((t) => t.id !== id))
   }
 
-  return { topics, newTopicName, creating, loading, setNewTopicName, setCreating, createTopic, deleteTopic }
+  return { topics, newTopicName, creating, loading, error, setNewTopicName, setCreating, createTopic, deleteTopic, reload: load }
 }

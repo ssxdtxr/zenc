@@ -22,6 +22,18 @@ model Topic {
   user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   sessions      Session[]
   subtopics     TopicSubtopic[]
+  glossary      GlossaryTerm[]
+}
+
+model GlossaryTerm {
+  id         String   @id @default(cuid())
+  topicId    String
+  term       String
+  definition String   @db.Text
+  updatedAt  DateTime @updatedAt
+  topic      Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([topicId, term])
 }
 
 model TopicSubtopic {

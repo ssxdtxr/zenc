@@ -11,6 +11,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
       where: { id, userId },
       include: {
         subtopics: true,
+        glossary: { orderBy: { term: "asc" } },
         sessions: { orderBy: { date: "desc" } },
       },
     })

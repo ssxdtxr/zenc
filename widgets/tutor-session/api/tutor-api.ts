@@ -7,11 +7,16 @@ type RequestPayload = {
 }
 
 export const fetchTutorResponse = async (payload: RequestPayload): Promise<TutorResponse> => {
-  const res = await fetch("/api/tutor", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  })
+  let res: Response
+  try {
+    res = await fetch("/api/tutor", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+  } catch {
+    throw new Error("Нет подключения к интернету")
+  }
 
   const data = await res.json()
   if (!res.ok || data.error) throw new Error(data.error ?? "Ошибка сервера")

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getOrCreateUserId } from "@/lib/user-id"
-import type { SessionRecord } from "@/entities/topic/model/types"
+import type { GlossaryTerm, SessionRecord } from "@/entities/topic/model/types"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await getOrCreateUserId()
     const { id: topicId } = await params
-    const results: Omit<SessionRecord, "id" | "date"> = await req.json()
+    const results: Omit<SessionRecord, "id" | "date"> & { glossary?: GlossaryTerm[] } = await req.json()
 
     // Verify topic belongs to user
     const topic = await prisma.topic.findFirst({ where: { id: topicId, userId } })
@@ -37,6 +37,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         })
       )
     )
+
+    // Upsert glossary terms
+    if (results.glossary?.length) {
+      await Promise.all(
+        results.glossary.map((g) =>
+          prisma.glossaryTerm.upsert({
+            where: { topicId_term: { topicId, term: g.term } },
+            update: { definition: g.definition },
+            create: { topicId, term: g.term, definition: g.definition },
+          })
+        )
+      )
+    }
 
     // Update topic level + lastSessionAt
     await prisma.topic.update({
