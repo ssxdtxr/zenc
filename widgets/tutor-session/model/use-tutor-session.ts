@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import type { RefObject } from "react"
 import type { Message, TutorResponse } from "@/entities/session/model/types"
 import type { GlossaryTerm, SessionRecord } from "@/entities/topic/model/types"
@@ -9,6 +9,16 @@ import { fetchTutorResponse } from "../api/tutor-api"
 export type SessionState = "session" | "feedback" | "analyzing" | "results"
 
 export const MAX_QUESTIONS = 10
+
+type SavedSession = {
+  messages: Message[]
+  currentResponse: TutorResponse
+  sessionState: "session" | "feedback"
+  questionCount: number
+  correctCount: number
+  allGaps: string[]
+  pendingAnalysis: { messages: Message[]; correct: number } | null
+}
 
 type TutorSession = {
   sessionState: SessionState
@@ -27,12 +37,15 @@ type TutorSession = {
 }
 
 type Props = {
+  topicId: string
   topicName: string
   focusSubtopics?: string[]
   onComplete: (results: Omit<SessionRecord, "id" | "date">) => void
 }
 
-export const useTutorSession = ({ topicName, focusSubtopics, onComplete }: Props): TutorSession => {
+export const useTutorSession = ({ topicId, topicName, focusSubtopics, onComplete }: Props): TutorSession => {
+  const storageKey = `zerc_session_${topicId}${focusSubtopics ? "_focused" : ""}`
+
   const [sessionState, setSessionState] = useState<SessionState>("session")
   const [answer, setAnswer] = useState("")
   const [messages, setMessages] = useState<Message[]>([])
@@ -47,9 +60,50 @@ export const useTutorSession = ({ topicName, focusSubtopics, onComplete }: Props
   const initialized = useRef(false)
   const pendingAnalysis = useRef<{ messages: Message[]; correct: number } | null>(null)
 
+  const clearSaved = useCallback(() => {
+    try { localStorage.removeItem(storageKey) } catch {}
+  }, [storageKey])
+
+  const saveState = useCallback((
+    msgs: Message[],
+    response: TutorResponse,
+    state: "session" | "feedback",
+    qCount: number,
+    cCount: number,
+    gaps: string[],
+    pending: { messages: Message[]; correct: number } | null,
+  ) => {
+    try {
+      const data: SavedSession = {
+        messages: msgs, currentResponse: response, sessionState: state,
+        questionCount: qCount, correctCount: cCount, allGaps: gaps, pendingAnalysis: pending,
+      }
+      localStorage.setItem(storageKey, JSON.stringify(data))
+    } catch {}
+  }, [storageKey])
+
   useEffect(() => {
     if (initialized.current) return
     initialized.current = true
+
+    // Try to restore saved session
+    try {
+      const raw = localStorage.getItem(storageKey)
+      if (raw) {
+        const saved: SavedSession = JSON.parse(raw)
+        if (saved.currentResponse && saved.questionCount > 0) {
+          setMessages(saved.messages)
+          setCurrentResponse(saved.currentResponse)
+          setSessionState(saved.sessionState)
+          setQuestionCount(saved.questionCount)
+          setCorrectCount(saved.correctCount)
+          setAllGaps(saved.allGaps)
+          if (saved.pendingAnalysis) pendingAnalysis.current = saved.pendingAnalysis
+          return
+        }
+      }
+    } catch {}
+
     startSession()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -66,6 +120,7 @@ export const useTutorSession = ({ topicName, focusSubtopics, onComplete }: Props
       setCurrentResponse(data)
       setMessages([{ role: "assistant", content: data.assistantMessage }])
       setQuestionCount(1)
+      saveState([{ role: "assistant", content: data.assistantMessage }], data, "session", 1, 0, [], null)
     } catch (e) {
       setError(e instanceof Error ? e.message : "Не удалось подключиться к AI")
     } finally {
@@ -75,6 +130,7 @@ export const useTutorSession = ({ topicName, focusSubtopics, onComplete }: Props
 
   const analyzeSession = async (finalMessages: Message[], finalCorrect: number) => {
     setSessionState("analyzing")
+    clearSaved()
     try {
       let res: Response
       try {
@@ -134,19 +190,21 @@ export const useTutorSession = ({ topicName, focusSubtopics, onComplete }: Props
 
       const newCorrect = data.isCorrect ? correctCount + 1 : correctCount
       const finalMessages = [...updatedMessages, { role: "assistant" as const, content: data.assistantMessage }]
+      const newGaps = isLastQuestion
+        ? allGaps
+        : [...allGaps, ...(data.knowledgeGaps ?? []).filter((g) => !allGaps.includes(g))]
 
       setMessages(finalMessages)
       setCurrentResponse(data)
       setAnswer("")
       if (data.isCorrect) setCorrectCount(newCorrect)
-      if (data.knowledgeGaps?.length) {
-        setAllGaps((prev) => [...prev, ...data.knowledgeGaps.filter((g) => !prev.includes(g))])
-      }
+      if (!isLastQuestion && data.knowledgeGaps?.length) setAllGaps(newGaps)
 
-      if (isLastQuestion) {
-        pendingAnalysis.current = { messages: finalMessages, correct: newCorrect }
-      }
+      const pending = isLastQuestion ? { messages: finalMessages, correct: newCorrect } : null
+      if (isLastQuestion) pendingAnalysis.current = pending
+
       setSessionState("feedback")
+      saveState(finalMessages, data, "feedback", questionCount, newCorrect, newGaps, pending)
     } catch (e) {
       setError(e instanceof Error ? e.message : "Не удалось получить ответ")
     } finally {
@@ -156,13 +214,15 @@ export const useTutorSession = ({ topicName, focusSubtopics, onComplete }: Props
 
   const nextQuestion = () => {
     if (pendingAnalysis.current) {
-      const { messages, correct } = pendingAnalysis.current
+      const { messages: msgs, correct } = pendingAnalysis.current
       pendingAnalysis.current = null
-      analyzeSession(messages, correct)
+      analyzeSession(msgs, correct)
       return
     }
-    setQuestionCount((c) => c + 1)
+    const nextCount = questionCount + 1
+    setQuestionCount(nextCount)
     setSessionState("session")
+    if (currentResponse) saveState(messages, currentResponse, "session", nextCount, correctCount, allGaps, null)
   }
 
   return {

@@ -38,13 +38,22 @@ export const TopicPage = ({ id }: Props) => {
     await loadTopic()
   }
 
+  const clearSavedSession = (focused?: boolean) => {
+    try {
+      localStorage.removeItem(`zerc_session_${id}`)
+      if (focused) localStorage.removeItem(`zerc_session_${id}_focused`)
+    } catch {}
+  }
+
   const startNewSession = () => {
+    clearSavedSession(true)
     setFocusSubtopics(undefined)
     setSessionKey((k) => k + 1)
     setInSession(true)
   }
 
   const startFocusedSession = () => {
+    clearSavedSession(true)
     const weak = topic?.currentSubtopics
       .filter((s) => s.status === "needs_work" || s.status === "learning")
       .map((s) => s.name) ?? []
@@ -199,6 +208,7 @@ export const TopicPage = ({ id }: Props) => {
           <div className="p-5 rounded-3xl" style={{ background: "var(--surface)", boxShadow: "var(--shadow-lg)", border: "1.5px solid var(--border)" }}>
             <TutorSession
               key={sessionKey}
+              topicId={id}
               topicName={topic.name}
               focusSubtopics={focusSubtopics}
               onComplete={handleSessionComplete}

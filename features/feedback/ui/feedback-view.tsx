@@ -1,5 +1,6 @@
 import type { TutorResponse } from "@/entities/session/model/types"
 import { Button } from "@/shared/ui/button"
+import { RichText } from "@/features/theory-view/ui/rich-text"
 
 type Props = { response: TutorResponse; isLast: boolean; onNext: () => void }
 
@@ -23,7 +24,7 @@ export const FeedbackView = ({ response, isLast, onNext }: Props) => {
           style={{ background: verdict.bg, border: `1.5px solid ${verdict.border}` }}
         >
           <p className="text-xs font-bold uppercase tracking-wider mb-1.5" style={{ color: verdict.color }}>{verdict.label}</p>
-          <p className="text-sm leading-relaxed" style={{ color: "var(--text)" }}>{response.evaluation}</p>
+          <RichText text={response.evaluation} className="[&_p]:!text-[var(--text)]" />
         </div>
       )}
 
@@ -33,7 +34,7 @@ export const FeedbackView = ({ response, isLast, onNext }: Props) => {
           style={{ background: "var(--surface-2)", border: "1.5px solid var(--border)" }}
         >
           <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-3)" }}>Объяснение</p>
-          <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "var(--text-2)" }}>{response.explanation}</p>
+          <RichText text={response.explanation} />
         </div>
       )}
 
@@ -55,7 +56,7 @@ export const FeedbackView = ({ response, isLast, onNext }: Props) => {
           style={{ background: "var(--violet-light)", border: "1.5px solid rgba(124,58,237,0.15)" }}
         >
           <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--violet)" }}>Следующий вопрос</p>
-          <p className="text-sm leading-relaxed" style={{ color: "var(--text)" }}>{response.question}</p>
+          <RichText text={response.question} className="[&_p]:!text-[var(--text)]" />
           <Button onClick={onNext}>Продолжить →</Button>
         </div>
       )}

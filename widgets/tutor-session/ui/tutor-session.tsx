@@ -4,11 +4,13 @@ import { AnswerForm } from "@/features/answer-question/ui/answer-form"
 import { ChoiceForm } from "@/features/choose-answer/ui/choice-form"
 import { FeedbackView } from "@/features/feedback/ui/feedback-view"
 import { SessionResults } from "@/features/session-results/ui/session-results"
+import { RichText } from "@/features/theory-view/ui/rich-text"
 import { DIFFICULTY_CONFIG } from "@/entities/session/config"
 import type { SessionRecord } from "@/entities/topic/model/types"
 import { MAX_QUESTIONS, useTutorSession } from "../model/use-tutor-session"
 
 type Props = {
+  topicId: string
   topicName: string
   focusSubtopics?: string[]
   onComplete: (results: Omit<SessionRecord, "id" | "date">) => void
@@ -16,12 +18,12 @@ type Props = {
   onNewSession: () => void
 }
 
-export const TutorSession = ({ topicName, focusSubtopics, onComplete, onBack, onNewSession }: Props) => {
+export const TutorSession = ({ topicId, topicName, focusSubtopics, onComplete, onBack, onNewSession }: Props) => {
   const {
     sessionState, answer, loading, error,
     questionCount, correctCount, currentResponse, results, textareaRef,
     setAnswer, submitAnswer, nextQuestion,
-  } = useTutorSession({ topicName, focusSubtopics, onComplete })
+  } = useTutorSession({ topicId, topicName, focusSubtopics, onComplete })
 
   const diffInfo = currentResponse ? DIFFICULTY_CONFIG[currentResponse.difficulty] : null
   const isChoice = currentResponse?.questionType === "choice" && !!currentResponse.options?.length
@@ -86,9 +88,10 @@ export const TutorSession = ({ topicName, focusSubtopics, onComplete, onBack, on
                 )}
               </div>
 
-              <p className="text-lg font-semibold leading-snug" style={{ color: "var(--text)" }}>
-                {currentResponse.question}
-              </p>
+              <RichText
+                text={currentResponse.question}
+                className="[&_p]:!text-base [&_p]:!font-semibold [&_p]:!leading-snug [&_p]:!text-[var(--text)]"
+              />
 
               {isChoice ? (
                 <ChoiceForm
