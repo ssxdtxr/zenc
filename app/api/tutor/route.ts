@@ -70,18 +70,23 @@ export async function POST(req: NextRequest) {
 
     const response = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 1024,
+      max_tokens: 1100,
       system: systemPrompt,
       messages: apiMessages,
     })
 
     const rawContent = response.content[0].type === "text" ? response.content[0].text : ""
 
+    if (response.stop_reason === "max_tokens") {
+      console.error("Tutor truncated, raw length:", rawContent.length)
+    }
+
     let parsed: Omit<TutorResponse, "questionNumber" | "assistantMessage">
     try {
       parsed = extractJson(rawContent) as typeof parsed
     } catch {
-      parsed = { theory: null, evaluation: null, explanation: null, isCorrect: null, question: rawContent, questionType: "text", options: null, difficulty: "basic", knowledgeGaps: [] }
+      console.error("Tutor JSON parse failed, stop_reason:", response.stop_reason, "raw:", rawContent.slice(0, 200))
+      return NextResponse.json({ error: "Не удалось получить ответ, попробуй ещё раз" }, { status: 500 })
     }
 
     return NextResponse.json({ ...parsed, questionNumber: questionNumber ?? 1, assistantMessage: rawContent })
