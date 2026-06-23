@@ -10,15 +10,16 @@ export const Textarea = ({ className, ref, ...props }: Props) => (
     ref={ref}
     className={cn("w-full rounded-2xl px-4 py-3.5 leading-relaxed resize-none outline-none transition-all", className)}
     style={{
-      background: "var(--surface)",
-      border: "1.5px solid var(--border)",
-      color: "var(--text)",
-      boxShadow: "var(--shadow-sm)",
+      background: "rgba(255,255,255,0.06)",
+      border: "1px solid rgba(255,255,255,0.12)",
+      color: "#fff",
       fontSize: "16px",
+      borderRadius: "14px",
+      padding: "14px",
     }}
     onFocus={(e) => {
-      e.currentTarget.style.borderColor = "var(--violet)"
-      e.currentTarget.style.boxShadow = "0 0 0 3px var(--violet-light), var(--shadow-sm)"
+      e.currentTarget.style.borderColor = "var(--accent)"
+      e.currentTarget.style.boxShadow = "0 0 0 3px var(--accent-light), var(--shadow-sm)"
     }}
     onBlur={(e) => {
       e.currentTarget.style.borderColor = "var(--border)"

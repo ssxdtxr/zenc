@@ -17,13 +17,13 @@ const parseInline = (text: string): React.ReactNode[] => {
     if (match[2]) {
       parts.push(<strong key={match.index} style={{ color: "var(--text)", fontWeight: 700 }}>{match[2]}</strong>)
     } else if (match[3]) {
-      parts.push(<em key={match.index} style={{ color: "var(--violet)" }}>{match[3]}</em>)
+      parts.push(<em key={match.index} style={{ color: "var(--accent)" }}>{match[3]}</em>)
     } else if (match[4]) {
       parts.push(
         <code
           key={match.index}
           className="px-1.5 py-0.5 rounded-lg text-xs font-mono"
-          style={{ background: "var(--violet-light)", color: "var(--violet)" }}
+          style={{ background: "var(--accent-light)", color: "var(--accent)" }}
         >
           {match[4]}
         </code>

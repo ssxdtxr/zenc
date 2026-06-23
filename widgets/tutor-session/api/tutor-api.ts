@@ -7,6 +7,7 @@ type RequestPayload = {
   focusSubtopics?: string[]
   previousSubtopics?: { name: string; status: string }[]
   overallLevel?: string | null
+  confidence?: 1 | 2 | 3
 }
 
 export const fetchTutorResponse = async (payload: RequestPayload): Promise<TutorResponse> => {

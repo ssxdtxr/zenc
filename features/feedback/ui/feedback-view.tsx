@@ -1,6 +1,7 @@
 import type { TutorResponse } from "@/entities/session/model/types"
 import { Button } from "@/shared/ui/button"
 import { RichText } from "@/features/theory-view/ui/rich-text"
+import { CheckIcon, CrossIcon } from "@/shared/ui/icons"
 
 type Props = { response: TutorResponse; isLast: boolean; onNext: () => void }
 
@@ -10,10 +11,11 @@ export const FeedbackView = ({ response, isLast, onNext }: Props) => {
   const isWrong = correct === false
 
   const verdict = {
-    color: isRight ? "#059669" : isWrong ? "#dc2626" : "#d97706",
-    bg: isRight ? "#f0fdf4" : isWrong ? "#fef2f2" : "#fffbeb",
-    border: isRight ? "rgba(5,150,105,0.2)" : isWrong ? "rgba(220,38,38,0.2)" : "rgba(217,119,6,0.2)",
-    label: isRight ? "✓ Правильно" : isWrong ? "✗ Не совсем" : "~ Частично",
+    color: isRight ? "#4ade80" : isWrong ? "#f87171" : "#fbbf24",
+    bg: isRight ? "rgba(74,222,128,0.1)" : isWrong ? "rgba(220,38,38,0.12)" : "rgba(251,191,36,0.1)",
+    border: isRight ? "rgba(74,222,128,0.25)" : isWrong ? "rgba(220,38,38,0.25)" : "rgba(251,191,36,0.25)",
+    label: isRight ? "Верно" : isWrong ? "Не верно" : "Частично",
+    Icon: isRight ? CheckIcon : isWrong ? CrossIcon : null,
   }
 
   return (
@@ -23,7 +25,10 @@ export const FeedbackView = ({ response, isLast, onNext }: Props) => {
           className="p-4 rounded-2xl"
           style={{ background: verdict.bg, border: `1.5px solid ${verdict.border}` }}
         >
-          <p className="text-xs font-bold uppercase tracking-wider mb-1.5" style={{ color: verdict.color }}>{verdict.label}</p>
+          <div className="flex items-center gap-1.5 mb-1.5">
+            {verdict.Icon && <verdict.Icon size={13} color={verdict.color} />}
+            <p className="text-xs font-bold uppercase tracking-wider" style={{ color: verdict.color }}>{verdict.label}</p>
+          </div>
           <RichText text={response.evaluation} className="[&_p]:!text-[var(--text)]" />
         </div>
       )}
@@ -53,9 +58,9 @@ export const FeedbackView = ({ response, isLast, onNext }: Props) => {
       {!isLast && response.question && (
         <div
           className="p-4 rounded-2xl space-y-3"
-          style={{ background: "var(--violet-light)", border: "1.5px solid rgba(124,58,237,0.15)" }}
+          style={{ background: "rgba(155,107,255,0.08)", border: "1px solid rgba(155,107,255,0.2)" }}
         >
-          <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--violet)" }}>Следующий вопрос</p>
+          <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--accent)" }}>Следующий вопрос</p>
           <RichText text={response.question} className="[&_p]:!text-[var(--text)]" />
           <Button onClick={onNext}>Продолжить →</Button>
         </div>

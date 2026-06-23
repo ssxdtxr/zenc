@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import type { RefObject } from "react"
 import type { Message, TutorResponse } from "@/entities/session/model/types"
 import type { GlossaryTerm, SessionRecord } from "@/entities/topic/model/types"
+import type { ConfidenceLevel } from "@/features/confidence-picker/ui/confidence-picker"
 import { fetchTutorResponse } from "../api/tutor-api"
 
 export type SessionState = "session" | "feedback" | "analyzing" | "results"
@@ -24,6 +25,7 @@ type SavedSession = {
 type TutorSession = {
   sessionState: SessionState
   answer: string
+  confidence: ConfidenceLevel | null
   loading: boolean
   error: string | null
   questionCount: number
@@ -33,6 +35,7 @@ type TutorSession = {
   results: Omit<SessionRecord, "id" | "date"> | null
   textareaRef: RefObject<HTMLTextAreaElement | null>
   setAnswer: (v: string) => void
+  setConfidence: (v: ConfidenceLevel | null) => void
   submitAnswer: () => Promise<void>
   nextQuestion: () => void
 }
@@ -53,6 +56,7 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSu
   const [answer, setAnswer] = useState("")
   const [messages, setMessages] = useState<Message[]>([])
   const [currentResponse, setCurrentResponse] = useState<TutorResponse | null>(null)
+  const [confidence, setConfidence] = useState<ConfidenceLevel | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [questionCount, setQuestionCount] = useState(0)
@@ -190,7 +194,9 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSu
         messages: updatedMessages,
         questionNumber: nextNum,
         focusSubtopics,
+        confidence: confidence ?? undefined,
       })
+      setConfidence(null)
 
       const newCorrect = data.isCorrect ? correctCount + 1 : correctCount
       const finalMessages = [...updatedMessages, { role: "assistant" as const, content: data.assistantMessage }]
@@ -230,8 +236,8 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSu
   }
 
   return {
-    sessionState, answer, loading, error,
+    sessionState, answer, confidence, loading, error,
     questionCount, correctCount, allGaps, currentResponse, results, textareaRef,
-    setAnswer, submitAnswer, nextQuestion,
+    setAnswer, setConfidence, submitAnswer, nextQuestion,
   }
 }

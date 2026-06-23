@@ -13,6 +13,7 @@ const SYSTEM_PROMPT = `Ты — адаптивный тьютор-эксперт
 3. ПЕРСОНАЛИЗАЦИЯ: Объяснения должны опираться на аналогии, примеры и язык, понятный именно этому пользователю, исходя из его ответов.
 4. ПРОГРЕССИЯ: Начинай с базовых концепций, постепенно переходи к сложным взаимосвязям и нюансам.
 5. ЧЕСТНОСТЬ: Если ответ неверный — скажи прямо, но конструктивно. Объясни почему и дай правильное понимание.
+6. МЕТАКОГНИЦИЯ: Если в начале ответа пользователя стоит метка уверенности — учти её в оценке. Высокая уверенность + неверный ответ = явный сигнал иллюзии понимания, укажи на это прямо. Низкая уверенность + верный ответ = скажи что знания лучше чем кажется.
 
 Тип вопроса:
 - "choice" — для фактических, определительных или терминологических вопросов. Дай 3–4 варианта ответа, один из которых правильный. Варианты должны быть правдоподобными.
@@ -36,7 +37,7 @@ const SYSTEM_PROMPT = `Ты — адаптивный тьютор-эксперт
 
 export async function POST(req: NextRequest) {
   try {
-    const { topic, messages, questionNumber, focusSubtopics, previousSubtopics, overallLevel } = await req.json()
+    const { topic, messages, questionNumber, focusSubtopics, previousSubtopics, overallLevel, confidence } = await req.json()
     const conversationMessages: Message[] = messages ?? []
     const hasFocus = Array.isArray(focusSubtopics) && focusSubtopics.length > 0
     const hasPrevious = Array.isArray(previousSubtopics) && previousSubtopics.length > 0
@@ -59,7 +60,13 @@ export async function POST(req: NextRequest) {
     const apiMessages =
       conversationMessages.length === 0
         ? [{ role: "user" as const, content: firstMessage }]
-        : conversationMessages
+        : confidence
+          ? conversationMessages.map((msg, idx) =>
+              idx === conversationMessages.length - 1 && msg.role === "user"
+                ? { ...msg, content: `[Уверенность перед ответом: ${confidence === 1 ? "низкая" : confidence === 2 ? "средняя" : "высокая"}]\n${msg.content}` }
+                : msg
+            )
+          : conversationMessages
 
     const response = await client.messages.create({
       model: "claude-sonnet-4-6",

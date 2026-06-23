@@ -11,8 +11,8 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variants: Record<Variant, string> = {
   primary: "text-white disabled:opacity-40",
-  secondary: "text-violet-700 disabled:opacity-40",
-  ghost: "text-violet-500 hover:text-violet-700 disabled:opacity-40",
+  secondary: "disabled:opacity-40",
+  ghost: "disabled:opacity-40",
 }
 
 const sizes: Record<Size, string> = {
@@ -30,11 +30,13 @@ export const Button = ({ variant = "primary", size = "md", className, children, 
       className={cn("font-semibold transition-all active:scale-[0.98]", variants[variant], sizes[size], className)}
       style={{
         background: isPrimary
-          ? "linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)"
+          ? "linear-gradient(135deg, #9b6bff 0%, #6d3cff 100%)"
           : isSecondary
-          ? "var(--violet-light)"
+          ? "rgba(255,255,255,0.08)"
           : "transparent",
-        boxShadow: isPrimary ? "0 4px 16px rgba(124,58,237,0.3), 0 1px 4px rgba(124,58,237,0.2)" : undefined,
+        boxShadow: isPrimary ? "0 8px 22px rgba(109,60,255,0.45)" : undefined,
+        border: isSecondary ? "1px solid rgba(255,255,255,0.16)" : undefined,
+        color: isSecondary ? "rgba(255,255,255,0.85)" : undefined,
         ...style,
       }}
       {...props}

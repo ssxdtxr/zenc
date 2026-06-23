@@ -18,7 +18,7 @@ export const Header = ({ topic, appState, difficulty, correctCount, answeredCoun
   return (
     <header className="border-b border-zinc-800/60 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 bg-zinc-950/90 backdrop-blur-sm z-10">
       <div className="flex items-center gap-2.5 min-w-0">
-        <div className="w-7 h-7 shrink-0 bg-violet-500 rounded-md flex items-center justify-center text-white font-bold text-xs select-none">
+        <div className="w-7 h-7 shrink-0 bg-red-600 rounded-md flex items-center justify-center text-white font-bold text-xs select-none">
           Z
         </div>
         <span className="font-semibold text-sm">Zerc</span>

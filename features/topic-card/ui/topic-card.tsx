@@ -29,6 +29,8 @@ export const TopicCard = ({ topic, onClick, onDelete }: Props) => {
         className="w-full text-left p-4 rounded-3xl transition-all active:scale-[0.98]"
         style={{
           background: "var(--surface)",
+          backdropFilter: "var(--glass)",
+          WebkitBackdropFilter: "var(--glass)",
           boxShadow: "var(--shadow)",
           border: "1.5px solid var(--border)",
         }}
@@ -76,7 +78,7 @@ export const TopicCard = ({ topic, onClick, onDelete }: Props) => {
         )}
 
         {!hasSession && (
-          <p className="text-sm font-medium mt-2" style={{ color: "var(--violet)" }}>Начать →</p>
+          <p className="text-sm font-medium mt-2" style={{ color: "var(--accent)" }}>Начать →</p>
         )}
       </button>
 

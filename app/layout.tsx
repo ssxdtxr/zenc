@@ -1,19 +1,25 @@
 import type { Metadata, Viewport } from "next"
-import { Geist } from "next/font/google"
-import { Lora } from "next/font/google"
+import { Space_Grotesk, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google"
 import { SwRegister } from "@/shared/ui/sw-register"
 import "./globals.css"
 
-const geist = Geist({ subsets: ["latin", "latin-ext"], variable: "--font-geist" })
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-display",
+})
 
-const lora = Lora({
-  subsets: ["latin", "latin-ext", "cyrillic"],
-  style: ["normal", "italic"],
-  variable: "--font-lora",
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-sans",
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
 })
 
 export const viewport: Viewport = {
-  themeColor: "#0c0b09",
+  themeColor: "#08070f",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -34,7 +40,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" className={`${geist.variable} ${lora.variable} h-full`}>
+    <html lang="ru" className={`${spaceGrotesk.variable} ${plusJakarta.variable} ${jetbrainsMono.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
         {children}
         <SwRegister />

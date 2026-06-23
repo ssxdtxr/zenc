@@ -23,22 +23,22 @@ export const ChoiceForm = ({ options, selected, loading, error, onSelect, onSubm
             onClick={() => onSelect(option)}
             className="w-full text-left p-4 rounded-2xl transition-all active:scale-[0.98] flex items-start gap-3"
             style={{
-              background: isSelected ? "var(--violet-light)" : "var(--surface-2)",
-              border: `1.5px solid ${isSelected ? "var(--violet)" : "var(--border)"}`,
-              boxShadow: isSelected ? "0 0 0 3px var(--violet-light)" : "none",
+              background: isSelected ? "var(--accent-light)" : "var(--surface-2)",
+              border: `1.5px solid ${isSelected ? "var(--accent)" : "var(--border)"}`,
+              boxShadow: isSelected ? "0 0 0 3px var(--accent-light)" : "none",
             }}
           >
             <span
               className="text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5"
               style={{
-                background: isSelected ? "var(--violet)" : "var(--surface)",
+                background: isSelected ? "var(--accent)" : "var(--surface)",
                 color: isSelected ? "white" : "var(--text-3)",
                 border: `1px solid ${isSelected ? "transparent" : "var(--border)"}`,
               }}
             >
               {String.fromCharCode(65 + i)}
             </span>
-            <span className="text-sm leading-relaxed" style={{ color: isSelected ? "var(--violet)" : "var(--text)" }}>
+            <span className="text-sm leading-relaxed" style={{ color: isSelected ? "var(--accent)" : "var(--text)" }}>
               {option}
             </span>
           </button>

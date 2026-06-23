@@ -37,11 +37,11 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-dvh flex items-center justify-center px-5" style={{ background: "var(--bg)" }}>
-      <div className="w-full max-w-sm space-y-6 p-7 rounded-3xl" style={{ background: "var(--surface)", boxShadow: "var(--shadow-lg)" }}>
+      <div className="w-full max-w-sm space-y-6 p-7 rounded-3xl" style={{ background: "var(--surface)", backdropFilter: "var(--glass)", WebkitBackdropFilter: "var(--glass)", boxShadow: "var(--shadow-lg)" }}>
         <div className="text-center space-y-1">
           <div
             className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-lg mx-auto"
-            style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7)", boxShadow: "0 4px 16px rgba(124,58,237,0.35)" }}
+            style={{ background: "linear-gradient(135deg,#9b6bff,#6d3cff)", boxShadow: "0 4px 16px rgba(109,60,255,0.5)" }}
           >
             Z
           </div>
@@ -73,7 +73,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm" style={{ color: "var(--text-2)" }}>
           Нет аккаунта?{" "}
-          <Link href="/register" className="font-semibold" style={{ color: "var(--violet)" }}>
+          <Link href="/register" className="font-semibold" style={{ color: "var(--accent)" }}>
             Зарегистрироваться
           </Link>
         </p>

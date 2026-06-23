@@ -9,17 +9,17 @@ export type StatusMeta = {
 }
 
 export const SUBTOPIC_STATUS_CONFIG: Record<SubtopicStatus, StatusMeta> = {
-  needs_work: { label: "Нужно подтянуть", color: "#dc2626", bg: "#fef2f2", dot: "#f87171", border: "rgba(220,38,38,0.15)" },
-  learning:   { label: "В процессе",      color: "#d97706", bg: "#fffbeb", dot: "#fbbf24", border: "rgba(217,119,6,0.15)"  },
-  good:       { label: "Хорошо",          color: "#059669", bg: "#f0fdf4", dot: "#34d399", border: "rgba(5,150,105,0.15)"  },
-  expert:     { label: "Экспертно",       color: "#7c3aed", bg: "#f5f3ff", dot: "#a78bfa", border: "rgba(124,58,237,0.15)" },
+  needs_work: { label: "Нужно подтянуть", color: "#f87171", bg: "rgba(220,38,38,0.12)",  dot: "#f87171", border: "rgba(220,38,38,0.25)" },
+  learning:   { label: "В процессе",      color: "#fbbf24", bg: "rgba(251,191,36,0.12)", dot: "#fbbf24", border: "rgba(251,191,36,0.25)" },
+  good:       { label: "Хорошо",          color: "#4ade80", bg: "rgba(74,222,128,0.12)", dot: "#4ade80", border: "rgba(74,222,128,0.25)" },
+  expert:     { label: "Экспертно",       color: "#a78bfa", bg: "rgba(155,107,255,0.15)", dot: "#a78bfa", border: "rgba(155,107,255,0.3)" },
 }
 
 export type LevelMeta = { label: string; color: string; bg: string; border: string }
 
 export const OVERALL_LEVEL_CONFIG: Record<OverallLevel, LevelMeta> = {
-  beginner:     { label: "Новичок",      color: "#6b6485", bg: "#f5f3ff", border: "rgba(107,100,133,0.2)"  },
-  intermediate: { label: "Средний",      color: "#d97706", bg: "#fffbeb", border: "rgba(217,119,6,0.2)"    },
-  advanced:     { label: "Продвинутый",  color: "#059669", bg: "#f0fdf4", border: "rgba(5,150,105,0.2)"    },
-  expert:       { label: "Эксперт",      color: "#7c3aed", bg: "#f5f3ff", border: "rgba(124,58,237,0.2)"   },
+  beginner:     { label: "Новичок",      color: "rgba(255,255,255,0.6)",  bg: "rgba(255,255,255,0.08)", border: "rgba(255,255,255,0.18)" },
+  intermediate: { label: "Средний",      color: "#fbbf24", bg: "rgba(251,191,36,0.15)", border: "rgba(251,191,36,0.3)"  },
+  advanced:     { label: "Продвинутый",  color: "#4ade80", bg: "rgba(74,222,128,0.15)", border: "rgba(74,222,128,0.3)"  },
+  expert:       { label: "Эксперт",      color: "#a78bfa", bg: "rgba(155,107,255,0.18)", border: "rgba(155,107,255,0.35)" },
 }
