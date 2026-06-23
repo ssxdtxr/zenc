@@ -3,6 +3,19 @@ import { prisma } from "@/lib/prisma"
 import { getOrCreateUserId } from "@/lib/user-id"
 import type { GlossaryTerm, SessionRecord } from "@/entities/topic/model/types"
 
+function nextReviewAt(status: string): Date {
+  const daysMap: Record<string, number> = {
+    needs_work: 1,
+    learning:   3,
+    good:       7,
+    expert:     21,
+  }
+  const days = daysMap[status] ?? 3
+  const d = new Date()
+  d.setDate(d.getDate() + days)
+  return d
+}
+
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await getOrCreateUserId()
@@ -32,8 +45,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       results.subtopics.map((s) =>
         prisma.topicSubtopic.upsert({
           where: { topicId_name: { topicId, name: s.name } },
-          update: { status: s.status, recommendation: s.recommendation, definitions: s.definitions ?? [] },
-          create: { topicId, name: s.name, status: s.status, recommendation: s.recommendation, definitions: s.definitions ?? [] },
+          update: { status: s.status, recommendation: s.recommendation, definitions: s.definitions ?? [], nextReviewAt: nextReviewAt(s.status) },
+          create: { topicId, name: s.name, status: s.status, recommendation: s.recommendation, definitions: s.definitions ?? [], nextReviewAt: nextReviewAt(s.status) },
         })
       )
     )

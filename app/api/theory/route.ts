@@ -73,8 +73,10 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    await prisma.theoryCache.create({
-      data: { cacheKey, topicName, subtopicName, userLevel: level, content: parsed as object },
+    await prisma.theoryCache.upsert({
+      where: { cacheKey },
+      update: { content: parsed as object },
+      create: { cacheKey, topicName, subtopicName, userLevel: level, content: parsed as object },
     })
 
     return NextResponse.json(parsed)

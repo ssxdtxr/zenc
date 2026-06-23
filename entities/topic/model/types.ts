@@ -12,6 +12,7 @@ export type Subtopic = {
   status: SubtopicStatus
   recommendation: string
   definitions: SubtopicDefinition[]
+  nextReviewAt: string | null
 }
 
 export type SessionRecord = {

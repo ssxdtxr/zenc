@@ -20,6 +20,10 @@ const formatDate = (iso: string) => {
 export const TopicCard = ({ topic, onClick, onDelete }: Props) => {
   const levelCfg = topic.overallLevel ? OVERALL_LEVEL_CONFIG[topic.overallLevel] : null
   const hasSession = topic.sessions.length > 0
+  const now = Date.now()
+  const dueCount = topic.currentSubtopics.filter(
+    s => s.nextReviewAt && new Date(s.nextReviewAt).getTime() <= now
+  ).length
 
   return (
     <div className="relative">
@@ -44,6 +48,11 @@ export const TopicCard = ({ topic, onClick, onDelete }: Props) => {
               {hasSession ? `${topic.sessions.length} сессий · ${formatDate(topic.lastSessionAt!)}` : "Ещё не начато"}
             </p>
           </div>
+          {dueCount > 0 && (
+            <span className="text-xs font-bold px-2 py-1 rounded-full shrink-0" style={{ background: "rgba(255,187,92,0.18)", color: "#ffbb5c", border: "1px solid rgba(255,187,92,0.35)" }}>
+              🔔 {dueCount}
+            </span>
+          )}
           {levelCfg && (
             <span
               className="text-xs font-semibold px-2.5 py-1 rounded-full shrink-0"

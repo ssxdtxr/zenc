@@ -6,7 +6,7 @@ type DbTopic = Topic & {
     toStudyMore: string[]
     toStudyDeeper: string[]
   })[]
-  subtopics: { id: string; name: string; status: string; recommendation: string; definitions: { term: string; definition: string }[] }[]
+  subtopics: { id: string; name: string; status: string; recommendation: string; definitions: { term: string; definition: string }[]; nextReviewAt: string | null }[]
   glossary: { id: string; term: string; definition: string }[]
 }
 
@@ -22,6 +22,7 @@ function mapDbTopic(t: DbTopic): Topic {
       status: s.status as Topic["currentSubtopics"][0]["status"],
       recommendation: s.recommendation,
       definitions: (s.definitions as { term: string; definition: string }[]) ?? [],
+      nextReviewAt: s.nextReviewAt as string | null,
     })),
     glossary: (t.glossary ?? []).map((g): GlossaryTerm => ({
       term: g.term,

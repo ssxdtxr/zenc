@@ -26,8 +26,6 @@ export const TopicPage = ({ id }: Props) => {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<Filter>("all")
   const [openTerms, setOpenTerms] = useState<Record<string, boolean>>({})
-  const [glossaryQuery, setGlossaryQuery] = useState("")
-  const [showAllGlossary, setShowAllGlossary] = useState(false)
 
   const [inSession, setInSession] = useState(() => {
     try {
@@ -72,6 +70,14 @@ export const TopicPage = ({ id }: Props) => {
     setFocusSubtopics(weak); setSessionKey(k => k + 1); setInSession(true)
   }
 
+  const startReview = () => {
+    clearSaved()
+    const due = topic?.currentSubtopics
+      .filter(s => s.nextReviewAt && new Date(s.nextReviewAt).getTime() <= Date.now())
+      .map(s => s.name) ?? []
+    setFocusSubtopics(due); setSessionKey(k => k + 1); setInSession(true)
+  }
+
   if (loading) return (
     <div style={{ minHeight: "100vh", background: "#08070f", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ width: 28, height: 28, borderRadius: "50%", border: "2px solid transparent", borderTopColor: "#9b6bff", animation: "spin 0.8s linear infinite" }} />
@@ -98,13 +104,8 @@ export const TopicPage = ({ id }: Props) => {
   const levelCfg = topic.overallLevel ? OVERALL_LEVEL_CONFIG[topic.overallLevel] : null
   const lastSession = topic.sessions[0] ?? null
   const nextWeak = subs.find(s => s.status === "needs_work" || s.status === "learning")
-
-  const gQuery = glossaryQuery.trim().toLowerCase()
-  const matchedGlossary = topic.glossary.filter(g =>
-    !gQuery || g.term.toLowerCase().includes(gQuery) || g.definition.toLowerCase().includes(gQuery)
-  )
-  const GLOSS_LIMIT = 5
-  const shownGlossary = showAllGlossary || gQuery ? matchedGlossary : matchedGlossary.slice(0, GLOSS_LIMIT)
+  const now = Date.now()
+  const dueForReview = subs.filter(s => s.nextReviewAt && new Date(s.nextReviewAt).getTime() <= now)
 
   const BG = "radial-gradient(1200px 800px at 80% -10%, rgba(109,60,255,0.18), transparent 60%), radial-gradient(900px 700px at 0% 100%, rgba(240,82,156,0.13), transparent 55%), #08070f"
 
@@ -198,7 +199,13 @@ export const TopicPage = ({ id }: Props) => {
                 <div className="font-display">{lastSession ? "Новая сессия →" : "Начать →"}</div>
                 <div style={{ fontWeight: 500, fontSize: 12.5, opacity: 0.8, marginTop: 3 }}>10 вопросов · адаптивно</div>
               </button>
-              {weakCount > 0 && (
+              {dueForReview.length > 0 && (
+                <button onClick={startReview} style={{ flex: 1, minWidth: 200, padding: "18px 20px", borderRadius: 18, cursor: "pointer", background: "rgba(255,187,92,0.1)", backdropFilter: "blur(22px)", WebkitBackdropFilter: "blur(22px)", border: "1px solid rgba(255,187,92,0.4)", color: "#fff", fontWeight: 700, fontSize: 17, textAlign: "left", fontFamily: "inherit" }}>
+                  <div className="font-display" style={{ color: "#ffbb5c" }}>Повторить →</div>
+                  <div style={{ fontWeight: 500, fontSize: 12.5, color: "rgba(255,255,255,0.6)", marginTop: 3 }}>{dueForReview.length} подтем пора повторить</div>
+                </button>
+              )}
+              {weakCount > 0 && dueForReview.length === 0 && (
                 <button onClick={startFocused} style={{ flex: 1, minWidth: 200, padding: "18px 20px", borderRadius: 18, cursor: "pointer", background: "rgba(255,255,255,0.08)", backdropFilter: "blur(22px)", WebkitBackdropFilter: "blur(22px)", border: "1px solid rgba(255,255,255,0.18)", color: "#fff", fontWeight: 700, fontSize: 17, textAlign: "left", fontFamily: "inherit" }}>
                   <div className="font-display">Слабые места →</div>
                   <div style={{ fontWeight: 500, fontSize: 12.5, color: "rgba(255,255,255,0.6)", marginTop: 3 }}>{weakCount} подтем · {nextWeak?.name ?? ""}</div>
@@ -244,10 +251,14 @@ export const TopicPage = ({ id }: Props) => {
                 <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
                   {filtered.map(s => {
                     const th = getTheme(s.status)
+                    const isDue = s.nextReviewAt && new Date(s.nextReviewAt).getTime() <= now
                     return (
                       <button key={s.name} onClick={() => router.push(`/topic/${id}/subtopic/${encodeURIComponent(s.name)}`)} style={{ textAlign: "left", display: "block", width: "100%", padding: "17px 20px", borderRadius: 16, cursor: "pointer", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderLeft: `3px solid ${th.accent}`, backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)", fontFamily: "inherit" }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
-                          <span className="font-display" style={{ fontWeight: 600, fontSize: 16.5, color: "#fff" }}>{s.name}</span>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+                            <span className="font-display" style={{ fontWeight: 600, fontSize: 16.5, color: "#fff" }}>{s.name}</span>
+                            {isDue && <span style={{ fontSize: 11, fontWeight: 700, color: "#ffbb5c", background: "rgba(255,187,92,0.15)", padding: "2px 8px", borderRadius: 999, flexShrink: 0 }}>пора повторить</span>}
+                          </div>
                           <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 11px", borderRadius: 999, background: th.bg, border: `1px solid ${th.border}`, fontWeight: 700, fontSize: 12, color: th.accent, whiteSpace: "nowrap", flexShrink: 0 }}>
                             <span style={{ width: 6, height: 6, borderRadius: "50%", background: th.accent }} />{th.label}
                           </span>
@@ -268,47 +279,52 @@ export const TopicPage = ({ id }: Props) => {
               </>
             )}
 
-            {/* GLOSSARY */}
-            {topic.glossary.length > 0 && (
-              <>
-                <div style={{ marginTop: 38, paddingBottom: 12, borderBottom: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 16 }}>
-                  <h2 className="font-display" style={{ fontWeight: 600, fontSize: 13, letterSpacing: "0.07em", color: "rgba(255,255,255,0.5)", margin: 0 }}>
-                    ГЛОССАРИЙ <span style={{ color: "rgba(255,255,255,0.3)" }}>· {topic.glossary.length}</span>
-                  </h2>
-                </div>
+            {/* GLOSSARY BY SUBTOPIC */}
+            {subs.some(s => s.definitions.length > 0) && (() => {
+              const subsWithDefs = subs.filter(s => s.definitions.length > 0)
+              const totalDefs = subsWithDefs.reduce((n, s) => n + s.definitions.length, 0)
+              return (
+                <>
+                  <div style={{ marginTop: 38, paddingBottom: 12, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                    <h2 className="font-display" style={{ fontWeight: 600, fontSize: 13, letterSpacing: "0.07em", color: "rgba(255,255,255,0.5)", margin: 0 }}>
+                      ГЛОССАРИЙ <span style={{ color: "rgba(255,255,255,0.3)" }}>· {totalDefs} терминов</span>
+                    </h2>
+                  </div>
 
-                <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 10, padding: "11px 15px", borderRadius: 13, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                  <span style={{ width: 14, height: 14, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.4)", flexShrink: 0 }} />
-                  <input value={glossaryQuery} onChange={e => setGlossaryQuery(e.target.value)} placeholder="Поиск по терминам…" style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "#fff", fontSize: 14, fontWeight: 500, fontFamily: "inherit" }} />
-                </div>
-
-                <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 9 }}>
-                  {shownGlossary.map(g => {
-                    const open = !!openTerms[g.term] || gQuery.length > 0
-                    return (
-                      <div key={g.term} style={{ borderRadius: 14, background: "rgba(255,255,255,0.045)", border: "1px solid rgba(255,255,255,0.1)", overflow: "hidden" }}>
-                        <button onClick={() => setOpenTerms(prev => ({ ...prev, [g.term]: !prev[g.term] }))} style={{ width: "100%", textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, padding: "15px 18px", cursor: "pointer", background: "transparent", border: "none", color: "#fff", fontFamily: "inherit" }}>
-                          <strong className="font-display" style={{ fontWeight: 600, fontSize: 15.5 }}>{g.term}</strong>
-                          <span style={{ fontSize: 16, color: "rgba(255,255,255,0.4)", display: "inline-block", transform: open ? "rotate(180deg)" : "rotate(0)", transition: "transform .2s ease" }}>⌄</span>
-                        </button>
-                        {open && (
-                          <p style={{ margin: 0, padding: "0 18px 16px", fontSize: 13.5, lineHeight: 1.6, color: "rgba(255,255,255,0.6)" }}>{g.definition}</p>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-
-                {!showAllGlossary && !gQuery && matchedGlossary.length > GLOSS_LIMIT && (
-                  <button onClick={() => setShowAllGlossary(true)} style={{ marginTop: 12, width: "100%", padding: "13px", borderRadius: 13, cursor: "pointer", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)", fontWeight: 600, fontSize: 14, fontFamily: "inherit" }}>
-                    Показать ещё {matchedGlossary.length - GLOSS_LIMIT} →
-                  </button>
-                )}
-                {matchedGlossary.length === 0 && (
-                  <div style={{ marginTop: 12, padding: "28px", textAlign: "center", borderRadius: 14, border: "1px dashed rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.45)", fontSize: 14 }}>Ничего не найдено</div>
-                )}
-              </>
-            )}
+                  <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+                    {subsWithDefs.map(s => {
+                      const th = getTheme(s.status)
+                      const isOpen = !!openTerms[s.name]
+                      return (
+                        <div key={s.name} style={{ borderRadius: 16, background: "rgba(255,255,255,0.045)", border: `1px solid rgba(255,255,255,0.1)`, borderLeft: `3px solid ${th.accent}`, overflow: "hidden" }}>
+                          <button
+                            onClick={() => setOpenTerms(prev => ({ ...prev, [s.name]: !prev[s.name] }))}
+                            style={{ width: "100%", textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "14px 18px", cursor: "pointer", background: "transparent", border: "none", fontFamily: "inherit" }}
+                          >
+                            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                              <span style={{ width: 7, height: 7, borderRadius: "50%", background: th.accent, flexShrink: 0 }} />
+                              <span className="font-display" style={{ fontWeight: 600, fontSize: 15, color: "#fff" }}>{s.name}</span>
+                              <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.35)" }}>{s.definitions.length} {s.definitions.length === 1 ? "термин" : "термина"}</span>
+                            </div>
+                            <span style={{ fontSize: 15, color: "rgba(255,255,255,0.35)", display: "inline-block", transform: isOpen ? "rotate(180deg)" : "rotate(0)", transition: "transform .2s ease", flexShrink: 0 }}>⌄</span>
+                          </button>
+                          {isOpen && (
+                            <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", padding: "14px 18px 18px", display: "flex", flexDirection: "column", gap: 14 }}>
+                              {s.definitions.map(d => (
+                                <div key={d.term}>
+                                  <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: th.accent }}>{d.term}</p>
+                                  <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.6, color: "rgba(255,255,255,0.65)" }}>{d.definition}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </>
+              )
+            })()}
 
             {/* HISTORY */}
             {topic.sessions.length > 1 && (

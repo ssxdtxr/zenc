@@ -39,13 +39,14 @@ model GlossaryTerm {
 }
 
 model TopicSubtopic {
-  id             String @id @default(cuid())
+  id             String    @id @default(cuid())
   topicId        String
   name           String
   status         String
-  recommendation String @db.Text
-  definitions    Json   @default("[]")
-  topic          Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  recommendation String    @db.Text
+  definitions    Json      @default("[]")
+  nextReviewAt   DateTime?
+  topic          Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@unique([topicId, name])
 }

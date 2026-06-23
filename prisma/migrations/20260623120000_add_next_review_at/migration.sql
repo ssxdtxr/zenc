@@ -1,0 +1,1 @@
+ALTER TABLE "TopicSubtopic" ADD COLUMN IF NOT EXISTS "nextReviewAt" TIMESTAMP(3);

@@ -37,6 +37,7 @@ type TutorSession = {
   setAnswer: (v: string) => void
   setConfidence: (v: ConfidenceLevel | null) => void
   submitAnswer: () => Promise<void>
+  submitDontKnow: () => Promise<void>
   nextQuestion: () => void
 }
 
@@ -222,6 +223,46 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSu
     }
   }
 
+  const submitDontKnow = async () => {
+    if (loading) return
+    setLoading(true)
+    setError(null)
+    setConfidence(1)
+    try {
+      const userMessage: Message = { role: "user", content: "Не знаю ответа на этот вопрос." }
+      const updatedMessages = [...messages, userMessage]
+
+      const isLastQuestion = questionCount >= MAX_QUESTIONS
+      const nextNum = questionCount + 1
+
+      const data = await fetchTutorResponse({
+        topic: topicName,
+        messages: updatedMessages,
+        questionNumber: nextNum,
+        focusSubtopics,
+        confidence: 1,
+      })
+      setConfidence(null)
+
+      const finalMessages = [...updatedMessages, { role: "assistant" as const, content: data.assistantMessage }]
+      const newGaps = [...allGaps, ...(data.knowledgeGaps ?? []).filter((g: string) => !allGaps.includes(g))]
+
+      setMessages(finalMessages)
+      setCurrentResponse(data)
+      setAnswer("")
+      if (data.knowledgeGaps?.length) setAllGaps(newGaps)
+
+      const pending = isLastQuestion ? { messages: finalMessages, correct: correctCount } : null
+      if (isLastQuestion) pendingAnalysis.current = pending
+      setSessionState("feedback")
+      saveState(finalMessages, data, "feedback", questionCount, correctCount, newGaps, pending)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Не удалось получить ответ")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const nextQuestion = () => {
     if (pendingAnalysis.current) {
       const { messages: msgs, correct } = pendingAnalysis.current
@@ -238,6 +279,6 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSu
   return {
     sessionState, answer, confidence, loading, error,
     questionCount, correctCount, allGaps, currentResponse, results, textareaRef,
-    setAnswer, setConfidence, submitAnswer, nextQuestion,
+    setAnswer, setConfidence, submitAnswer, submitDontKnow, nextQuestion,
   }
 }

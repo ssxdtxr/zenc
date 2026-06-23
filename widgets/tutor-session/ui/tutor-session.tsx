@@ -33,7 +33,7 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
   const {
     sessionState, answer, confidence, loading, error,
     questionCount, correctCount, currentResponse, results, textareaRef,
-    setAnswer, setConfidence, submitAnswer, nextQuestion,
+    setAnswer, setConfidence, submitAnswer, submitDontKnow, nextQuestion,
   } = useTutorSession({ topicId, topicName, focusSubtopics, previousSubtopics, overallLevel, onComplete })
 
   const [focusOpen, setFocusOpen] = useState(false)
@@ -166,8 +166,13 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
           {/* ERROR */}
           {error && <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 12, background: "rgba(220,38,38,0.15)", border: "1px solid rgba(220,38,38,0.35)", color: "#fca5a5", fontSize: 13 }}>{error}</div>}
 
+          {/* DONT KNOW */}
+          <button onClick={submitDontKnow} disabled={loading} style={{ marginTop: 12, width: "100%", padding: "11px", borderRadius: 12, border: "1px dashed rgba(255,255,255,0.18)", background: "transparent", color: "rgba(255,255,255,0.45)", fontSize: 13.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+            Не знаю / Не знаком с темой
+          </button>
+
           {/* SUBMIT ROW */}
-          <div style={{ marginTop: 16, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <div style={{ marginTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 6 }}>
               <span style={{ padding: "3px 8px", borderRadius: 7, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", fontSize: 12 }}>⌘ Enter</span>
               отправить
@@ -188,21 +193,43 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
             <span style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.4 }}>{currentResponse.question}</span>
           </div>
 
+          {/* VERDICT — главный сигнал */}
+          {currentResponse.evaluation && (() => {
+            const isRight = currentResponse.isCorrect === true
+            const isWrong = currentResponse.isCorrect === false
+            const verdict = {
+              icon: isRight ? "✓" : isWrong ? "✗" : "~",
+              label: isRight ? "Верно" : isWrong ? "Не совсем" : "Частично",
+              color: isRight ? "#5ee08a" : isWrong ? "#ff7e92" : "#ffbb5c",
+              bg: isRight ? "rgba(94,224,138,0.1)" : isWrong ? "rgba(255,126,146,0.1)" : "rgba(255,187,92,0.1)",
+              border: isRight ? "rgba(94,224,138,0.35)" : isWrong ? "rgba(255,126,146,0.35)" : "rgba(255,187,92,0.35)",
+            }
+            return (
+              <div style={{ padding: "18px 20px", borderRadius: 16, background: verdict.bg, border: `1.5px solid ${verdict.border}`, marginBottom: 14 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+                  <span style={{ width: 28, height: 28, borderRadius: "50%", background: verdict.bg, border: `2px solid ${verdict.color}`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14, color: verdict.color, flexShrink: 0 }}>{verdict.icon}</span>
+                  <span style={{ fontWeight: 700, fontSize: 15, color: verdict.color }}>{verdict.label}</span>
+                </div>
+                <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.6, color: "rgba(255,255,255,0.82)" }}>{currentResponse.evaluation}</p>
+              </div>
+            )
+          })()}
+
           {/* User's answer */}
-          <div style={{ padding: "18px 20px", borderRadius: 16, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", marginBottom: 14 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", color: "rgba(255,255,255,0.4)", marginBottom: 8 }}>ТВОЙ ОТВЕТ</div>
-            <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, color: "rgba(255,255,255,0.8)", whiteSpace: "pre-wrap" }}>{answer}</p>
+          <div style={{ padding: "14px 18px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", marginBottom: 14 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "rgba(255,255,255,0.35)", marginBottom: 6 }}>ТВОЙ ОТВЕТ</div>
+            <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.6, color: "rgba(255,255,255,0.75)", whiteSpace: "pre-wrap" }}>{answer}</p>
           </div>
 
           {/* Breakdown */}
-          {(currentResponse.evaluation || currentResponse.explanation) && (
-            <div style={{ padding: "20px 22px", borderRadius: 16, background: "linear-gradient(135deg,rgba(155,107,255,0.14),rgba(43,217,227,0.08))", border: "1px solid rgba(155,107,255,0.28)", marginBottom: 18 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", color: "#b69cff", marginBottom: 12 }}>РАЗБОР · ЧТО ВАЖНО БЫЛО УПОМЯНУТЬ</div>
+          {currentResponse.explanation && (
+            <div style={{ padding: "18px 20px", borderRadius: 16, background: "linear-gradient(135deg,rgba(155,107,255,0.12),rgba(43,217,227,0.06))", border: "1px solid rgba(155,107,255,0.25)", marginBottom: 18 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "#b69cff", marginBottom: 12 }}>ЧТО ВАЖНО БЫЛО УПОМЯНУТЬ</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {(currentResponse.explanation || currentResponse.evaluation || "").split("\n").filter(Boolean).map((line, i) => (
-                  <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-                    <span style={{ color: "#7be3ec", fontWeight: 700, fontSize: 15, lineHeight: 1.5, flexShrink: 0 }}>✓</span>
-                    <span style={{ fontSize: 14.5, lineHeight: 1.55, color: "rgba(255,255,255,0.82)" }}>{line}</span>
+                {currentResponse.explanation.split("\n").filter(Boolean).map((line, i) => (
+                  <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                    <span style={{ color: "#7be3ec", fontWeight: 700, fontSize: 14, lineHeight: 1.5, flexShrink: 0 }}>·</span>
+                    <span style={{ fontSize: 14, lineHeight: 1.6, color: "rgba(255,255,255,0.78)" }}>{line}</span>
                   </div>
                 ))}
               </div>
