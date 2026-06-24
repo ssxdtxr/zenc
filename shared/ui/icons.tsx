@@ -22,15 +22,46 @@ export const TargetIcon = ({ size = 16, color = "currentColor" }: IconProps) => 
   </svg>
 )
 
-export const ArrowRightIcon = ({ size = 14, color = "currentColor" }: IconProps) => (
+export const ChevronLeftIcon = ({ size = 20, color = "currentColor" }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M15 18l-6-6 6-6" />
+  </svg>
+)
+
+export const ChevronRightIcon = ({ size = 20, color = "currentColor" }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 18l6-6-6-6" />
+  </svg>
+)
+
+export const ChevronDownIcon = ({ size = 16, color = "currentColor" }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 9l6 6 6-6" />
+  </svg>
+)
+
+export const ArrowRightIcon = ({ size = 16, color = "currentColor" }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M5 12h14M12 5l7 7-7 7" />
   </svg>
 )
 
-export const ArrowLeftIcon = ({ size = 14, color = "currentColor" }: IconProps) => (
+export const ArrowLeftIcon = ({ size = 16, color = "currentColor" }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M19 12H5M12 19l-7-7 7-7" />
+  </svg>
+)
+
+export const SendIcon = ({ size = 16, color = "currentColor" }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 2L11 13" />
+    <path d="M22 2L15 22l-4-9-9-4 20-7z" />
+  </svg>
+)
+
+export const XIcon = ({ size = 14, color = "currentColor" }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round">
+    <path d="M18 6L6 18M6 6l12 12" />
   </svg>
 )
 
@@ -46,7 +77,20 @@ export const CrossIcon = ({ size = 14, color = "currentColor" }: IconProps) => (
   </svg>
 )
 
-/* Confidence icons — abstract geometric */
+export const SearchIcon = ({ size = 14, color = "currentColor" }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round">
+    <circle cx="11" cy="11" r="8" />
+    <path d="m21 21-4.35-4.35" />
+  </svg>
+)
+
+export const PlusIcon = ({ size = 16, color = "currentColor" }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round">
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+)
+
+/* Confidence icons */
 export const UncertainIcon = ({ size = 18, color = "currentColor" }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round">
     <circle cx="12" cy="12" r="9" />

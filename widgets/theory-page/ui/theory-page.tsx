@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { ChevronLeftIcon } from "@/shared/ui/icons"
 import { useRouter } from "next/navigation"
 import { useTheory } from "../model/use-theory"
 import { apiClient } from "@/shared/lib/api-client"
@@ -45,7 +46,7 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
 
         {/* NAV */}
         <nav style={{ position: "sticky", top: 16, zIndex: 20, display: "flex", alignItems: "center", gap: 16, padding: "11px 16px", borderRadius: 20, background: "rgba(255,255,255,0.06)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 10px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18)" }}>
-          <button onClick={() => router.back()} style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 12, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.85)", fontSize: 17, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }}>←</button>
+          <button onClick={() => router.back()} style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 12, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.85)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><ChevronLeftIcon size={20} color="rgba(255,255,255,0.85)" /></button>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 12.5, fontWeight: 600, color: "rgba(255,255,255,0.45)" }}>{topic?.name}</div>
             <h1 className="font-display" style={{ fontWeight: 700, fontSize: 20, letterSpacing: "-0.01em", margin: "1px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#fff" }}>{subtopicName}</h1>

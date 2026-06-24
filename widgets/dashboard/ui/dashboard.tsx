@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { XIcon, SearchIcon, PlusIcon } from "@/shared/ui/icons"
 import { useDashboard } from "../model/use-dashboard"
 import { OVERALL_LEVEL_CONFIG } from "@/entities/topic/config"
 import type { Topic } from "@/entities/topic/model/types"
@@ -52,21 +53,21 @@ export const Dashboard = () => {
         <div style={{ position: "absolute", top: "42%", left: "-8%", width: "30vw", height: "30vw", borderRadius: "50%", background: "radial-gradient(circle at 30% 30%, #ffae3b, transparent 70%)", opacity: 0.22, animation: "drift4 28s ease-in-out infinite" }} />
       </div>
 
-      <div style={{ position: "relative", zIndex: 1, maxWidth: 780, margin: "0 auto", padding: "16px 20px 80px" }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 780, margin: "0 auto", padding: "16px 16px 100px" }}>
 
         {/* NAV */}
-        <nav style={{ position: "sticky", top: 12, zIndex: 20, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "10px 12px 10px 14px", borderRadius: 18, background: "rgba(255,255,255,0.06)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 10px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18)" }}>
+        <nav style={{ position: "sticky", top: "calc(env(safe-area-inset-top, 8px) + 8px)", zIndex: 20, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "10px 12px 10px 14px", borderRadius: 18, background: "rgba(255,255,255,0.06)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 10px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div className="font-display" style={{ width: 36, height: 36, borderRadius: 11, background: "linear-gradient(135deg,#9b6bff,#6d3cff)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 18, color: "#fff", boxShadow: "0 6px 18px rgba(109,60,255,0.5)" }}>Z</div>
             <span className="font-display" style={{ fontWeight: 600, fontSize: 17, letterSpacing: "-0.01em", color: "#fff" }}>Zerc</span>
           </div>
           <div style={{ flex: 1, maxWidth: 320, display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <SearchIcon size={14} color="rgba(255,255,255,0.4)" />
             <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Поиск по темам…" style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "#fff", fontSize: 13, fontWeight: 500, fontFamily: "inherit" }} />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <button onClick={() => setCreating(true)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 16px", borderRadius: 12, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 13, boxShadow: "0 8px 22px rgba(109,60,255,0.45)", fontFamily: "inherit" }}>
-              <span style={{ fontSize: 16, lineHeight: 1 }}>+</span> Тема
+              <PlusIcon size={14} color="#fff" /> Тема
             </button>
             {userEmail && (
               <button onClick={logout} title={`Выйти (${userEmail})`} style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#2bd9e3,#3b82f6)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, color: "#06121a", cursor: "pointer", border: "1.5px solid rgba(255,255,255,0.25)", fontFamily: "inherit" }}>
@@ -131,7 +132,7 @@ export const Dashboard = () => {
               ).length
               return (
                 <article key={t.id} className="anim-pop" style={{ position: "relative", borderRadius: 20, background: "rgba(255,255,255,0.055)", backdropFilter: "blur(22px) saturate(140%)", WebkitBackdropFilter: "blur(22px) saturate(140%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.14)", padding: "20px" }}>
-                  <button onClick={() => deleteTopic(t.id)} style={{ position: "absolute", top: 14, right: 14, width: 26, height: 26, borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }}>×</button>
+                  <button onClick={() => deleteTopic(t.id)} style={{ position: "absolute", top: 14, right: 14, width: 26, height: 26, borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.5)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><XIcon size={12} color="rgba(255,255,255,0.5)" /></button>
 
                   <div style={{ display: "flex", alignItems: "center", gap: 8, paddingRight: 32, marginBottom: 4 }}>
                     <h3 className="font-display" style={{ fontWeight: 600, fontSize: 17, letterSpacing: "-0.01em", margin: 0, color: "#fff" }}>{t.name}</h3>

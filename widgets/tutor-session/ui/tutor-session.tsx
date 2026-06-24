@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
+import { ChevronDownIcon } from "@/shared/ui/icons"
 import { SessionResults } from "@/features/session-results/ui/session-results"
 import { RichText } from "@/features/theory-view/ui/rich-text"
 import type { SessionRecord } from "@/entities/topic/model/types"
@@ -79,7 +80,7 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
               <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#9b6bff", boxShadow: "0 0 8px #9b6bff", flexShrink: 0 }} />
               Фокус сессии · {focusSubtopics.length} тем
             </span>
-            <span style={{ fontSize: 15, color: "rgba(255,255,255,0.4)", display: "inline-block", transform: focusOpen ? "rotate(180deg)" : "rotate(0)", transition: "transform .2s ease" }}>⌄</span>
+            <span style={{ fontSize: 15, color: "rgba(255,255,255,0.4)", display: "inline-block", transform: focusOpen ? "rotate(180deg)" : "rotate(0)", transition: "transform .2s ease" }}><ChevronDownIcon size={15} color="rgba(255,255,255,0.4)" /></span>
           </button>
           {focusOpen && (
             <div style={{ marginTop: -14, marginBottom: 22, display: "flex", flexWrap: "wrap", gap: 7 }}>

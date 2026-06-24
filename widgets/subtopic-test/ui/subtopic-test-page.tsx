@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { ChevronLeftIcon } from "@/shared/ui/icons"
 import { useRouter } from "next/navigation"
 import { apiClient } from "@/shared/lib/api-client"
 import { SUBTOPIC_STATUS_CONFIG, OVERALL_LEVEL_CONFIG } from "@/entities/topic/config"
@@ -141,7 +142,7 @@ export const SubtopicTestPage = ({ topicId, subtopicName }: Props) => {
       <div style={{ position: "relative", zIndex: 1, maxWidth: 860, margin: "0 auto", padding: "22px 28px 80px" }}>
         {/* NAV */}
         <nav style={{ display: "flex", alignItems: "center", gap: 16, padding: "12px 18px", borderRadius: 20, background: "rgba(255,255,255,0.06)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 10px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18)" }}>
-          <button onClick={() => router.back()} style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 12, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.85)", fontSize: 17, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }}>←</button>
+          <button onClick={() => router.back()} style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 12, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.85)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><ChevronLeftIcon size={20} color="rgba(255,255,255,0.85)" /></button>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>{topic?.name}</div>
             <h1 className="font-display" style={{ margin: "1px 0 0", fontSize: 20, fontWeight: 700, letterSpacing: "-0.01em", color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{subtopicName}</h1>

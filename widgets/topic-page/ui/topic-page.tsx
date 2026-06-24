@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { ChevronLeftIcon, TargetIcon, ChevronDownIcon } from "@/shared/ui/icons"
 import { useRouter } from "next/navigation"
 import type { GlossaryTerm, Topic, SessionRecord } from "@/entities/topic/model/types"
 import { OVERALL_LEVEL_CONFIG } from "@/entities/topic/config"
@@ -129,7 +130,7 @@ export const TopicPage = ({ id }: Props) => {
 
         {/* NAV */}
         <nav style={{ position: "sticky", top: 16, zIndex: 20, display: "flex", alignItems: "center", gap: 16, padding: "12px 18px", borderRadius: 20, background: "rgba(255,255,255,0.06)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 10px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18)" }}>
-          <button onClick={() => inSession ? setInSession(false) : router.push("/")} style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 12, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.85)", fontSize: 17, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "inherit" }}>←</button>
+          <button onClick={() => inSession ? setInSession(false) : router.push("/")} style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 12, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.85)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><ChevronLeftIcon size={20} color="rgba(255,255,255,0.85)" /></button>
           <h1 className="font-display" style={{ fontWeight: 700, fontSize: 22, letterSpacing: "-0.02em", margin: 0, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "#fff" }}>{topic.name}</h1>
           {levelCfg && (
             <span style={{ padding: "6px 14px", borderRadius: 999, fontSize: 13, fontWeight: 700, background: levelCfg.bg, color: levelCfg.color, border: `1px solid ${levelCfg.border}`, flexShrink: 0 }}>{levelCfg.label}</span>
@@ -306,7 +307,7 @@ export const TopicPage = ({ id }: Props) => {
                               <span className="font-display" style={{ fontWeight: 600, fontSize: 15, color: "#fff" }}>{s.name}</span>
                               <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.35)" }}>{s.definitions.length} {s.definitions.length === 1 ? "термин" : "термина"}</span>
                             </div>
-                            <span style={{ fontSize: 15, color: "rgba(255,255,255,0.35)", display: "inline-block", transform: isOpen ? "rotate(180deg)" : "rotate(0)", transition: "transform .2s ease", flexShrink: 0 }}>⌄</span>
+                            <span style={{ fontSize: 15, color: "rgba(255,255,255,0.35)", display: "inline-block", transform: isOpen ? "rotate(180deg)" : "rotate(0)", transition: "transform .2s ease", flexShrink: 0 }}><ChevronDownIcon size={15} color="rgba(255,255,255,0.35)" /></span>
                           </button>
                           {isOpen && (
                             <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", padding: "14px 18px 18px", display: "flex", flexDirection: "column", gap: 14 }}>
