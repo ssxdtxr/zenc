@@ -20,7 +20,10 @@ type SavedSession = {
   allGaps: string[]
   pendingAnalysis: { messages: Message[]; correct: number } | null
   focusSubtopics?: string[]
+  followUpMessages?: FollowUpMessage[]
 }
+
+export type FollowUpMessage = { question: string; answer: string }
 
 type TutorSession = {
   sessionState: SessionState
@@ -34,10 +37,15 @@ type TutorSession = {
   currentResponse: TutorResponse | null
   results: Omit<SessionRecord, "id" | "date"> | null
   textareaRef: RefObject<HTMLTextAreaElement | null>
+  followUpMessages: FollowUpMessage[]
+  followUpLoading: boolean
+  lastQuestion: string | null
+  lastAnswer: string | null
   setAnswer: (v: string) => void
   setConfidence: (v: ConfidenceLevel | null) => void
   submitAnswer: () => Promise<void>
   submitDontKnow: () => Promise<void>
+  askFollowUp: (question: string) => Promise<void>
   nextQuestion: () => void
 }
 
@@ -64,6 +72,10 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSu
   const [correctCount, setCorrectCount] = useState(0)
   const [allGaps, setAllGaps] = useState<string[]>([])
   const [results, setResults] = useState<Omit<SessionRecord, "id" | "date"> | null>(null)
+  const [followUpMessages, setFollowUpMessages] = useState<FollowUpMessage[]>([])
+  const [followUpLoading, setFollowUpLoading] = useState(false)
+  const [lastQuestion, setLastQuestion] = useState<string | null>(null)
+  const [lastAnswer, setLastAnswer] = useState<string | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const initialized = useRef(false)
   const pendingAnalysis = useRef<{ messages: Message[]; correct: number } | null>(null)
@@ -80,16 +92,17 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSu
     cCount: number,
     gaps: string[],
     pending: { messages: Message[]; correct: number } | null,
+    overrideFollowUps?: FollowUpMessage[],
   ) => {
     try {
       const data: SavedSession = {
         messages: msgs, currentResponse: response, sessionState: state,
         questionCount: qCount, correctCount: cCount, allGaps: gaps, pendingAnalysis: pending,
-        focusSubtopics,
+        focusSubtopics, followUpMessages: overrideFollowUps ?? followUpMessages,
       }
       localStorage.setItem(storageKey, JSON.stringify(data))
     } catch {}
-  }, [storageKey])
+  }, [storageKey, followUpMessages])
 
   useEffect(() => {
     if (initialized.current) return
@@ -108,6 +121,7 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSu
           setCorrectCount(saved.correctCount)
           setAllGaps(saved.allGaps)
           if (saved.pendingAnalysis) pendingAnalysis.current = saved.pendingAnalysis
+          if (saved.followUpMessages?.length) setFollowUpMessages(saved.followUpMessages)
           return
         }
       }
@@ -183,6 +197,9 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSu
     if (!answer.trim() || loading) return
     setLoading(true)
     setError(null)
+    const questionBeingAnswered = currentResponse?.question ?? null
+    setLastQuestion(questionBeingAnswered)
+    setLastAnswer(answer)
     try {
       const userMessage: Message = { role: "user", content: answer }
       const updatedMessages = [...messages, userMessage]
@@ -228,6 +245,8 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSu
     setLoading(true)
     setError(null)
     setConfidence(1)
+    setLastQuestion(currentResponse?.question ?? null)
+    setLastAnswer("Не знаю ответа.")
     try {
       const userMessage: Message = { role: "user", content: "Не знаю ответа на этот вопрос." }
       const updatedMessages = [...messages, userMessage]
@@ -273,12 +292,44 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSu
     const nextCount = questionCount + 1
     setQuestionCount(nextCount)
     setSessionState("session")
+    setFollowUpMessages([])
     if (currentResponse) saveState(messages, currentResponse, "session", nextCount, correctCount, allGaps, null)
+  }
+
+  const askFollowUp = async (question: string) => {
+    if (!question.trim() || followUpLoading || !currentResponse) return
+    setFollowUpLoading(true)
+    try {
+      const res = await fetch("/api/follow-up", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          topicName,
+          originalQuestion: currentResponse.question,
+          userAnswer: messages[messages.length - 2]?.content ?? "",
+          evaluation: currentResponse.evaluation,
+          history: followUpMessages,
+          question,
+        }),
+      })
+      const data = await res.json()
+      if (data.answer) {
+        const updated = [...followUpMessages, { question, answer: data.answer }]
+        setFollowUpMessages(updated)
+        // Persist to localStorage so reload restores chat history
+        if (currentResponse) saveState(messages, currentResponse, "feedback", questionCount, correctCount, allGaps, pendingAnalysis.current, updated)
+      }
+    } catch {
+      // silent fail
+    } finally {
+      setFollowUpLoading(false)
+    }
   }
 
   return {
     sessionState, answer, confidence, loading, error,
     questionCount, correctCount, allGaps, currentResponse, results, textareaRef,
-    setAnswer, setConfidence, submitAnswer, submitDontKnow, nextQuestion,
+    followUpMessages, followUpLoading, lastQuestion, lastAnswer,
+    setAnswer, setConfidence, submitAnswer, submitDontKnow, askFollowUp, nextQuestion,
   }
 }

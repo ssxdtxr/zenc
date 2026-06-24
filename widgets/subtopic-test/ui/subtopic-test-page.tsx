@@ -197,11 +197,13 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
 }) {
   const [selectedConfidence, setSelectedConfidence] = useState<ConfidenceLevel | null>(null)
   const [collectedMessages, setCollectedMessages] = useState<Message[]>([])
+  const [followUpInput, setFollowUpInput] = useState("")
 
   const {
     sessionState, answer, confidence, loading, error,
     questionCount, correctCount, currentResponse, textareaRef,
-    setAnswer, setConfidence, submitAnswer, submitDontKnow, nextQuestion,
+    followUpMessages, followUpLoading, lastQuestion, lastAnswer,
+    setAnswer, setConfidence, submitAnswer, submitDontKnow, askFollowUp, nextQuestion,
   } = useTutorSession({
     topicId,
     topicName,
@@ -346,9 +348,21 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
       {/* Feedback */}
       {currentResponse && sessionState === "feedback" && (
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 16 }}>
-            <span style={{ width: 28, height: 28, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, background: levelTheme.bg, color: levelTheme.color, border: `1px solid ${levelTheme.border}`, fontFamily: "inherit" }}>{questionCount}</span>
-            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.4 }}>{currentResponse.question}</span>
+          {/* Question */}
+          {lastQuestion && (
+            <div style={{ padding: "14px 18px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", marginBottom: 10 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                <span style={{ width: 22, height: 22, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 11, background: levelTheme.bg, color: levelTheme.color, border: `1px solid ${levelTheme.border}`, fontFamily: "inherit" }}>{questionCount}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "rgba(255,255,255,0.35)" }}>ВОПРОС</span>
+              </div>
+              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: "rgba(255,255,255,0.75)" }}>{lastQuestion}</p>
+            </div>
+          )}
+
+          {/* User's answer */}
+          <div style={{ padding: "14px 18px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", marginBottom: 12 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "rgba(255,255,255,0.35)", marginBottom: 6 }}>МОЙ ОТВЕТ</div>
+            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: "rgba(255,255,255,0.75)", whiteSpace: "pre-wrap" }}>{lastAnswer}</p>
           </div>
 
           {currentResponse.evaluation && (() => {
@@ -369,14 +383,48 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
           {currentResponse.explanation && (
             <div style={{ padding: "16px 18px", borderRadius: 14, background: "linear-gradient(135deg,rgba(155,107,255,0.1),rgba(43,217,227,0.05))", border: "1px solid rgba(155,107,255,0.22)", marginBottom: 16 }}>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "#b69cff", marginBottom: 10 }}>ЧТО ВАЖНО</div>
-              {currentResponse.explanation.split("\n").filter(Boolean).map((line, i) => (
-                <div key={i} style={{ display: "flex", gap: 9, alignItems: "flex-start", marginBottom: 6 }}>
-                  <span style={{ color: "#7be3ec", fontWeight: 700, fontSize: 13, flexShrink: 0 }}>·</span>
-                  <span style={{ fontSize: 13.5, lineHeight: 1.55, color: "rgba(255,255,255,0.75)" }}>{line}</span>
-                </div>
-              ))}
+              <RichText text={currentResponse.explanation} className="[&_p]:!text-[rgba(255,255,255,0.75)] [&_p]:!text-sm" />
             </div>
           )}
+
+          {/* Follow-up chat */}
+          <div style={{ marginTop: 6 }}>
+            {followUpMessages.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
+                {followUpMessages.map((m, i) => (
+                  <div key={i} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    <div style={{ alignSelf: "flex-end", maxWidth: "85%", padding: "10px 14px", borderRadius: "14px 14px 4px 14px", background: "rgba(155,107,255,0.2)", border: "1px solid rgba(155,107,255,0.35)", fontSize: 13.5, color: "#fff", fontWeight: 500 }}>
+                      {m.question}
+                    </div>
+                    <div style={{ alignSelf: "flex-start", maxWidth: "92%", padding: "10px 14px", borderRadius: "14px 14px 14px 4px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                      <RichText text={m.answer} className="[&_p]:!text-sm [&_p]:!text-[rgba(255,255,255,0.82)]" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div style={{ display: "flex", gap: 8, alignItems: "flex-end", marginBottom: 14 }}>
+              <textarea
+                value={followUpInput}
+                onChange={e => setFollowUpInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && followUpInput.trim()) {
+                    askFollowUp(followUpInput); setFollowUpInput("")
+                  }
+                }}
+                placeholder="Задай уточняющий вопрос…"
+                rows={2}
+                style={{ flex: 1, resize: "none", padding: "10px 14px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.12)", outline: "none", color: "#fff", fontSize: 13.5, lineHeight: 1.5, fontFamily: "inherit" }}
+              />
+              <button
+                onClick={() => { if (followUpInput.trim()) { askFollowUp(followUpInput); setFollowUpInput("") } }}
+                disabled={!followUpInput.trim() || followUpLoading}
+                style={{ padding: "10px 14px", borderRadius: 12, border: "none", cursor: "pointer", background: "rgba(155,107,255,0.25)", color: "#c4adff", fontWeight: 700, fontSize: 13, fontFamily: "inherit", flexShrink: 0, opacity: (!followUpInput.trim() || followUpLoading) ? 0.5 : 1 }}
+              >
+                {followUpLoading ? "…" : "Спросить"}
+              </button>
+            </div>
+          </div>
 
           {!isLastQuestion ? (
             <button onClick={nextQuestion} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 22px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
