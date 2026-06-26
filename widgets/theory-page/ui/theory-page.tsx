@@ -75,7 +75,7 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
       <div style={{ position: "relative", zIndex: 1, maxWidth: 1280, margin: "0 auto", padding: "22px 28px 72px" }}>
 
         {/* NAV */}
-        <nav style={{ position: "sticky", top: 16, zIndex: 20, display: "flex", alignItems: "center", gap: 16, padding: "11px 16px", borderRadius: 20, background: "rgba(255,255,255,0.06)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 10px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18)", marginBottom: 22 }}>
+        <nav style={{ position: "sticky", top: 16, zIndex: 20, display: "flex", alignItems: "center", gap: 12, padding: "11px 16px", borderRadius: 20, background: "rgba(255,255,255,0.06)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 10px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18)", marginBottom: 22 }}>
           <button onClick={() => router.back()} style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 12, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.85)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <ChevronLeftIcon size={20} color="rgba(255,255,255,0.85)" />
           </button>
@@ -88,6 +88,20 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
               {statusCfg.label}
             </span>
           )}
+          <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+            <button
+              onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(subtopicName)}/practice`)}
+              style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 12, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#2bd9e3,#1bb8c4)", color: "#08070f", fontWeight: 700, fontSize: 13.5, boxShadow: "0 4px 14px rgba(43,217,227,0.3)", fontFamily: "inherit", whiteSpace: "nowrap" }}
+            >
+              ✏️ Практика
+            </button>
+            <button
+              onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(subtopicName)}/test`)}
+              style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 12, border: "1px solid rgba(155,107,255,0.4)", cursor: "pointer", background: "rgba(155,107,255,0.12)", color: "#c4adff", fontWeight: 600, fontSize: 13.5, fontFamily: "inherit", whiteSpace: "nowrap" }}
+            >
+              🧠 Тест
+            </button>
+          </div>
         </nav>
 
         {/* LOADING */}
@@ -203,12 +217,9 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                 )}
 
                 {/* FOOTER NAV */}
-                <div style={{ marginTop: 8, display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ marginTop: 8 }}>
                   <button onClick={() => router.back()} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 20px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.16)", cursor: "pointer", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", fontWeight: 600, fontSize: 15, fontFamily: "inherit" }}>
                     ← Вернуться
-                  </button>
-                  <button onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(subtopicName)}/test`)} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 26px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 10px 26px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
-                    Проверить себя →
                   </button>
                 </div>
               </div>
@@ -236,12 +247,6 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                         )
                       })}
                     </div>
-                    <button
-                      onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(subtopicName)}/test`)}
-                      style={{ marginTop: 14, width: "100%", padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 14.5, boxShadow: "0 8px 22px rgba(109,60,255,0.38)", fontFamily: "inherit" }}
-                    >
-                      Проверить себя →
-                    </button>
                   </section>
                 )}
 
