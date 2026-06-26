@@ -6,25 +6,50 @@ import { extractJson } from "@/lib/extract-json"
 
 const client = new Anthropic()
 
-const SYSTEM_PROMPT = `Ты — технический наставник. Объясняй кратко и по делу — только суть, без воды.
+const SYSTEM_PROMPT = `Ты — технический наставник. Объясняй точно и по делу — только суть, без воды.
 
 Формат ответа — СТРОГО JSON без markdown:
 {
   "title": "название подтемы",
   "mainIdea": "главная идея в 2-4 предложениях — что это такое, зачем нужно и как работает",
-  "watchOut": "на что обратить внимание — 1-2 предложения о типичных ошибках, нюансах или распространённых заблуждениях",
+  "watchOut": "на что обратить внимание — 1-2 предложения о нюансах или распространённых заблуждениях",
   "definitions": [
-    { "term": "ключевой термин подтемы", "definition": "точное определение в одном предложении" }
+    { "term": "ключевой термин", "definition": "точное определение в одном предложении" }
   ],
-  "keyPoints": ["ключевой вывод 1", "ключевой вывод 2", "ключевой вывод 3"],
-  "codeExample": "небольшой показательный пример кода или null если не применимо"
+  "examples": [
+    {
+      "label": "Базовый",
+      "explanation": "короткое описание что показывает этот пример",
+      "code": "код или null если не применимо"
+    },
+    {
+      "label": "Реальный сценарий",
+      "explanation": "как это выглядит в продакшн-коде",
+      "code": "код или null"
+    },
+    {
+      "label": "Edge case",
+      "explanation": "нетривиальный случай, который часто упускают",
+      "code": "код или null"
+    }
+  ],
+  "antiPatterns": [
+    "конкретная ошибка или антипаттерн, которую делают разработчики",
+    "ещё одна типичная ошибка"
+  ],
+  "relatedSubtopics": [
+    { "name": "название другой подтемы из списка", "relation": "одна фраза — зачем связь" }
+  ],
+  "keyPoints": ["главный вывод 1", "главный вывод 2", "главный вывод 3"]
 }
 
 Правила:
-- definitions: 3-5 самых важных терминов этой подтемы
-- keyPoints: 3 главных вывода которые нужно запомнить
-- codeExample: только если код реально помогает понять — иначе null
-- Без лишних слов, без вступлений, только по делу`
+- definitions: 3-5 самых важных терминов
+- examples: всегда 3 примера с нарастающей сложностью; code — null только если код совсем не применим
+- antiPatterns: 2-4 конкретных ошибки которые реально допускают в коде или на собеседованиях
+- relatedSubtopics: только из предоставленного списка подтем, только реально связанные
+- keyPoints: ровно 3 вывода
+- Без лишних слов, без вступлений`
 
 const levelHints: Record<OverallLevel, string> = {
   beginner: "Объясняй просто, избегай жаргона, расшифровывай термины.",
@@ -35,19 +60,24 @@ const levelHints: Record<OverallLevel, string> = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { topicName, subtopicName, userLevel, recommendation } = await req.json()
+    const { topicName, subtopicName, userLevel, recommendation, allSubtopics } = await req.json()
     const level: OverallLevel = userLevel ?? "beginner"
-    const cacheKey = `${topicName}:${subtopicName}:${level}`
+    const cacheKey = `v2:${topicName}:${subtopicName}:${level}`
 
     const cached = await prisma.theoryCache.findUnique({ where: { cacheKey } })
     if (cached) return NextResponse.json(cached.content)
 
-    const userMessage = `Объясни подтему "${subtopicName}" в контексте "${topicName}".
-Уровень: ${level}. ${levelHints[level]}${recommendation ? ` Акцент: ${recommendation}` : ""}`
+    const otherSubtopics = Array.isArray(allSubtopics)
+      ? (allSubtopics as string[]).filter((s: string) => s !== subtopicName)
+      : []
+
+    const userMessage = `Объясни подтему "${subtopicName}" в контексте темы "${topicName}".
+Уровень пользователя: ${level}. ${levelHints[level]}${recommendation ? ` Акцент: ${recommendation}` : ""}
+${otherSubtopics.length > 0 ? `\nДругие подтемы этой темы (используй для relatedSubtopics): ${otherSubtopics.join(", ")}` : ""}`
 
     const response = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 2000,
+      max_tokens: 4000,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
     })

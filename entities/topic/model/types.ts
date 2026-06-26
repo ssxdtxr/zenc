@@ -33,13 +33,27 @@ export type TheoryDefinition = {
   definition: string
 }
 
+export type TheoryExample = {
+  label: string
+  explanation: string
+  code?: string | null
+}
+
+export type TheoryRelated = {
+  name: string
+  relation: string
+}
+
 export type TheoryContent = {
   title: string
   mainIdea: string
   watchOut: string
   definitions: TheoryDefinition[]
   keyPoints: string[]
-  codeExample: string | null
+  codeExample?: string | null
+  examples?: TheoryExample[]
+  antiPatterns?: string[]
+  relatedSubtopics?: TheoryRelated[]
 }
 
 export type GlossaryTerm = {

@@ -29,6 +29,7 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
     subtopicName,
     userLevel: topic?.overallLevel ?? null,
     recommendation: subtopic?.recommendation ?? "",
+    allSubtopics: topic?.currentSubtopics.map(s => s.name),
   })
 
   const BG = "radial-gradient(1200px 800px at 80% -10%, rgba(109,60,255,0.18), transparent 60%), radial-gradient(900px 700px at 0% 100%, rgba(43,217,227,0.1), transparent 55%), #08070f"
@@ -107,18 +108,59 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
               </section>
             )}
 
-            {/* ПРИМЕР (code) */}
-            {content.codeExample && (
-              <section style={{ marginTop: 14, borderRadius: 22, overflow: "hidden", border: "1px solid rgba(255,255,255,0.13)", boxShadow: "0 14px 46px rgba(0,0,0,0.45)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "13px 18px", background: "rgba(10,9,16,0.9)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-                  <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#ff5f57", flexShrink: 0 }} />
-                  <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#febc2e", flexShrink: 0 }} />
-                  <span style={{ width: 11, height: 11, borderRadius: "50%", background: "#28c840", flexShrink: 0 }} />
-                  <span style={{ fontSize: 12.5, fontWeight: 600, color: "rgba(255,255,255,0.5)", marginLeft: 8 }}>Пример</span>
+            {/* ПРИМЕРЫ */}
+            {content.examples && content.examples.length > 0 && (
+              <section style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.07em", color: "rgba(255,255,255,0.42)", padding: "0 2px" }}>ПРИМЕРЫ</div>
+                {content.examples.map((ex, i) => (
+                  <div key={i} style={{ borderRadius: 18, overflow: "hidden", border: "1px solid rgba(255,255,255,0.13)", boxShadow: "0 10px 36px rgba(0,0,0,0.4)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 18px", background: "rgba(10,9,16,0.88)", borderBottom: ex.code ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
+                      <span style={{ padding: "3px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: i === 0 ? "rgba(43,217,227,0.15)" : i === 1 ? "rgba(155,107,255,0.15)" : "rgba(255,187,92,0.15)", color: i === 0 ? "#2bd9e3" : i === 1 ? "#b69cff" : "#ffbb5c", border: `1px solid ${i === 0 ? "rgba(43,217,227,0.3)" : i === 1 ? "rgba(155,107,255,0.3)" : "rgba(255,187,92,0.3)"}` }}>{ex.label}</span>
+                      <span style={{ fontSize: 13.5, color: "rgba(255,255,255,0.65)", lineHeight: 1.45 }}>{ex.explanation}</span>
+                    </div>
+                    {ex.code && (
+                      <pre className="font-mono" style={{ margin: 0, padding: "18px 22px", background: "rgba(8,7,15,0.92)", fontSize: 13, lineHeight: 1.7, color: "rgba(255,255,255,0.82)", overflowX: "auto", whiteSpace: "pre" }}>{ex.code}</pre>
+                    )}
+                  </div>
+                ))}
+              </section>
+            )}
+
+            {/* АНТИПАТТЕРНЫ */}
+            {content.antiPatterns && content.antiPatterns.length > 0 && (
+              <section style={{ marginTop: 14, padding: "22px 26px", borderRadius: 22, background: "linear-gradient(135deg,rgba(255,80,80,0.1),rgba(255,60,60,0.04))", backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", border: "1px solid rgba(255,80,80,0.25)", boxShadow: "0 14px 46px rgba(0,0,0,0.32)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 14 }}>
+                  <span style={{ width: 20, height: 20, borderRadius: "50%", background: "rgba(255,80,80,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 12, color: "#ff6060", flexShrink: 0 }}>✕</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.07em", color: "#ff6060" }}>АНТИПАТТЕРНЫ</span>
                 </div>
-                <pre className="font-mono" style={{ margin: 0, padding: "20px 22px", background: "rgba(8,7,15,0.92)", fontSize: 13, lineHeight: 1.7, color: "rgba(255,255,255,0.82)", overflowX: "auto", whiteSpace: "pre" }}>
-                  {content.codeExample}
-                </pre>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {content.antiPatterns.map((p, i) => (
+                    <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
+                      <span style={{ width: 20, height: 20, borderRadius: 6, flexShrink: 0, background: "rgba(255,80,80,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#ff7070", fontWeight: 700, fontSize: 11, marginTop: 1 }}>✕</span>
+                      <span style={{ fontSize: 15, lineHeight: 1.6, color: "rgba(255,255,255,0.8)" }}>{p}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* СВЯЗАНО С */}
+            {content.relatedSubtopics && content.relatedSubtopics.length > 0 && (
+              <section style={{ marginTop: 14, padding: "22px 26px", borderRadius: 22, background: "rgba(255,255,255,0.05)", backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", border: "1px solid rgba(255,255,255,0.11)" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.07em", color: "rgba(255,255,255,0.42)", marginBottom: 14 }}>СВЯЗАНО С</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                  {content.relatedSubtopics.map((r, i) => (
+                    <button
+                      key={i}
+                      onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(r.name)}`)}
+                      style={{ textAlign: "left", display: "flex", alignItems: "center", gap: 12, padding: "11px 14px", borderRadius: 12, cursor: "pointer", background: "rgba(155,107,255,0.08)", border: "1px solid rgba(155,107,255,0.2)", fontFamily: "inherit" }}
+                    >
+                      <span className="font-display" style={{ fontWeight: 600, fontSize: 14.5, color: "#c4adff", flexShrink: 0 }}>{r.name}</span>
+                      <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.4 }}>{r.relation}</span>
+                      <span style={{ marginLeft: "auto", fontSize: 14, color: "rgba(155,107,255,0.6)", flexShrink: 0 }}>→</span>
+                    </button>
+                  ))}
+                </div>
               </section>
             )}
 
