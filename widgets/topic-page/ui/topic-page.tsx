@@ -9,12 +9,14 @@ import { TutorSession } from "@/widgets/tutor-session/ui/tutor-session"
 import { apiClient } from "@/shared/lib/api-client"
 
 type Props = { id: string }
-type Filter = "all" | "needs_work" | "learning" | "good"
+type Filter = "all" | "needs_work" | "learning" | "good" | "expert"
 
 const CIRC = 282.74
 
 function getTheme(status: string) {
-  if (status === "good" || status === "expert")
+  if (status === "expert")
+    return { accent: "#ffd700", bg: "rgba(255,215,0,0.12)", border: "rgba(255,215,0,0.3)", label: "Освоено" }
+  if (status === "good")
     return { accent: "#5ee08a", bg: "rgba(94,224,138,0.12)", border: "rgba(94,224,138,0.28)", label: "Хорошо" }
   if (status === "learning")
     return { accent: "#ffbb5c", bg: "rgba(255,187,92,0.12)", border: "rgba(255,187,92,0.28)", label: "В процессе" }
@@ -27,6 +29,28 @@ export const TopicPage = ({ id }: Props) => {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<Filter>("all")
   const [openTerms, setOpenTerms] = useState<Record<string, boolean>>({})
+
+  const [regenerating, setRegenerating] = useState(false)
+
+  const regenerateSubtopics = async () => {
+    if (regenerating) return
+    setRegenerating(true)
+    try {
+      const res = await fetch(`/api/topics/${id}/regenerate-subtopics`, { method: "POST" })
+      const data = await res.json()
+      if (!res.ok) {
+        console.error("Regenerate failed:", data)
+        alert(`Ошибка: ${data.detail ?? data.error ?? "неизвестная ошибка"}`)
+        return
+      }
+      await loadTopic()
+    } catch (err) {
+      console.error("Regenerate error:", err)
+      alert("Ошибка соединения")
+    } finally {
+      setRegenerating(false)
+    }
+  }
 
   const [inSession, setInSession] = useState(() => {
     try {
@@ -67,7 +91,7 @@ export const TopicPage = ({ id }: Props) => {
   const startNewSession = () => { clearSaved(); setFocusSubtopics(undefined); setSessionKey(k => k + 1); setInSession(true) }
   const startFocused = () => {
     clearSaved()
-    const weak = topic?.currentSubtopics.filter(s => s.status === "needs_work" || s.status === "learning").map(s => s.name) ?? []
+    const weak = topic?.currentSubtopics.filter(s => s.status !== "expert").map(s => s.name) ?? []
     setFocusSubtopics(weak); setSessionKey(k => k + 1); setInSession(true)
   }
 
@@ -89,22 +113,22 @@ export const TopicPage = ({ id }: Props) => {
   if (!topic) return null
 
   const subs = topic.currentSubtopics
-  const goodCount = subs.filter(s => s.status === "good" || s.status === "expert").length
+  const expertCount = subs.filter(s => s.status === "expert").length
+  const goodCount = subs.filter(s => s.status === "good").length
   const progCount = subs.filter(s => s.status === "learning").length
   const weakCount = subs.filter(s => s.status === "needs_work").length
   const total = subs.length
-  const mastery = total ? Math.round(((goodCount + progCount * 0.5) / total) * 100) : 0
+  const mastery = total ? Math.round((expertCount / total) * 100) : 0
   const dashOffset = CIRC * (1 - mastery / 100)
 
   const filtered = subs.filter(s => {
     if (filter === "all") return true
-    if (filter === "good") return s.status === "good" || s.status === "expert"
     return s.status === filter
   })
 
   const levelCfg = topic.overallLevel ? OVERALL_LEVEL_CONFIG[topic.overallLevel] : null
   const lastSession = topic.sessions[0] ?? null
-  const nextWeak = subs.find(s => s.status === "needs_work" || s.status === "learning")
+  const nextWeak = subs.find(s => s.status !== "expert")
   const now = Date.now()
   const dueForReview = subs.filter(s => s.nextReviewAt && new Date(s.nextReviewAt).getTime() <= now)
 
@@ -114,7 +138,8 @@ export const TopicPage = ({ id }: Props) => {
     { key: "all", label: "Все", count: total },
     { key: "needs_work", label: "Слабые", count: weakCount },
     { key: "learning", label: "В процессе", count: progCount },
-    { key: "good", label: "Освоено", count: goodCount },
+    { key: "good", label: "Хорошо", count: goodCount },
+    { key: "expert", label: "Освоено", count: expertCount },
   ]
 
   return (
@@ -178,9 +203,12 @@ export const TopicPage = ({ id }: Props) => {
               </div>
               <div style={{ flex: 1, minWidth: 240 }}>
                 <div className="font-display" style={{ fontWeight: 600, fontSize: 17, marginBottom: 12, color: "#fff" }}>
-                  Освоено {goodCount} из {total} подтем
+                  Освоено {expertCount} из {total} подтем
                 </div>
                 <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "6px 12px", borderRadius: 999, background: "rgba(255,215,0,0.12)", border: "1px solid rgba(255,215,0,0.3)", fontSize: 13, fontWeight: 600, color: "#ffd700" }}>
+                    <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#ffd700", flexShrink: 0 }} />{expertCount} освоено
+                  </span>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "6px 12px", borderRadius: 999, background: "rgba(94,224,138,0.12)", border: "1px solid rgba(94,224,138,0.28)", fontSize: 13, fontWeight: 600, color: "#86efac" }}>
                     <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#5ee08a", flexShrink: 0 }} />{goodCount} хорошо
                   </span>
@@ -206,10 +234,10 @@ export const TopicPage = ({ id }: Props) => {
                   <div style={{ fontWeight: 500, fontSize: 12.5, color: "rgba(255,255,255,0.6)", marginTop: 3 }}>{dueForReview.length} подтем пора повторить</div>
                 </button>
               )}
-              {weakCount > 0 && dueForReview.length === 0 && (
+              {(weakCount > 0 || goodCount > 0 || progCount > 0) && dueForReview.length === 0 && (
                 <button onClick={startFocused} style={{ flex: 1, minWidth: 200, padding: "18px 20px", borderRadius: 18, cursor: "pointer", background: "rgba(255,255,255,0.08)", backdropFilter: "blur(22px)", WebkitBackdropFilter: "blur(22px)", border: "1px solid rgba(255,255,255,0.18)", color: "#fff", fontWeight: 700, fontSize: 17, textAlign: "left", fontFamily: "inherit" }}>
-                  <div className="font-display">Слабые места →</div>
-                  <div style={{ fontWeight: 500, fontSize: 12.5, color: "rgba(255,255,255,0.6)", marginTop: 3 }}>{weakCount} подтем · {nextWeak?.name ?? ""}</div>
+                  <div className="font-display">До мастерства →</div>
+                  <div style={{ fontWeight: 500, fontSize: 12.5, color: "rgba(255,255,255,0.6)", marginTop: 3 }}>{total - expertCount} подтем · {nextWeak?.name ?? ""}</div>
                 </button>
               )}
             </div>
@@ -229,11 +257,20 @@ export const TopicPage = ({ id }: Props) => {
             {/* KNOWLEDGE MAP */}
             {total > 0 && (
               <>
-                <div style={{ marginTop: 34, paddingBottom: 12, borderBottom: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 16 }}>
+                <div style={{ marginTop: 34, paddingBottom: 12, borderBottom: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
                   <h2 className="font-display" style={{ fontWeight: 600, fontSize: 13, letterSpacing: "0.07em", color: "rgba(255,255,255,0.5)", margin: 0 }}>
                     КАРТА ЗНАНИЙ <span style={{ color: "rgba(255,255,255,0.3)" }}>· {total}</span>
                   </h2>
-                  <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", fontWeight: 500 }}>нажми → читай теорию</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", fontWeight: 500 }}>нажми → читай теорию</span>
+                    <button
+                      onClick={regenerateSubtopics}
+                      disabled={regenerating}
+                      style={{ padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: regenerating ? "default" : "pointer", background: regenerating ? "rgba(255,255,255,0.05)" : "rgba(155,107,255,0.12)", border: "1px solid rgba(155,107,255,0.3)", color: regenerating ? "rgba(255,255,255,0.3)" : "rgba(155,107,255,0.9)", fontFamily: "inherit", transition: "opacity .15s" }}
+                    >
+                      {regenerating ? "Пересобираем..." : "Пересобрать"}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Filters */}

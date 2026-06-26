@@ -1,0 +1,102 @@
+import Anthropic from "@anthropic-ai/sdk"
+import { NextRequest, NextResponse } from "next/server"
+import { prisma } from "@/lib/prisma"
+import { getOrCreateUserId } from "@/lib/user-id"
+import { extractJson } from "@/lib/extract-json"
+
+const client = new Anthropic()
+
+const SYSTEM_PROMPT = `Ты — эксперт в составлении карт знаний. Составь список подтем для учебной темы.
+
+Правила:
+1. Каждая подтема — отдельный механизм, паттерн или концепция, НЕ аспект одного и того же.
+2. Если несколько пунктов отвечают на вопрос "что это / зачем / как использовать" про ОДИН объект — это ОДНА подтема.
+3. НЕ создавай отдельные подтемы для "концепция X", "паттерны X", "применение X" — это одна подтема "X".
+4. Генерируй 10–15 подтем, которые ПОЛНОСТЬЮ покрывают тему — так, чтобы человек, освоивший все подтемы, мог считать себя экспертом в этой теме.
+5. Для каждой подтемы — до 5 ключевых терминов. Включай только те, которые нужны для понимания этой подтемы и часто встречаются на практике. Не включай общеизвестные термины, которые любой разработчик знает без объяснения.
+
+Формат ответа — СТРОГО JSON без markdown:
+{
+  "subtopics": [
+    {
+      "name": "название подтемы",
+      "recommendation": "что конкретно изучить (1 предложение)",
+      "definitions": [
+        { "term": "один ключевой термин", "definition": "определение в одном предложении" }
+      ]
+    }
+  ]
+}`
+
+export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const userId = await getOrCreateUserId()
+    const { id } = await params
+
+    const topic = await prisma.topic.findFirst({
+      where: { id, userId },
+      include: {
+        subtopics: true,
+        sessions: { orderBy: { date: "desc" }, take: 3 },
+      },
+    })
+
+    if (!topic) return NextResponse.json({ error: "Not found" }, { status: 404 })
+
+    const sessionContext = topic.sessions.length > 0
+      ? topic.sessions.map(s =>
+          `Сессия ${new Date(s.date).toLocaleDateString("ru")}: ${s.score}/${s.total}. ${s.summary}`
+        ).join("\n")
+      : ""
+
+    const userMessage = `Тема: "${topic.name}"
+${sessionContext ? `\nКонтекст знаний пользователя:\n${sessionContext}` : ""}
+${topic.subtopics.length > 0 ? `\nТекущие подтемы (перегруппируй при необходимости): ${topic.subtopics.map(s => s.name).join(", ")}` : ""}
+
+Составь правильный сгруппированный список подтем.`
+
+    const response = await client.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 8000,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: "user", content: userMessage }],
+    })
+
+    const rawContent = response.content[0].type === "text" ? response.content[0].text : ""
+
+    let parsed: { subtopics: { name: string; recommendation: string; definitions: { term: string; definition: string }[] }[] }
+    try {
+      parsed = extractJson(rawContent) as typeof parsed
+    } catch {
+      console.error("Regenerate: JSON parse failed, stop_reason:", response.stop_reason, "raw:", rawContent.slice(0, 500))
+      return NextResponse.json({ error: "Ошибка генерации", detail: `stop=${response.stop_reason} raw=${rawContent.slice(0, 200)}` }, { status: 500 })
+    }
+
+    if (!parsed.subtopics?.length) {
+      return NextResponse.json({ error: "Пустой результат" }, { status: 500 })
+    }
+
+    // Map old statuses/nextReviewAt by lowercase name match
+    const oldStatusMap = new Map(topic.subtopics.map(s => [s.name.toLowerCase(), s.status]))
+    const oldReviewMap = new Map(topic.subtopics.map(s => [s.name.toLowerCase(), s.nextReviewAt]))
+
+    await prisma.topicSubtopic.deleteMany({ where: { topicId: id } })
+
+    await prisma.topicSubtopic.createMany({
+      data: parsed.subtopics.map(s => ({
+        topicId: id,
+        name: s.name,
+        status: oldStatusMap.get(s.name.toLowerCase()) ?? "needs_work",
+        recommendation: s.recommendation,
+        definitions: s.definitions ?? [],
+        nextReviewAt: oldReviewMap.get(s.name.toLowerCase()) ?? null,
+      })),
+    })
+
+    return NextResponse.json({ ok: true, count: parsed.subtopics.length })
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error("Regenerate subtopics error:", msg)
+    return NextResponse.json({ error: "Ошибка сервера", detail: msg }, { status: 500 })
+  }
+}
