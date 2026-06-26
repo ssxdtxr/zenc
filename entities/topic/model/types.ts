@@ -44,6 +44,12 @@ export type TheoryRelated = {
   relation: string
 }
 
+export type TheoryExercise = {
+  title: string
+  description: string
+  difficulty: "easy" | "medium" | "hard"
+}
+
 export type TheoryContent = {
   title: string
   mainIdea: string
@@ -54,6 +60,7 @@ export type TheoryContent = {
   examples?: TheoryExample[]
   antiPatterns?: string[]
   relatedSubtopics?: TheoryRelated[]
+  exercises?: TheoryExercise[]
 }
 
 export type GlossaryTerm = {

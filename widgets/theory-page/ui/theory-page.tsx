@@ -13,6 +13,35 @@ type Props = {
   subtopicName: string
 }
 
+const DIFFICULTY_CONFIG = {
+  easy:   { label: "Лёгкое", color: "#5ee08a", bg: "rgba(94,224,138,0.12)", border: "rgba(94,224,138,0.3)" },
+  medium: { label: "Среднее", color: "#ffbb5c", bg: "rgba(255,187,92,0.12)", border: "rgba(255,187,92,0.3)" },
+  hard:   { label: "Сложное", color: "#ff7e92", bg: "rgba(255,126,146,0.12)", border: "rgba(255,126,146,0.3)" },
+}
+
+const EXAMPLE_COLORS = [
+  { color: "#2bd9e3", bg: "rgba(43,217,227,0.12)", border: "rgba(43,217,227,0.28)" },
+  { color: "#b69cff", bg: "rgba(155,107,255,0.12)", border: "rgba(155,107,255,0.28)" },
+  { color: "#ffbb5c", bg: "rgba(255,187,92,0.12)", border: "rgba(255,187,92,0.28)" },
+]
+
+const CARD = {
+  borderRadius: 20,
+  background: "rgba(255,255,255,0.06)",
+  backdropFilter: "blur(26px) saturate(150%)",
+  WebkitBackdropFilter: "blur(26px) saturate(150%)",
+  border: "1px solid rgba(255,255,255,0.12)",
+  boxShadow: "0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.14)",
+} as const
+
+const LABEL = {
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: "0.08em",
+  color: "rgba(255,255,255,0.38)",
+  marginBottom: 12,
+} as const
+
 export const TheoryPage = ({ topicId, subtopicName }: Props) => {
   const router = useRouter()
   const [topic, setTopic] = useState<Topic | null>(null)
@@ -43,13 +72,15 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
         <div style={{ position: "absolute", bottom: "-12%", left: "34%", width: "40vw", height: "40vw", borderRadius: "50%", background: "radial-gradient(circle at 30% 30%, #ff4d8d, transparent 70%)", opacity: 0.18, animation: "drift3 34s ease-in-out infinite" }} />
       </div>
 
-      <div style={{ position: "relative", zIndex: 1, maxWidth: 780, margin: "0 auto", padding: "22px 28px 72px" }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 1280, margin: "0 auto", padding: "22px 28px 72px" }}>
 
         {/* NAV */}
-        <nav style={{ position: "sticky", top: 16, zIndex: 20, display: "flex", alignItems: "center", gap: 16, padding: "11px 16px", borderRadius: 20, background: "rgba(255,255,255,0.06)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 10px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18)" }}>
-          <button onClick={() => router.back()} style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 12, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.85)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><ChevronLeftIcon size={20} color="rgba(255,255,255,0.85)" /></button>
+        <nav style={{ position: "sticky", top: 16, zIndex: 20, display: "flex", alignItems: "center", gap: 16, padding: "11px 16px", borderRadius: 20, background: "rgba(255,255,255,0.06)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 10px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18)", marginBottom: 22 }}>
+          <button onClick={() => router.back()} style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 12, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.85)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <ChevronLeftIcon size={20} color="rgba(255,255,255,0.85)" />
+          </button>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12.5, fontWeight: 600, color: "rgba(255,255,255,0.45)" }}>{topic?.name}</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.42)" }}>{topic?.name}</div>
             <h1 className="font-display" style={{ fontWeight: 700, fontSize: 20, letterSpacing: "-0.01em", margin: "1px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#fff" }}>{subtopicName}</h1>
           </div>
           {statusCfg && (
@@ -75,120 +106,186 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
           </div>
         )}
 
-        {/* CONTENT */}
+        {/* TWO-COLUMN LAYOUT */}
         {content && (
-          <>
-            {/* ГЛАВНАЯ ИДЕЯ */}
-            <section style={{ marginTop: 20, padding: "24px 26px", borderRadius: 22, background: "rgba(255,255,255,0.06)", backdropFilter: "blur(26px) saturate(150%)", WebkitBackdropFilter: "blur(26px) saturate(150%)", border: "1px solid rgba(255,255,255,0.13)", boxShadow: "0 14px 46px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.16)" }}>
-              <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.07em", color: "rgba(255,255,255,0.42)", marginBottom: 12 }}>ГЛАВНАЯ ИДЕЯ</div>
-              <p style={{ margin: 0, fontSize: 16.5, lineHeight: 1.68, color: "rgba(255,255,255,0.85)" }}>{content.mainIdea}</p>
-            </section>
+          <div className="theory-layout">
 
-            {/* НА ЧТО ОБРАТИТЬ ВНИМАНИЕ */}
-            {content.watchOut && (
-              <section style={{ marginTop: 14, padding: "24px 26px", borderRadius: 22, background: "linear-gradient(135deg,rgba(255,187,92,0.12),rgba(255,174,59,0.05))", backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", border: "1px solid rgba(255,187,92,0.3)", boxShadow: "0 14px 46px rgba(0,0,0,0.32)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 12 }}>
-                  <span style={{ width: 20, height: 20, borderRadius: "50%", background: "rgba(255,187,92,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, color: "#ffbb5c", flexShrink: 0, fontFamily: "inherit" }}>!</span>
-                  <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.07em", color: "#ffbb5c" }}>НА ЧТО ОБРАТИТЬ ВНИМАНИЕ</span>
-                </div>
-                <p style={{ margin: 0, fontSize: 16, lineHeight: 1.65, color: "rgba(255,255,255,0.82)" }}>{content.watchOut}</p>
-              </section>
-            )}
+            {/* ── ЛЕВАЯ КОЛОНКА: ТЕОРИЯ ── */}
+            <div className="theory-main">
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
-            {/* ОПРЕДЕЛЕНИЯ */}
-            {content.definitions.length > 0 && (
-              <section style={{ marginTop: 14, padding: "8px 26px", borderRadius: 22, background: "rgba(255,255,255,0.05)", backdropFilter: "blur(26px) saturate(150%)", WebkitBackdropFilter: "blur(26px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 14px 46px rgba(0,0,0,0.4)" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.07em", color: "rgba(255,255,255,0.42)", margin: "18px 0 4px" }}>ОПРЕДЕЛЕНИЯ</div>
-                {content.definitions.map((d, i) => (
-                  <div key={d.term} style={{ padding: "16px 0", borderBottom: i < content.definitions.length - 1 ? "1px solid rgba(255,255,255,0.07)" : "none" }}>
-                    <strong className="font-display" style={{ fontWeight: 700, fontSize: 16.5, color: "#b69cff" }}>{d.term}</strong>
-                    <p style={{ margin: "6px 0 0", fontSize: 15, lineHeight: 1.6, color: "rgba(255,255,255,0.7)" }}>{d.definition}</p>
-                  </div>
-                ))}
-              </section>
-            )}
+                {/* ГЛАВНАЯ ИДЕЯ */}
+                <section style={{ ...CARD, padding: "22px 24px" }}>
+                  <div style={LABEL}>ГЛАВНАЯ ИДЕЯ</div>
+                  <p style={{ margin: 0, fontSize: 16.5, lineHeight: 1.7, color: "rgba(255,255,255,0.88)" }}>{content.mainIdea}</p>
+                </section>
 
-            {/* ПРИМЕРЫ */}
-            {content.examples && content.examples.length > 0 && (
-              <section style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.07em", color: "rgba(255,255,255,0.42)", padding: "0 2px" }}>ПРИМЕРЫ</div>
-                {content.examples.map((ex, i) => (
-                  <div key={i} style={{ borderRadius: 18, overflow: "hidden", border: "1px solid rgba(255,255,255,0.13)", boxShadow: "0 10px 36px rgba(0,0,0,0.4)" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 18px", background: "rgba(10,9,16,0.88)", borderBottom: ex.code ? "1px solid rgba(255,255,255,0.08)" : "none" }}>
-                      <span style={{ padding: "3px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: i === 0 ? "rgba(43,217,227,0.15)" : i === 1 ? "rgba(155,107,255,0.15)" : "rgba(255,187,92,0.15)", color: i === 0 ? "#2bd9e3" : i === 1 ? "#b69cff" : "#ffbb5c", border: `1px solid ${i === 0 ? "rgba(43,217,227,0.3)" : i === 1 ? "rgba(155,107,255,0.3)" : "rgba(255,187,92,0.3)"}` }}>{ex.label}</span>
-                      <span style={{ fontSize: 13.5, color: "rgba(255,255,255,0.65)", lineHeight: 1.45 }}>{ex.explanation}</span>
+                {/* НА ЧТО ОБРАТИТЬ ВНИМАНИЕ */}
+                {content.watchOut && (
+                  <section style={{ ...CARD, padding: "22px 24px", background: "linear-gradient(135deg,rgba(255,187,92,0.1),rgba(255,174,59,0.04))", border: "1px solid rgba(255,187,92,0.28)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 12 }}>
+                      <span style={{ width: 20, height: 20, borderRadius: "50%", background: "rgba(255,187,92,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 12, color: "#ffbb5c", flexShrink: 0 }}>!</span>
+                      <span style={{ ...LABEL, marginBottom: 0, color: "#ffbb5c" }}>НА ЧТО ОБРАТИТЬ ВНИМАНИЕ</span>
                     </div>
-                    {ex.code && (
-                      <pre className="font-mono" style={{ margin: 0, padding: "18px 22px", background: "rgba(8,7,15,0.92)", fontSize: 13, lineHeight: 1.7, color: "rgba(255,255,255,0.82)", overflowX: "auto", whiteSpace: "pre" }}>{ex.code}</pre>
-                    )}
-                  </div>
-                ))}
-              </section>
-            )}
+                    <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.68, color: "rgba(255,255,255,0.82)" }}>{content.watchOut}</p>
+                  </section>
+                )}
 
-            {/* АНТИПАТТЕРНЫ */}
-            {content.antiPatterns && content.antiPatterns.length > 0 && (
-              <section style={{ marginTop: 14, padding: "22px 26px", borderRadius: 22, background: "linear-gradient(135deg,rgba(255,80,80,0.1),rgba(255,60,60,0.04))", backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", border: "1px solid rgba(255,80,80,0.25)", boxShadow: "0 14px 46px rgba(0,0,0,0.32)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 14 }}>
-                  <span style={{ width: 20, height: 20, borderRadius: "50%", background: "rgba(255,80,80,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 12, color: "#ff6060", flexShrink: 0 }}>✕</span>
-                  <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.07em", color: "#ff6060" }}>АНТИПАТТЕРНЫ</span>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {content.antiPatterns.map((p, i) => (
-                    <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
-                      <span style={{ width: 20, height: 20, borderRadius: 6, flexShrink: 0, background: "rgba(255,80,80,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#ff7070", fontWeight: 700, fontSize: 11, marginTop: 1 }}>✕</span>
-                      <span style={{ fontSize: 15, lineHeight: 1.6, color: "rgba(255,255,255,0.8)" }}>{p}</span>
+                {/* ОПРЕДЕЛЕНИЯ */}
+                {content.definitions.length > 0 && (
+                  <section style={{ ...CARD, padding: "18px 24px" }}>
+                    <div style={LABEL}>ОПРЕДЕЛЕНИЯ</div>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      {content.definitions.map((d, i) => (
+                        <div key={d.term} style={{ padding: "14px 0", borderBottom: i < content.definitions.length - 1 ? "1px solid rgba(255,255,255,0.07)" : "none" }}>
+                          <strong className="font-display" style={{ fontWeight: 700, fontSize: 15.5, color: "#b69cff" }}>{d.term}</strong>
+                          <p style={{ margin: "5px 0 0", fontSize: 14.5, lineHeight: 1.6, color: "rgba(255,255,255,0.68)" }}>{d.definition}</p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </section>
-            )}
+                  </section>
+                )}
 
-            {/* СВЯЗАНО С */}
-            {content.relatedSubtopics && content.relatedSubtopics.length > 0 && (
-              <section style={{ marginTop: 14, padding: "22px 26px", borderRadius: 22, background: "rgba(255,255,255,0.05)", backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", border: "1px solid rgba(255,255,255,0.11)" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.07em", color: "rgba(255,255,255,0.42)", marginBottom: 14 }}>СВЯЗАНО С</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-                  {content.relatedSubtopics.map((r, i) => (
-                    <button
-                      key={i}
-                      onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(r.name)}`)}
-                      style={{ textAlign: "left", display: "flex", alignItems: "center", gap: 12, padding: "11px 14px", borderRadius: 12, cursor: "pointer", background: "rgba(155,107,255,0.08)", border: "1px solid rgba(155,107,255,0.2)", fontFamily: "inherit" }}
-                    >
-                      <span className="font-display" style={{ fontWeight: 600, fontSize: 14.5, color: "#c4adff", flexShrink: 0 }}>{r.name}</span>
-                      <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", lineHeight: 1.4 }}>{r.relation}</span>
-                      <span style={{ marginLeft: "auto", fontSize: 14, color: "rgba(155,107,255,0.6)", flexShrink: 0 }}>→</span>
-                    </button>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* ЗАПОМНИ */}
-            {content.keyPoints.length > 0 && (
-              <section style={{ marginTop: 14, padding: "24px 26px", borderRadius: 22, background: "linear-gradient(135deg,rgba(155,107,255,0.16),rgba(43,217,227,0.07))", backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", border: "1px solid rgba(155,107,255,0.3)", boxShadow: "0 14px 46px rgba(0,0,0,0.34)" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.07em", color: "#b69cff", marginBottom: 14 }}>ЗАПОМНИ</div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
-                  {content.keyPoints.map((point, i) => (
-                    <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                      <span style={{ width: 22, height: 22, borderRadius: 7, flexShrink: 0, background: "rgba(155,107,255,0.25)", display: "flex", alignItems: "center", justifyContent: "center", color: "#c4adff", fontWeight: 700, fontSize: 12 }}>✓</span>
-                      <span style={{ fontSize: 15.5, lineHeight: 1.6, color: "rgba(255,255,255,0.85)" }}>{point}</span>
+                {/* ПРИМЕРЫ */}
+                {content.examples && content.examples.length > 0 && (
+                  <section>
+                    <div style={LABEL}>ПРИМЕРЫ</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {content.examples.map((ex, i) => {
+                        const clr = EXAMPLE_COLORS[i % EXAMPLE_COLORS.length]
+                        return (
+                          <div key={i} style={{ borderRadius: 16, overflow: "hidden", border: `1px solid ${clr.border}`, boxShadow: "0 8px 28px rgba(0,0,0,0.38)" }}>
+                            <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "13px 18px", background: "rgba(10,9,16,0.85)", borderBottom: ex.code ? "1px solid rgba(255,255,255,0.08)" : "none", flexWrap: "wrap" }}>
+                              <span style={{ padding: "3px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: clr.bg, color: clr.color, border: `1px solid ${clr.border}`, flexShrink: 0, marginTop: 1 }}>{ex.label}</span>
+                              <span style={{ fontSize: 13.5, color: "rgba(255,255,255,0.65)", lineHeight: 1.5, flex: 1 }}>{ex.explanation}</span>
+                            </div>
+                            {ex.code && (
+                              <pre className="font-mono" style={{ margin: 0, padding: "18px 22px", background: "rgba(8,7,15,0.92)", fontSize: 13, lineHeight: 1.72, color: "rgba(255,255,255,0.82)", overflowX: "auto", whiteSpace: "pre" }}>{ex.code}</pre>
+                            )}
+                          </div>
+                        )
+                      })}
                     </div>
-                  ))}
-                </div>
-              </section>
-            )}
+                  </section>
+                )}
 
-            {/* FOOTER NAV */}
-            <div style={{ marginTop: 24, display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "space-between", alignItems: "center" }}>
-              <button onClick={() => router.back()} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 20px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.16)", cursor: "pointer", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", fontWeight: 600, fontSize: 15, fontFamily: "inherit" }}>
-                ← Вернуться к теме
-              </button>
-              <button onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(subtopicName)}/test`)} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 26px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 10px 26px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
-                Проверить себя →
-              </button>
+                {/* АНТИПАТТЕРНЫ */}
+                {content.antiPatterns && content.antiPatterns.length > 0 && (
+                  <section style={{ ...CARD, padding: "22px 24px", background: "linear-gradient(135deg,rgba(255,80,80,0.09),rgba(255,60,60,0.03))", border: "1px solid rgba(255,80,80,0.22)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 14 }}>
+                      <span style={{ width: 20, height: 20, borderRadius: "50%", background: "rgba(255,80,80,0.18)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 11, color: "#ff6060", flexShrink: 0 }}>✕</span>
+                      <span style={{ ...LABEL, marginBottom: 0, color: "#ff7070" }}>АНТИПАТТЕРНЫ</span>
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {content.antiPatterns.map((p, i) => (
+                        <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                          <span style={{ width: 20, height: 20, borderRadius: 6, flexShrink: 0, background: "rgba(255,80,80,0.14)", display: "flex", alignItems: "center", justifyContent: "center", color: "#ff7070", fontWeight: 700, fontSize: 11, marginTop: 1 }}>✕</span>
+                          <span style={{ fontSize: 15, lineHeight: 1.62, color: "rgba(255,255,255,0.8)" }}>{p}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {/* ЗАПОМНИ */}
+                {content.keyPoints.length > 0 && (
+                  <section style={{ ...CARD, padding: "22px 24px", background: "linear-gradient(135deg,rgba(155,107,255,0.14),rgba(43,217,227,0.06))", border: "1px solid rgba(155,107,255,0.28)" }}>
+                    <div style={{ ...LABEL, color: "#b69cff" }}>ЗАПОМНИ</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      {content.keyPoints.map((point, i) => (
+                        <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
+                          <span style={{ width: 22, height: 22, borderRadius: 7, flexShrink: 0, background: "rgba(155,107,255,0.22)", display: "flex", alignItems: "center", justifyContent: "center", color: "#c4adff", fontWeight: 700, fontSize: 11 }}>✓</span>
+                          <span style={{ fontSize: 15.5, lineHeight: 1.62, color: "rgba(255,255,255,0.86)" }}>{point}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {/* FOOTER NAV */}
+                <div style={{ marginTop: 8, display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "space-between", alignItems: "center" }}>
+                  <button onClick={() => router.back()} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 20px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.16)", cursor: "pointer", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", fontWeight: 600, fontSize: 15, fontFamily: "inherit" }}>
+                    ← Вернуться
+                  </button>
+                  <button onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(subtopicName)}/test`)} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 26px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 10px 26px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
+                    Проверить себя →
+                  </button>
+                </div>
+              </div>
             </div>
-          </>
+
+            {/* ── ПРАВАЯ КОЛОНКА: ПРАКТИКА ── */}
+            <div className="theory-sidebar">
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+
+                {/* ПРАКТИЧЕСКИЕ ЗАДАНИЯ */}
+                {content.exercises && content.exercises.length > 0 && (
+                  <section style={{ ...CARD, padding: "20px 20px" }}>
+                    <div style={LABEL}>ПРАКТИКА</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {content.exercises.map((ex, i) => {
+                        const d = DIFFICULTY_CONFIG[ex.difficulty] ?? DIFFICULTY_CONFIG.medium
+                        return (
+                          <div key={i} style={{ padding: "14px 16px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)" }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
+                              <span style={{ padding: "2px 9px", borderRadius: 999, fontSize: 10.5, fontWeight: 700, background: d.bg, color: d.color, border: `1px solid ${d.border}`, flexShrink: 0 }}>{d.label}</span>
+                              <span className="font-display" style={{ fontWeight: 600, fontSize: 14, color: "#fff", lineHeight: 1.3 }}>{ex.title}</span>
+                            </div>
+                            <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.58, color: "rgba(255,255,255,0.58)" }}>{ex.description}</p>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    <button
+                      onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(subtopicName)}/test`)}
+                      style={{ marginTop: 14, width: "100%", padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 14.5, boxShadow: "0 8px 22px rgba(109,60,255,0.38)", fontFamily: "inherit" }}
+                    >
+                      Проверить себя →
+                    </button>
+                  </section>
+                )}
+
+                {/* СВЯЗАНО С */}
+                {content.relatedSubtopics && content.relatedSubtopics.length > 0 && (
+                  <section style={{ ...CARD, padding: "20px 20px" }}>
+                    <div style={LABEL}>СВЯЗАНО С</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {content.relatedSubtopics.map((r, i) => (
+                        <button
+                          key={i}
+                          onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(r.name)}`)}
+                          style={{ textAlign: "left", display: "flex", flexDirection: "column", gap: 3, padding: "11px 14px", borderRadius: 12, cursor: "pointer", background: "rgba(155,107,255,0.07)", border: "1px solid rgba(155,107,255,0.18)", fontFamily: "inherit" }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                            <span className="font-display" style={{ fontWeight: 600, fontSize: 14, color: "#c4adff" }}>{r.name}</span>
+                            <span style={{ fontSize: 13, color: "rgba(155,107,255,0.55)", flexShrink: 0 }}>→</span>
+                          </div>
+                          <span style={{ fontSize: 12.5, color: "rgba(255,255,255,0.45)", lineHeight: 1.4 }}>{r.relation}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {/* ГЛОССАРИЙ ПОДТЕМЫ */}
+                {subtopic && subtopic.definitions.length > 0 && (
+                  <section style={{ ...CARD, padding: "20px 20px" }}>
+                    <div style={LABEL}>ГЛОССАРИЙ ПОДТЕМЫ</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      {subtopic.definitions.map((d) => (
+                        <div key={d.term}>
+                          <span style={{ fontSize: 13.5, fontWeight: 700, color: "#b69cff" }}>{d.term}</span>
+                          <p style={{ margin: "3px 0 0", fontSize: 13, lineHeight: 1.55, color: "rgba(255,255,255,0.55)" }}>{d.definition}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+              </div>
+            </div>
+
+          </div>
         )}
       </div>
     </div>
