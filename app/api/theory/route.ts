@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
   try {
     const { topicName, subtopicName, userLevel, recommendation, allSubtopics } = await req.json()
     const level: OverallLevel = userLevel ?? "beginner"
-    const cacheKey = `v2:${topicName}:${subtopicName}:${level}`
+    const cacheKey = `v3:${topicName}:${subtopicName}:${level}`
 
     const cached = await prisma.theoryCache.findUnique({ where: { cacheKey } })
     if (cached) return NextResponse.json(cached.content)
