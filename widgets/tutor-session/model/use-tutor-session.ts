@@ -165,6 +165,7 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSu
             messages: finalMessages,
             score: finalCorrect,
             total: MAX_QUESTIONS,
+            existingSubtopics: previousSubtopics?.map(s => s.name) ?? [],
           }),
         })
       } catch {
