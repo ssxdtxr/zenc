@@ -31,6 +31,7 @@ export const TopicPage = ({ id }: Props) => {
   const [openTerms, setOpenTerms] = useState<Record<string, boolean>>({})
 
   const [regenerating, setRegenerating] = useState(false)
+  const [resetting, setResetting] = useState(false)
 
   const regenerateSubtopics = async () => {
     if (regenerating) return
@@ -49,6 +50,24 @@ export const TopicPage = ({ id }: Props) => {
       alert("Ошибка соединения")
     } finally {
       setRegenerating(false)
+    }
+  }
+
+  const resetAndReanalyze = async () => {
+    if (resetting) return
+    setResetting(true)
+    try {
+      const res = await fetch(`/api/topics/${id}/reset`, { method: "POST" })
+      if (!res.ok) { alert("Ошибка сброса"); return }
+      clearSaved()
+      await loadTopic()
+      setFocusSubtopics(undefined)
+      setSessionKey(k => k + 1)
+      setInSession(true)
+    } catch {
+      alert("Ошибка соединения")
+    } finally {
+      setResetting(false)
     }
   }
 
@@ -261,14 +280,21 @@ export const TopicPage = ({ id }: Props) => {
                   <h2 className="font-display" style={{ fontWeight: 600, fontSize: 13, letterSpacing: "0.07em", color: "rgba(255,255,255,0.5)", margin: 0 }}>
                     КАРТА ЗНАНИЙ <span style={{ color: "rgba(255,255,255,0.3)" }}>· {total}</span>
                   </h2>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", fontWeight: 500 }}>нажми → читай теорию</span>
                     <button
                       onClick={regenerateSubtopics}
-                      disabled={regenerating}
-                      style={{ padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: regenerating ? "default" : "pointer", background: regenerating ? "rgba(255,255,255,0.05)" : "rgba(155,107,255,0.12)", border: "1px solid rgba(155,107,255,0.3)", color: regenerating ? "rgba(255,255,255,0.3)" : "rgba(155,107,255,0.9)", fontFamily: "inherit", transition: "opacity .15s" }}
+                      disabled={regenerating || resetting}
+                      style={{ padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: (regenerating || resetting) ? "default" : "pointer", background: regenerating ? "rgba(255,255,255,0.05)" : "rgba(155,107,255,0.12)", border: "1px solid rgba(155,107,255,0.3)", color: (regenerating || resetting) ? "rgba(255,255,255,0.3)" : "rgba(155,107,255,0.9)", fontFamily: "inherit" }}
                     >
                       {regenerating ? "Пересобираем..." : "Пересобрать"}
+                    </button>
+                    <button
+                      onClick={resetAndReanalyze}
+                      disabled={regenerating || resetting}
+                      style={{ padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: (regenerating || resetting) ? "default" : "pointer", background: resetting ? "rgba(255,255,255,0.05)" : "rgba(43,217,227,0.1)", border: "1px solid rgba(43,217,227,0.3)", color: (regenerating || resetting) ? "rgba(255,255,255,0.3)" : "rgba(43,217,227,0.9)", fontFamily: "inherit" }}
+                    >
+                      {resetting ? "Сбрасываем..." : "Заново"}
                     </button>
                   </div>
                 </div>
