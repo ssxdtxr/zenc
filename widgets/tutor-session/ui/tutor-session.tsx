@@ -232,6 +232,14 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
             )
           })()}
 
+          {/* Correct answer — only on wrong */}
+          {currentResponse.isCorrect === false && currentResponse.correctAnswer && (
+            <div style={{ padding: "16px 20px", borderRadius: 16, background: "rgba(94,224,138,0.08)", border: "1px solid rgba(94,224,138,0.28)", marginBottom: 14 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "#5ee08a", marginBottom: 8 }}>ПРАВИЛЬНЫЙ ОТВЕТ</div>
+              <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.62, color: "rgba(255,255,255,0.88)" }}>{currentResponse.correctAnswer}</p>
+            </div>
+          )}
+
           {/* Breakdown */}
           {currentResponse.explanation && (
             <div style={{ padding: "18px 20px", borderRadius: 16, background: "linear-gradient(135deg,rgba(155,107,255,0.12),rgba(43,217,227,0.06))", border: "1px solid rgba(155,107,255,0.25)", marginBottom: 18 }}>

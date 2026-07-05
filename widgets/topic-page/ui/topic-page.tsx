@@ -289,13 +289,6 @@ export const TopicPage = ({ id }: Props) => {
                     >
                       {regenerating ? "Пересобираем..." : "Пересобрать"}
                     </button>
-                    <button
-                      onClick={resetAndReanalyze}
-                      disabled={regenerating || resetting}
-                      style={{ padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: (regenerating || resetting) ? "default" : "pointer", background: resetting ? "rgba(255,255,255,0.05)" : "rgba(43,217,227,0.1)", border: "1px solid rgba(43,217,227,0.3)", color: (regenerating || resetting) ? "rgba(255,255,255,0.3)" : "rgba(43,217,227,0.9)", fontFamily: "inherit" }}
-                    >
-                      {resetting ? "Сбрасываем..." : "Заново"}
-                    </button>
                   </div>
                 </div>
 

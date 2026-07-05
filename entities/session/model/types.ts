@@ -15,6 +15,7 @@ export type TutorResponse = {
   questionType: QuestionType
   options: string[] | null
   evaluation: string | null
+  correctAnswer: string | null
   explanation: string | null
   isCorrect: boolean | null
   difficulty: Difficulty

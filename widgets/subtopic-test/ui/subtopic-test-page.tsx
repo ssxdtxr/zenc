@@ -381,6 +381,13 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
             )
           })()}
 
+          {currentResponse.isCorrect === false && currentResponse.correctAnswer && (
+            <div style={{ padding: "14px 18px", borderRadius: 14, background: "rgba(94,224,138,0.08)", border: "1px solid rgba(94,224,138,0.28)", marginBottom: 12 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "#5ee08a", marginBottom: 8 }}>ПРАВИЛЬНЫЙ ОТВЕТ</div>
+              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.62, color: "rgba(255,255,255,0.88)" }}>{currentResponse.correctAnswer}</p>
+            </div>
+          )}
+
           {currentResponse.explanation && (
             <div style={{ padding: "16px 18px", borderRadius: 14, background: "linear-gradient(135deg,rgba(155,107,255,0.1),rgba(43,217,227,0.05))", border: "1px solid rgba(155,107,255,0.22)", marginBottom: 16 }}>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "#b69cff", marginBottom: 10 }}>ЧТО ВАЖНО</div>
