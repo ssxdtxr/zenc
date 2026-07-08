@@ -183,12 +183,12 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                   </section>
                 )}
 
-                {/* АНТИПАТТЕРНЫ */}
+                {/* ТИПИЧНЫЕ ОШИБКИ */}
                 {content.antiPatterns && content.antiPatterns.length > 0 && (
                   <section style={{ ...CARD, padding: "22px 24px", background: "linear-gradient(135deg,rgba(255,80,80,0.09),rgba(255,60,60,0.03))", border: "1px solid rgba(255,80,80,0.22)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 14 }}>
                       <span style={{ width: 20, height: 20, borderRadius: "50%", background: "rgba(255,80,80,0.18)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 11, color: "#ff6060", flexShrink: 0 }}>✕</span>
-                      <span style={{ ...LABEL, marginBottom: 0, color: "#ff7070" }}>АНТИПАТТЕРНЫ</span>
+                      <span style={{ ...LABEL, marginBottom: 0, color: "#ff7070" }}>ТИПИЧНЫЕ ОШИБКИ</span>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {content.antiPatterns.map((p, i) => (
@@ -228,6 +228,56 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
             {/* ── ПРАВАЯ КОЛОНКА: ПРАКТИКА ── */}
             <div className="theory-sidebar">
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+
+                {/* УРОВНЕВОЕ ТЕСТИРОВАНИЕ */}
+                <section style={{ ...CARD, padding: "18px 18px" }}>
+                  <div style={LABEL}>ТЕСТ ПО УРОВНЯМ</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {([
+                      { level: "basic",        label: "Базовый",     desc: "Определения и концепции", color: "#5ee08a", bg: "rgba(94,224,138,0.1)",  border: "rgba(94,224,138,0.28)"  },
+                      { level: "intermediate", label: "Средний",     desc: "Применение и нюансы",     color: "#ffbb5c", bg: "rgba(255,187,92,0.1)",  border: "rgba(255,187,92,0.28)"  },
+                      { level: "advanced",     label: "Продвинутый", desc: "Edge cases и детали",     color: "#ff7e92", bg: "rgba(255,126,146,0.1)", border: "rgba(255,126,146,0.28)" },
+                    ] as const).map(l => (
+                      <button
+                        key={l.level}
+                        onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(subtopicName)}/level/${l.level}`)}
+                        style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 13, border: `1px solid ${l.border}`, cursor: "pointer", background: l.bg, fontFamily: "inherit", textAlign: "left" }}
+                      >
+                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: l.color, flexShrink: 0, boxShadow: `0 0 6px ${l.color}` }} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: 700, fontSize: 14, color: l.color }}>{l.label}</div>
+                          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>{l.desc}</div>
+                        </div>
+                        <span style={{ fontSize: 13, color: l.color, opacity: 0.7 }}>→</span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+
+                {/* ПРАКТИКА ПО УРОВНЯМ */}
+                <section style={{ ...CARD, padding: "18px 18px" }}>
+                  <div style={LABEL}>ПРАКТИКА ПО УРОВНЯМ</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {([
+                      { level: "basic",        label: "Базовый",     desc: "Определения и концепции", color: "#5ee08a", bg: "rgba(94,224,138,0.1)",  border: "rgba(94,224,138,0.28)"  },
+                      { level: "intermediate", label: "Средний",     desc: "Применение и нюансы",     color: "#ffbb5c", bg: "rgba(255,187,92,0.1)",  border: "rgba(255,187,92,0.28)"  },
+                      { level: "advanced",     label: "Продвинутый", desc: "Edge cases и детали",     color: "#ff7e92", bg: "rgba(255,126,146,0.1)", border: "rgba(255,126,146,0.28)" },
+                    ] as const).map(l => (
+                      <button
+                        key={l.level}
+                        onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(subtopicName)}/level/${l.level}/practice`)}
+                        style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 13, border: `1px solid ${l.border}`, cursor: "pointer", background: l.bg, fontFamily: "inherit", textAlign: "left" }}
+                      >
+                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: l.color, flexShrink: 0, boxShadow: `0 0 6px ${l.color}` }} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: 700, fontSize: 14, color: l.color }}>{l.label}</div>
+                          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>{l.desc}</div>
+                        </div>
+                        <span style={{ fontSize: 13, color: l.color, opacity: 0.7 }}>→</span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
 
                 {/* ПРАКТИЧЕСКИЕ ЗАДАНИЯ */}
                 {content.exercises && content.exercises.length > 0 && (

@@ -17,6 +17,8 @@ export const useTheory = ({ topicName, subtopicName, userLevel, recommendation, 
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (!topicName) return
+
     const fetchTheory = async () => {
       setLoading(true)
       setError(null)
