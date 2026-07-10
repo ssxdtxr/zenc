@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Input } from "@/shared/ui/input"
@@ -37,14 +38,17 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-dvh flex items-center justify-center px-5" style={{ background: "var(--bg)" }}>
-      <div className="w-full max-w-sm space-y-6 p-7 rounded-3xl" style={{ background: "var(--surface)", backdropFilter: "var(--glass)", WebkitBackdropFilter: "var(--glass)", boxShadow: "var(--shadow-lg)" }}>
+      <motion.div initial={{ opacity: 0, y: 16, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: "spring", stiffness: 280, damping: 26 }} className="w-full max-w-sm space-y-6 p-7 rounded-3xl" style={{ background: "var(--surface)", backdropFilter: "var(--glass)", WebkitBackdropFilter: "var(--glass)", boxShadow: "var(--shadow-lg)" }}>
         <div className="text-center space-y-1">
-          <div
+          <motion.div
+            initial={{ scale: 0.6, rotate: -8, opacity: 0 }}
+            animate={{ scale: 1, rotate: 0, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 18, delay: 0.1 }}
             className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-lg mx-auto"
             style={{ background: "linear-gradient(135deg,#9b6bff,#6d3cff)", boxShadow: "0 4px 16px rgba(109,60,255,0.5)" }}
           >
             Z
-          </div>
+          </motion.div>
           <h1 className="text-2xl font-bold mt-4" style={{ color: "var(--text)" }}>Создать аккаунт</h1>
           <p className="text-sm" style={{ color: "var(--text-2)" }}>Начни учиться адаптивно с Zerc</p>
         </div>
@@ -77,7 +81,7 @@ export default function RegisterPage() {
             Войти
           </Link>
         </p>
-      </div>
+      </motion.div>
     </div>
   )
 }

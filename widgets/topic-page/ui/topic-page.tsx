@@ -1,12 +1,14 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeftIcon, TargetIcon, ChevronDownIcon } from "@/shared/ui/icons"
 import { useRouter } from "next/navigation"
-import type { GlossaryTerm, Topic, SessionRecord } from "@/entities/topic/model/types"
+import type { Topic, SessionRecord } from "@/entities/topic/model/types"
 import { OVERALL_LEVEL_CONFIG } from "@/entities/topic/config"
 import { TutorSession } from "@/widgets/tutor-session/ui/tutor-session"
 import { apiClient } from "@/shared/lib/api-client"
+import { fadeInUp, staggerContainer } from "@/shared/lib/motion"
 
 type Props = { id: string }
 type Filter = "all" | "needs_work" | "learning" | "good" | "expert"
@@ -100,7 +102,7 @@ export const TopicPage = ({ id }: Props) => {
 
   useEffect(() => { loadTopic() }, [loadTopic])
 
-  const handleSessionComplete = async (results: Omit<SessionRecord, "id" | "date"> & { glossary?: GlossaryTerm[] }) => {
+  const handleSessionComplete = async (results: Omit<SessionRecord, "id" | "date">) => {
     if (!topic) return
     await apiClient.saveSession(id, results)
     await loadTopic()
@@ -181,9 +183,10 @@ export const TopicPage = ({ id }: Props) => {
           )}
         </nav>
 
+        <AnimatePresence mode="wait">
         {/* SESSION */}
         {inSession && (
-          <div style={{ marginTop: 22 }}>
+          <motion.div key="session" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.22 }} style={{ marginTop: 22 }}>
             <div style={{ padding: "20px", borderRadius: 20, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 16px 50px rgba(0,0,0,0.45)" }}>
               <TutorSession
                 key={sessionKey}
@@ -197,13 +200,13 @@ export const TopicPage = ({ id }: Props) => {
                 onNewSession={startNewSession}
               />
             </div>
-          </div>
+          </motion.div>
         )}
 
         {!inSession && (
-          <>
+          <motion.div key="overview" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.22 }}>
             {/* PROGRESS HERO */}
-            <div style={{ marginTop: 22, padding: "24px 26px", borderRadius: 24, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(28px) saturate(150%)", WebkitBackdropFilter: "blur(28px) saturate(150%)", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 16px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.2)", display: "flex", alignItems: "center", gap: 26, flexWrap: "wrap" }}>
+            <motion.div variants={fadeInUp} initial="hidden" animate="show" style={{ marginTop: 22, padding: "24px 26px", borderRadius: 24, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(28px) saturate(150%)", WebkitBackdropFilter: "blur(28px) saturate(150%)", border: "1px solid rgba(255,255,255,0.14)", boxShadow: "0 16px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.2)", display: "flex", alignItems: "center", gap: 26, flexWrap: "wrap" }}>
               <div style={{ position: "relative", width: 104, height: 104, flexShrink: 0 }}>
                 <svg width="104" height="104" viewBox="0 0 104 104" style={{ transform: "rotate(-90deg)" }}>
                   <defs>
@@ -239,27 +242,27 @@ export const TopicPage = ({ id }: Props) => {
                   </span>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* CTAs */}
-            <div style={{ marginTop: 14, display: "flex", gap: 12, flexWrap: "wrap" }}>
-              <button onClick={startNewSession} style={{ flex: 1, minWidth: 200, padding: "18px 20px", borderRadius: 18, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 17, boxShadow: "0 14px 38px rgba(109,60,255,0.45)", textAlign: "left", fontFamily: "inherit" }}>
+            <motion.div variants={staggerContainer(0.07)} initial="hidden" animate="show" style={{ marginTop: 14, display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <motion.button variants={fadeInUp} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} onClick={startNewSession} style={{ flex: 1, minWidth: 200, padding: "18px 20px", borderRadius: 18, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 17, boxShadow: "0 14px 38px rgba(109,60,255,0.45)", textAlign: "left", fontFamily: "inherit" }}>
                 <div className="font-display">{lastSession ? "Новая сессия →" : "Начать →"}</div>
                 <div style={{ fontWeight: 500, fontSize: 12.5, opacity: 0.8, marginTop: 3 }}>10 вопросов · адаптивно</div>
-              </button>
+              </motion.button>
               {dueForReview.length > 0 && (
-                <button onClick={startReview} style={{ flex: 1, minWidth: 200, padding: "18px 20px", borderRadius: 18, cursor: "pointer", background: "rgba(255,187,92,0.1)", backdropFilter: "blur(22px)", WebkitBackdropFilter: "blur(22px)", border: "1px solid rgba(255,187,92,0.4)", color: "#fff", fontWeight: 700, fontSize: 17, textAlign: "left", fontFamily: "inherit" }}>
+                <motion.button variants={fadeInUp} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} onClick={startReview} style={{ flex: 1, minWidth: 200, padding: "18px 20px", borderRadius: 18, cursor: "pointer", background: "rgba(255,187,92,0.1)", backdropFilter: "blur(22px)", WebkitBackdropFilter: "blur(22px)", border: "1px solid rgba(255,187,92,0.4)", color: "#fff", fontWeight: 700, fontSize: 17, textAlign: "left", fontFamily: "inherit" }}>
                   <div className="font-display" style={{ color: "#ffbb5c" }}>Повторить →</div>
                   <div style={{ fontWeight: 500, fontSize: 12.5, color: "rgba(255,255,255,0.6)", marginTop: 3 }}>{dueForReview.length} подтем пора повторить</div>
-                </button>
+                </motion.button>
               )}
               {(weakCount > 0 || goodCount > 0 || progCount > 0) && dueForReview.length === 0 && (
-                <button onClick={startFocused} style={{ flex: 1, minWidth: 200, padding: "18px 20px", borderRadius: 18, cursor: "pointer", background: "rgba(255,255,255,0.08)", backdropFilter: "blur(22px)", WebkitBackdropFilter: "blur(22px)", border: "1px solid rgba(255,255,255,0.18)", color: "#fff", fontWeight: 700, fontSize: 17, textAlign: "left", fontFamily: "inherit" }}>
+                <motion.button variants={fadeInUp} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} onClick={startFocused} style={{ flex: 1, minWidth: 200, padding: "18px 20px", borderRadius: 18, cursor: "pointer", background: "rgba(255,255,255,0.08)", backdropFilter: "blur(22px)", WebkitBackdropFilter: "blur(22px)", border: "1px solid rgba(255,255,255,0.18)", color: "#fff", fontWeight: 700, fontSize: 17, textAlign: "left", fontFamily: "inherit" }}>
                   <div className="font-display">До мастерства →</div>
                   <div style={{ fontWeight: 500, fontSize: 12.5, color: "rgba(255,255,255,0.6)", marginTop: 3 }}>{total - expertCount} подтем · {nextWeak?.name ?? ""}</div>
-                </button>
+                </motion.button>
               )}
-            </div>
+            </motion.div>
 
             {/* LAST SESSION */}
             {lastSession && (
@@ -297,20 +300,20 @@ export const TopicPage = ({ id }: Props) => {
                   {FILTERS.map(f => {
                     const on = filter === f.key
                     return (
-                      <button key={f.key} onClick={() => setFilter(f.key)} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 15px", borderRadius: 999, cursor: "pointer", background: on ? "rgba(155,107,255,0.18)" : "rgba(255,255,255,0.05)", border: `1px solid ${on ? "rgba(155,107,255,0.45)" : "rgba(255,255,255,0.12)"}`, color: on ? "#fff" : "rgba(255,255,255,0.7)", fontWeight: 600, fontSize: 13.5, fontFamily: "inherit" }}>
+                      <motion.button key={f.key} whileTap={{ scale: 0.94 }} onClick={() => setFilter(f.key)} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 15px", borderRadius: 999, cursor: "pointer", background: on ? "rgba(155,107,255,0.18)" : "rgba(255,255,255,0.05)", border: `1px solid ${on ? "rgba(155,107,255,0.45)" : "rgba(255,255,255,0.12)"}`, color: on ? "#fff" : "rgba(255,255,255,0.7)", fontWeight: 600, fontSize: 13.5, fontFamily: "inherit" }}>
                         {f.label}<span style={{ opacity: 0.65, fontWeight: 700 }}>{f.count}</span>
-                      </button>
+                      </motion.button>
                     )
                   })}
                 </div>
 
                 {/* Subtopic rows */}
-                <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+                <motion.div key={filter} variants={staggerContainer(0.04)} initial="hidden" animate="show" style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
                   {filtered.map(s => {
                     const th = getTheme(s.status)
                     const isDue = s.nextReviewAt && new Date(s.nextReviewAt).getTime() <= now
                     return (
-                      <button key={s.name} onClick={() => router.push(`/topic/${id}/subtopic/${encodeURIComponent(s.name)}`)} style={{ textAlign: "left", display: "block", width: "100%", padding: "17px 20px", borderRadius: 16, cursor: "pointer", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderLeft: `3px solid ${th.accent}`, backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)", fontFamily: "inherit" }}>
+                      <motion.button key={s.name} variants={fadeInUp} whileHover={{ x: 3, background: "rgba(255,255,255,0.07)" }} whileTap={{ scale: 0.985 }} onClick={() => router.push(`/topic/${id}/subtopic/${encodeURIComponent(s.name)}`)} style={{ textAlign: "left", display: "block", width: "100%", padding: "17px 20px", borderRadius: 16, cursor: "pointer", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderLeft: `3px solid ${th.accent}`, backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)", fontFamily: "inherit" }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
                             <span className="font-display" style={{ fontWeight: 600, fontSize: 16.5, color: "#fff" }}>{s.name}</span>
@@ -326,13 +329,13 @@ export const TopicPage = ({ id }: Props) => {
                         <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 14, fontSize: 12.5, color: "rgba(255,255,255,0.4)", fontWeight: 500 }}>
                           <span style={{ color: th.accent, fontWeight: 700 }}>Читать теорию →</span>
                         </div>
-                      </button>
+                      </motion.button>
                     )
                   })}
                   {filtered.length === 0 && (
                     <div style={{ padding: "28px", textAlign: "center", borderRadius: 16, border: "1px dashed rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.03)", color: "rgba(255,255,255,0.4)", fontSize: 14 }}>Нет подтем в этой категории</div>
                   )}
-                </div>
+                </motion.div>
               </>
             )}
 
@@ -403,8 +406,9 @@ export const TopicPage = ({ id }: Props) => {
               </div>
             )}
 
-          </>
+          </motion.div>
         )}
+        </AnimatePresence>
       </div>
     </div>
   )

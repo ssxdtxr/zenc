@@ -1,10 +1,10 @@
 import { cn } from "@/shared/lib/cn"
-import type { ButtonHTMLAttributes } from "react"
+import { motion, type HTMLMotionProps } from "framer-motion"
 
 type Variant = "primary" | "secondary" | "ghost"
 type Size = "sm" | "md" | "lg"
 
-type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
+type Props = HTMLMotionProps<"button"> & {
   variant?: Variant
   size?: Size
 }
@@ -21,13 +21,13 @@ const sizes: Record<Size, string> = {
   lg: "w-full py-4 text-base rounded-2xl",
 }
 
-export const Button = ({ variant = "primary", size = "md", className, children, style, ...props }: Props) => {
+export const Button = ({ variant = "primary", size = "md", className, children, style, disabled, ...props }: Props) => {
   const isPrimary = variant === "primary"
   const isSecondary = variant === "secondary"
 
   return (
-    <button
-      className={cn("font-semibold transition-all active:scale-[0.98]", variants[variant], sizes[size], className)}
+    <motion.button
+      className={cn("font-semibold transition-colors disabled:opacity-40", variants[variant], sizes[size], className)}
       style={{
         background: isPrimary
           ? "linear-gradient(135deg, #9b6bff 0%, #6d3cff 100%)"
@@ -39,9 +39,13 @@ export const Button = ({ variant = "primary", size = "md", className, children, 
         color: isSecondary ? "rgba(255,255,255,0.85)" : undefined,
         ...style,
       }}
+      disabled={disabled}
+      whileHover={disabled ? undefined : { scale: 1.015 }}
+      whileTap={disabled ? undefined : { scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 420, damping: 30 }}
       {...props}
     >
       {children}
-    </button>
+    </motion.button>
   )
 }

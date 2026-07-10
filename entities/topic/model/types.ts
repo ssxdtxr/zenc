@@ -50,9 +50,14 @@ export type TheoryExercise = {
   difficulty: "easy" | "medium" | "hard"
 }
 
+export type TheorySection = {
+  heading: string
+  explanation: string
+}
+
 export type TheoryContent = {
   title: string
-  mainIdea: string
+  sections: TheorySection[]
   watchOut: string
   definitions: TheoryDefinition[]
   keyPoints: string[]
@@ -63,11 +68,6 @@ export type TheoryContent = {
   exercises?: TheoryExercise[]
 }
 
-export type GlossaryTerm = {
-  term: string
-  definition: string
-}
-
 export type Topic = {
   id: string
   name: string
@@ -76,5 +76,4 @@ export type Topic = {
   sessions: SessionRecord[]
   currentSubtopics: Subtopic[]
   overallLevel: OverallLevel | null
-  glossary: GlossaryTerm[]
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeftIcon } from "@/shared/ui/icons"
 import { useRouter } from "next/navigation"
 import { apiClient } from "@/shared/lib/api-client"
@@ -8,6 +9,7 @@ import { SUBTOPIC_STATUS_CONFIG } from "@/entities/topic/config"
 import { RichText } from "@/features/theory-view/ui/rich-text"
 import type { Topic } from "@/entities/topic/model/types"
 import type { Message } from "@/entities/session/model/types"
+import { fadeInUp, staggerContainer } from "@/shared/lib/motion"
 
 type Props = { topicId: string; subtopicName: string; level: string }
 
@@ -194,50 +196,50 @@ export const LevelSessionPage = ({ topicId, subtopicName, level }: Props) => {
                 <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
               </div>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <motion.div variants={staggerContainer(0.08)} initial="hidden" animate="show" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 {/* Hero */}
-                <div style={{ padding: "26px 24px", borderRadius: 20, background: current.isComplete ? "linear-gradient(135deg,rgba(94,224,138,0.15),rgba(43,217,227,0.06))" : "linear-gradient(135deg,rgba(255,126,146,0.12),rgba(255,80,80,0.04))", border: `1px solid ${current.isComplete ? "rgba(94,224,138,0.3)" : "rgba(255,126,146,0.3)"}`, textAlign: "center" }}>
+                <motion.div variants={fadeInUp} style={{ padding: "26px 24px", borderRadius: 20, background: current.isComplete ? "linear-gradient(135deg,rgba(94,224,138,0.15),rgba(43,217,227,0.06))" : "linear-gradient(135deg,rgba(255,126,146,0.12),rgba(255,80,80,0.04))", border: `1px solid ${current.isComplete ? "rgba(94,224,138,0.3)" : "rgba(255,126,146,0.3)"}`, textAlign: "center" }}>
                   <div style={{ fontSize: 40 }}>{current.isComplete ? "🎯" : "📚"}</div>
                   <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: current.isComplete ? "#5ee08a" : "#ff7e92", marginTop: 10, marginBottom: 6 }}>
                     {current.isComplete ? `${lvl.label} уровень освоен` : "Нужно больше практики"}
                   </div>
                   <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, color: "rgba(255,255,255,0.72)" }}>{current.finishSummary}</p>
-                </div>
+                </motion.div>
 
                 {/* Stats */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+                <motion.div variants={staggerContainer(0.05)} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
                   {[
                     { label: "Вопросов", value: questionCount },
                     { label: "Правильно", value: correctCount },
                     { label: "Уровень", value: lvl.label },
                   ].map(s => (
-                    <div key={s.label} style={{ padding: "14px", borderRadius: 14, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", textAlign: "center" }}>
+                    <motion.div key={s.label} variants={fadeInUp} style={{ padding: "14px", borderRadius: 14, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", textAlign: "center" }}>
                       <div className="font-display" style={{ fontSize: 20, fontWeight: 800, color: "#fff" }}>{s.value}</div>
                       <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.45)", fontWeight: 600, marginTop: 3 }}>{s.label}</div>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
 
                 {/* New status */}
                 {savedCfg && (
-                  <div style={{ padding: "14px 18px", borderRadius: 14, background: savedCfg.bg, border: `1px solid ${savedCfg.border}`, display: "flex", alignItems: "center", gap: 10 }}>
+                  <motion.div variants={fadeInUp} style={{ padding: "14px 18px", borderRadius: 14, background: savedCfg.bg, border: `1px solid ${savedCfg.border}`, display: "flex", alignItems: "center", gap: 10 }}>
                     <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.5)" }}>НОВЫЙ СТАТУС ПОДТЕМЫ</span>
                     <span style={{ fontWeight: 800, fontSize: 15, color: savedCfg.color }}>{savedCfg.label}</span>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Actions */}
-                <div style={{ display: "flex", gap: 10 }}>
-                  <button onClick={() => { started.current = false; setMessages([]); setCurrent(null); setQuestionCount(0); setCorrectCount(0); setPhase("session"); setLastQuestion(null); setLastAnswer(null); setSavedStatus(null); started.current = true; ask([]) }}
+                <motion.div variants={fadeInUp} style={{ display: "flex", gap: 10 }}>
+                  <motion.button whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.97 }} onClick={() => { started.current = false; setMessages([]); setCurrent(null); setQuestionCount(0); setCorrectCount(0); setPhase("session"); setLastQuestion(null); setLastAnswer(null); setSavedStatus(null); started.current = true; ask([]) }}
                     style={{ flex: 1, padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${lvl.color},${lvl.color}aa)`, color: "#08070f", fontWeight: 700, fontSize: 15, fontFamily: "inherit" }}>
                     Пройти снова →
-                  </button>
-                  <button onClick={() => router.back()}
+                  </motion.button>
+                  <motion.button whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.97 }} onClick={() => router.back()}
                     style={{ flex: 1, padding: "14px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.16)", cursor: "pointer", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.82)", fontWeight: 600, fontSize: 15, fontFamily: "inherit" }}>
                     ← К теории
-                  </button>
-                </div>
-              </div>
+                  </motion.button>
+                </motion.div>
+              </motion.div>
             )}
           </div>
         )}
@@ -262,9 +264,10 @@ export const LevelSessionPage = ({ topicId, subtopicName, level }: Props) => {
               </div>
             )}
 
+            <AnimatePresence mode="wait">
             {/* FEEDBACK PHASE */}
             {phase === "feedback" && current && (
-              <div>
+              <motion.div key="feedback" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}>
                 {lastQuestion && (
                   <div style={{ padding: "13px 16px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", marginBottom: 10 }}>
                     <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "rgba(255,255,255,0.35)", marginBottom: 5 }}>ВОПРОС</div>
@@ -319,32 +322,32 @@ export const LevelSessionPage = ({ topicId, subtopicName, level }: Props) => {
                         </div>
                       )}
 
-                      <button onClick={next} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: `linear-gradient(135deg,#9b6bff,#6d3cff)`, color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 22px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
+                      <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.97 }} onClick={next} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: `linear-gradient(135deg,#9b6bff,#6d3cff)`, color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 22px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
                         Следующий вопрос →
-                      </button>
+                      </motion.button>
                     </div>
                   )
                 })()}
-              </div>
+              </motion.div>
             )}
 
             {/* SESSION PHASE */}
             {phase === "session" && current?.question && !loading && (
-              <div>
+              <motion.div key="session" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}>
                 <p style={{ margin: "0 0 20px", fontSize: 18, lineHeight: 1.65, color: "rgba(255,255,255,0.92)" }}>{current.question}</p>
 
                 {current.questionType === "choice" && current.options ? (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
+                  <motion.div variants={staggerContainer(0.05)} initial="hidden" animate="show" style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
                     {current.options.map((opt, i) => {
                       const sel = answer === opt
                       return (
-                        <button key={i} onClick={() => selectOption(opt)} style={{ textAlign: "left", padding: "14px 18px", borderRadius: 14, border: `1.5px solid ${sel ? lvl.border : "rgba(255,255,255,0.1)"}`, background: sel ? lvl.bg : "rgba(255,255,255,0.04)", color: sel ? "#fff" : "rgba(255,255,255,0.75)", fontWeight: sel ? 600 : 500, fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", gap: 12, fontFamily: "inherit" }}>
+                        <motion.button key={i} variants={fadeInUp} whileHover={{ x: 2 }} whileTap={{ scale: 0.985 }} onClick={() => selectOption(opt)} style={{ textAlign: "left", padding: "14px 18px", borderRadius: 14, border: `1.5px solid ${sel ? lvl.border : "rgba(255,255,255,0.1)"}`, background: sel ? lvl.bg : "rgba(255,255,255,0.04)", color: sel ? "#fff" : "rgba(255,255,255,0.75)", fontWeight: sel ? 600 : 500, fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", gap: 12, fontFamily: "inherit" }}>
                           <span style={{ width: 24, height: 24, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, background: sel ? lvl.color : "rgba(255,255,255,0.08)", color: sel ? "#08070f" : "rgba(255,255,255,0.4)", border: `1px solid ${sel ? "transparent" : "rgba(255,255,255,0.12)"}` }}>{String.fromCharCode(65 + i)}</span>
                           {opt}
-                        </button>
+                        </motion.button>
                       )
                     })}
-                  </div>
+                  </motion.div>
                 ) : (
                   <textarea
                     ref={textareaRef}
@@ -359,13 +362,14 @@ export const LevelSessionPage = ({ topicId, subtopicName, level }: Props) => {
 
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                   <span style={{ fontSize: 12.5, color: "rgba(255,255,255,0.35)" }}>⌘ Enter — отправить</span>
-                  <button onClick={submit} disabled={!answer.trim() || loading}
+                  <motion.button whileHover={(!answer.trim() || loading) ? undefined : { scale: 1.02 }} whileTap={(!answer.trim() || loading) ? undefined : { scale: 0.96 }} onClick={submit} disabled={!answer.trim() || loading}
                     style={{ padding: "13px 26px", borderRadius: 14, border: "none", cursor: (!answer.trim() || loading) ? "default" : "pointer", background: `linear-gradient(135deg,${lvl.color},${lvl.color}cc)`, color: "#08070f", fontWeight: 700, fontSize: 15, boxShadow: `0 8px 20px ${lvl.color}44`, opacity: (!answer.trim() || loading) ? 0.5 : 1, fontFamily: "inherit" }}>
                     {loading ? "Проверяю…" : "Ответить →"}
-                  </button>
+                  </motion.button>
                 </div>
-              </div>
+              </motion.div>
             )}
+            </AnimatePresence>
           </div>
         )}
       </div>

@@ -1,12 +1,14 @@
 "use client"
 
 import { useState, useRef } from "react"
+import { motion } from "framer-motion"
 import { ChevronDownIcon } from "@/shared/ui/icons"
 import { SessionResults } from "@/features/session-results/ui/session-results"
 import { RichText } from "@/features/theory-view/ui/rich-text"
 import type { SessionRecord } from "@/entities/topic/model/types"
 import { MAX_QUESTIONS, useTutorSession } from "../model/use-tutor-session"
 import type { ConfidenceLevel } from "@/features/confidence-picker/ui/confidence-picker"
+import { fadeInUp, staggerContainer } from "@/shared/lib/motion"
 
 const LEVEL_THEME: Record<string, { color: string; bg: string; border: string }> = {
   basic:        { color: "#86efac", bg: "rgba(74,222,128,0.14)",   border: "rgba(74,222,128,0.3)" },
@@ -57,11 +59,11 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
 
   if (sessionState === "analyzing") {
     return (
-      <div style={{ padding: "48px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ padding: "48px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
         <div style={{ width: 36, height: 36, borderRadius: "50%", border: "2.5px solid transparent", borderTopColor: "#9b6bff", animation: "spin 0.8s linear infinite" }} />
         <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.55)" }}>Анализирую твои знания…</p>
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-      </div>
+      </motion.div>
     )
   }
 
@@ -112,7 +114,7 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
 
       {/* QUESTION + ANSWER */}
       {currentResponse && sessionState === "session" && (
-        <div>
+        <motion.div key={`q-${questionCount}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
           {/* Question number + level */}
           <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 16 }}>
             <span style={{ width: 28, height: 28, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, background: levelTheme.bg, color: levelTheme.color, border: `1px solid ${levelTheme.border}`, fontFamily: "inherit" }}>{questionCount}</span>
@@ -128,19 +130,19 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
 
           {/* CHOICE OPTIONS */}
           {currentResponse.questionType === "choice" && currentResponse.options && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
+            <motion.div variants={staggerContainer(0.05)} initial="hidden" animate="show" style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
               {currentResponse.options.map((opt, i) => {
                 const isSelected = answer === opt
                 return (
-                  <button key={i} onClick={() => setAnswer(opt)} style={{ textAlign: "left", padding: "14px 18px", borderRadius: 14, border: `1.5px solid ${isSelected ? "rgba(155,107,255,0.5)" : "rgba(255,255,255,0.1)"}`, background: isSelected ? "rgba(155,107,255,0.15)" : "rgba(255,255,255,0.04)", color: isSelected ? "#fff" : "rgba(255,255,255,0.75)", fontWeight: isSelected ? 600 : 500, fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", gap: 12, fontFamily: "inherit" }}>
+                  <motion.button key={i} variants={fadeInUp} whileHover={{ x: 2 }} whileTap={{ scale: 0.985 }} onClick={() => setAnswer(opt)} style={{ textAlign: "left", padding: "14px 18px", borderRadius: 14, border: `1.5px solid ${isSelected ? "rgba(155,107,255,0.5)" : "rgba(255,255,255,0.1)"}`, background: isSelected ? "rgba(155,107,255,0.15)" : "rgba(255,255,255,0.04)", color: isSelected ? "#fff" : "rgba(255,255,255,0.75)", fontWeight: isSelected ? 600 : 500, fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", gap: 12, fontFamily: "inherit" }}>
                     <span style={{ width: 24, height: 24, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, background: isSelected ? "#9b6bff" : "rgba(255,255,255,0.08)", color: isSelected ? "#fff" : "rgba(255,255,255,0.4)", border: `1px solid ${isSelected ? "transparent" : "rgba(255,255,255,0.12)"}` }}>
                       {String.fromCharCode(65 + i)}
                     </span>
                     {opt}
-                  </button>
+                  </motion.button>
                 )
               })}
-            </div>
+            </motion.div>
           )}
 
           {/* CONFIDENCE */}
@@ -149,10 +151,10 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
             {CONFIDENCE_OPTIONS.map(c => {
               const isSelected = selectedConfidence === c.level
               return (
-                <button key={c.level} onClick={() => handleConfidence(c.level)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "16px 12px", borderRadius: 15, cursor: "pointer", background: isSelected ? c.iconBg : c.bg, border: `1.5px solid ${isSelected ? c.iconColor : c.border}`, fontFamily: "inherit", transition: "all .18s ease" }}>
+                <motion.button key={c.level} whileHover={{ y: -2 }} whileTap={{ scale: 0.93 }} animate={isSelected ? { scale: [1, 1.06, 1] } : {}} transition={{ duration: 0.25 }} onClick={() => handleConfidence(c.level)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "16px 12px", borderRadius: 15, cursor: "pointer", background: isSelected ? c.iconBg : c.bg, border: `1.5px solid ${isSelected ? c.iconColor : c.border}`, fontFamily: "inherit" }}>
                   <span style={{ width: 30, height: 30, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 700, background: c.iconBg, color: c.iconColor }}>{c.icon}</span>
                   <span style={{ fontWeight: 600, fontSize: 14, color: isSelected ? "#fff" : c.textColor }}>{c.label}</span>
-                </button>
+                </motion.button>
               )
             })}
           </div>
@@ -173,9 +175,9 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
           {error && <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 12, background: "rgba(220,38,38,0.15)", border: "1px solid rgba(220,38,38,0.35)", color: "#fca5a5", fontSize: 13 }}>{error}</div>}
 
           {/* DONT KNOW */}
-          <button onClick={submitDontKnow} disabled={loading} style={{ marginTop: 12, width: "100%", padding: "11px", borderRadius: 12, border: "1px dashed rgba(255,255,255,0.18)", background: "transparent", color: "rgba(255,255,255,0.45)", fontSize: 13.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+          <motion.button whileTap={{ scale: 0.97 }} onClick={submitDontKnow} disabled={loading} style={{ marginTop: 12, width: "100%", padding: "11px", borderRadius: 12, border: "1px dashed rgba(255,255,255,0.18)", background: "transparent", color: "rgba(255,255,255,0.45)", fontSize: 13.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
             Не знаю / Не знаком с темой
-          </button>
+          </motion.button>
 
           {/* SUBMIT ROW */}
           <div style={{ marginTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
@@ -183,16 +185,16 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
               <span style={{ padding: "3px 8px", borderRadius: 7, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", fontSize: 12 }}>⌘ Enter</span>
               отправить
             </span>
-            <button onClick={submitAnswer} disabled={(!answer.trim() && currentResponse.questionType === "text") || loading} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 28px", borderRadius: 14, border: "none", cursor: loading ? "not-allowed" : "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15.5, boxShadow: "0 10px 26px rgba(109,60,255,0.4)", opacity: ((!answer.trim() && currentResponse.questionType === "text") || loading) ? 0.5 : 1, fontFamily: "inherit", transition: "all .2s ease" }}>
+            <motion.button whileHover={loading ? undefined : { scale: 1.02 }} whileTap={loading ? undefined : { scale: 0.96 }} onClick={submitAnswer} disabled={(!answer.trim() && currentResponse.questionType === "text") || loading} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 28px", borderRadius: 14, border: "none", cursor: loading ? "not-allowed" : "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15.5, boxShadow: "0 10px 26px rgba(109,60,255,0.4)", opacity: ((!answer.trim() && currentResponse.questionType === "text") || loading) ? 0.5 : 1, fontFamily: "inherit" }}>
               {loading ? "Проверяю…" : "Ответить →"}
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* FEEDBACK / REVIEW STATE */}
       {currentResponse && sessionState === "feedback" && (
-        <div>
+        <motion.div key={`f-${questionCount}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
           {/* Question that was answered */}
           {lastQuestion && (
             <div style={{ padding: "14px 18px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", marginBottom: 12 }}>
@@ -297,18 +299,18 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
             <>
               <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", color: "rgba(255,255,255,0.42)", marginBottom: 11 }}>КАК ПРОШЛО?</div>
               <div style={{ display: "flex", gap: 11, flexWrap: "wrap" }}>
-                <button onClick={nextQuestion} style={{ flex: 1, minWidth: 180, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 9, padding: 15, borderRadius: 14, cursor: "pointer", background: "rgba(94,224,138,0.14)", border: "1.5px solid rgba(94,224,138,0.4)", color: "#86efac", fontWeight: 700, fontSize: 15, fontFamily: "inherit" }}>
+                <motion.button whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.97 }} onClick={nextQuestion} style={{ flex: 1, minWidth: 180, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 9, padding: 15, borderRadius: 14, cursor: "pointer", background: "rgba(94,224,138,0.14)", border: "1.5px solid rgba(94,224,138,0.4)", color: "#86efac", fontWeight: 700, fontSize: 15, fontFamily: "inherit" }}>
                   <span style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(94,224,138,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>✓</span>
                   Следующий вопрос →
-                </button>
+                </motion.button>
               </div>
             </>
           ) : (
-            <button onClick={nextQuestion} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 16, boxShadow: "0 10px 26px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
+            <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} onClick={nextQuestion} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 16, boxShadow: "0 10px 26px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
               Завершить сессию →
-            </button>
+            </motion.button>
           )}
-        </div>
+        </motion.div>
       )}
     </div>
   )

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Space_Grotesk, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google"
 import { SwRegister } from "@/shared/ui/sw-register"
+import { PageTransition } from "@/shared/ui/page-transition"
 import "./globals.css"
 
 const spaceGrotesk = Space_Grotesk({
@@ -42,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ru" className={`${spaceGrotesk.variable} ${plusJakarta.variable} ${jetbrainsMono.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
-        {children}
+        <PageTransition>{children}</PageTransition>
         <SwRegister />
       </body>
     </html>

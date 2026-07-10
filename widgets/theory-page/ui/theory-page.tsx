@@ -1,12 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
 import { ChevronLeftIcon } from "@/shared/ui/icons"
 import { useRouter } from "next/navigation"
 import { useTheory } from "../model/use-theory"
 import { apiClient } from "@/shared/lib/api-client"
 import { SUBTOPIC_STATUS_CONFIG } from "@/entities/topic/config"
 import type { Topic } from "@/entities/topic/model/types"
+import { fadeInUp, staggerContainer } from "@/shared/lib/motion"
 
 type Props = {
   topicId: string
@@ -126,28 +128,37 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
 
             {/* ── ЛЕВАЯ КОЛОНКА: ТЕОРИЯ ── */}
             <div className="theory-main">
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <motion.div variants={staggerContainer(0.07)} initial="hidden" animate="show" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
                 {/* ГЛАВНАЯ ИДЕЯ */}
-                <section style={{ ...CARD, padding: "22px 24px" }}>
+                <motion.section variants={fadeInUp} style={{ ...CARD, padding: "22px 24px" }}>
                   <div style={LABEL}>ГЛАВНАЯ ИДЕЯ</div>
-                  <p style={{ margin: 0, fontSize: 16.5, lineHeight: 1.7, color: "rgba(255,255,255,0.88)" }}>{content.mainIdea}</p>
-                </section>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    {content.sections.map((s, i) => (
+                      <div key={i} style={{ padding: i === 0 ? "0 0 16px" : "16px 0 0", borderTop: i > 0 ? "1px solid rgba(255,255,255,0.07)" : "none", marginTop: i > 0 ? 16 : 0 }}>
+                        {content.sections.length > 1 && (
+                          <h3 className="font-display" style={{ margin: "0 0 6px", fontWeight: 700, fontSize: 15.5, color: "#b69cff" }}>{s.heading}</h3>
+                        )}
+                        <p style={{ margin: 0, fontSize: 16.5, lineHeight: 1.7, color: "rgba(255,255,255,0.88)" }}>{s.explanation}</p>
+                      </div>
+                    ))}
+                  </div>
+                </motion.section>
 
                 {/* НА ЧТО ОБРАТИТЬ ВНИМАНИЕ */}
                 {content.watchOut && (
-                  <section style={{ ...CARD, padding: "22px 24px", background: "linear-gradient(135deg,rgba(255,187,92,0.1),rgba(255,174,59,0.04))", border: "1px solid rgba(255,187,92,0.28)" }}>
+                  <motion.section variants={fadeInUp} style={{ ...CARD, padding: "22px 24px", background: "linear-gradient(135deg,rgba(255,187,92,0.1),rgba(255,174,59,0.04))", border: "1px solid rgba(255,187,92,0.28)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 12 }}>
                       <span style={{ width: 20, height: 20, borderRadius: "50%", background: "rgba(255,187,92,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 12, color: "#ffbb5c", flexShrink: 0 }}>!</span>
                       <span style={{ ...LABEL, marginBottom: 0, color: "#ffbb5c" }}>НА ЧТО ОБРАТИТЬ ВНИМАНИЕ</span>
                     </div>
                     <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.68, color: "rgba(255,255,255,0.82)" }}>{content.watchOut}</p>
-                  </section>
+                  </motion.section>
                 )}
 
                 {/* ОПРЕДЕЛЕНИЯ */}
                 {content.definitions.length > 0 && (
-                  <section style={{ ...CARD, padding: "18px 24px" }}>
+                  <motion.section variants={fadeInUp} style={{ ...CARD, padding: "18px 24px" }}>
                     <div style={LABEL}>ОПРЕДЕЛЕНИЯ</div>
                     <div style={{ display: "flex", flexDirection: "column" }}>
                       {content.definitions.map((d, i) => (
@@ -157,12 +168,12 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                         </div>
                       ))}
                     </div>
-                  </section>
+                  </motion.section>
                 )}
 
                 {/* ПРИМЕРЫ */}
                 {content.examples && content.examples.length > 0 && (
-                  <section>
+                  <motion.section variants={fadeInUp}>
                     <div style={LABEL}>ПРИМЕРЫ</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {content.examples.map((ex, i) => {
@@ -180,12 +191,12 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                         )
                       })}
                     </div>
-                  </section>
+                  </motion.section>
                 )}
 
                 {/* ТИПИЧНЫЕ ОШИБКИ */}
                 {content.antiPatterns && content.antiPatterns.length > 0 && (
-                  <section style={{ ...CARD, padding: "22px 24px", background: "linear-gradient(135deg,rgba(255,80,80,0.09),rgba(255,60,60,0.03))", border: "1px solid rgba(255,80,80,0.22)" }}>
+                  <motion.section variants={fadeInUp} style={{ ...CARD, padding: "22px 24px", background: "linear-gradient(135deg,rgba(255,80,80,0.09),rgba(255,60,60,0.03))", border: "1px solid rgba(255,80,80,0.22)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 14 }}>
                       <span style={{ width: 20, height: 20, borderRadius: "50%", background: "rgba(255,80,80,0.18)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 11, color: "#ff6060", flexShrink: 0 }}>✕</span>
                       <span style={{ ...LABEL, marginBottom: 0, color: "#ff7070" }}>ТИПИЧНЫЕ ОШИБКИ</span>
@@ -198,12 +209,12 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                         </div>
                       ))}
                     </div>
-                  </section>
+                  </motion.section>
                 )}
 
                 {/* ЗАПОМНИ */}
                 {content.keyPoints.length > 0 && (
-                  <section style={{ ...CARD, padding: "22px 24px", background: "linear-gradient(135deg,rgba(155,107,255,0.14),rgba(43,217,227,0.06))", border: "1px solid rgba(155,107,255,0.28)" }}>
+                  <motion.section variants={fadeInUp} style={{ ...CARD, padding: "22px 24px", background: "linear-gradient(135deg,rgba(155,107,255,0.14),rgba(43,217,227,0.06))", border: "1px solid rgba(155,107,255,0.28)" }}>
                     <div style={{ ...LABEL, color: "#b69cff" }}>ЗАПОМНИ</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                       {content.keyPoints.map((point, i) => (
@@ -213,7 +224,7 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                         </div>
                       ))}
                     </div>
-                  </section>
+                  </motion.section>
                 )}
 
                 {/* FOOTER NAV */}
@@ -222,15 +233,15 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                     ← Вернуться
                   </button>
                 </div>
-              </div>
+              </motion.div>
             </div>
 
             {/* ── ПРАВАЯ КОЛОНКА: ПРАКТИКА ── */}
             <div className="theory-sidebar">
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <motion.div variants={staggerContainer(0.07, 0.1)} initial="hidden" animate="show" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
                 {/* УРОВНЕВОЕ ТЕСТИРОВАНИЕ */}
-                <section style={{ ...CARD, padding: "18px 18px" }}>
+                <motion.section variants={fadeInUp} style={{ ...CARD, padding: "18px 18px" }}>
                   <div style={LABEL}>ТЕСТ ПО УРОВНЯМ</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {([
@@ -238,8 +249,10 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                       { level: "intermediate", label: "Средний",     desc: "Применение и нюансы",     color: "#ffbb5c", bg: "rgba(255,187,92,0.1)",  border: "rgba(255,187,92,0.28)"  },
                       { level: "advanced",     label: "Продвинутый", desc: "Edge cases и детали",     color: "#ff7e92", bg: "rgba(255,126,146,0.1)", border: "rgba(255,126,146,0.28)" },
                     ] as const).map(l => (
-                      <button
+                      <motion.button
                         key={l.level}
+                        whileHover={{ x: 3 }}
+                        whileTap={{ scale: 0.97 }}
                         onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(subtopicName)}/level/${l.level}`)}
                         style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 13, border: `1px solid ${l.border}`, cursor: "pointer", background: l.bg, fontFamily: "inherit", textAlign: "left" }}
                       >
@@ -249,13 +262,13 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>{l.desc}</div>
                         </div>
                         <span style={{ fontSize: 13, color: l.color, opacity: 0.7 }}>→</span>
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
-                </section>
+                </motion.section>
 
                 {/* ПРАКТИКА ПО УРОВНЯМ */}
-                <section style={{ ...CARD, padding: "18px 18px" }}>
+                <motion.section variants={fadeInUp} style={{ ...CARD, padding: "18px 18px" }}>
                   <div style={LABEL}>ПРАКТИКА ПО УРОВНЯМ</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {([
@@ -263,8 +276,10 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                       { level: "intermediate", label: "Средний",     desc: "Применение и нюансы",     color: "#ffbb5c", bg: "rgba(255,187,92,0.1)",  border: "rgba(255,187,92,0.28)"  },
                       { level: "advanced",     label: "Продвинутый", desc: "Edge cases и детали",     color: "#ff7e92", bg: "rgba(255,126,146,0.1)", border: "rgba(255,126,146,0.28)" },
                     ] as const).map(l => (
-                      <button
+                      <motion.button
                         key={l.level}
+                        whileHover={{ x: 3 }}
+                        whileTap={{ scale: 0.97 }}
                         onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(subtopicName)}/level/${l.level}/practice`)}
                         style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 13, border: `1px solid ${l.border}`, cursor: "pointer", background: l.bg, fontFamily: "inherit", textAlign: "left" }}
                       >
@@ -274,14 +289,14 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>{l.desc}</div>
                         </div>
                         <span style={{ fontSize: 13, color: l.color, opacity: 0.7 }}>→</span>
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
-                </section>
+                </motion.section>
 
                 {/* ПРАКТИЧЕСКИЕ ЗАДАНИЯ */}
                 {content.exercises && content.exercises.length > 0 && (
-                  <section style={{ ...CARD, padding: "20px 20px" }}>
+                  <motion.section variants={fadeInUp} style={{ ...CARD, padding: "20px 20px" }}>
                     <div style={LABEL}>ПРАКТИКА</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {content.exercises.map((ex, i) => {
@@ -297,17 +312,19 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                         )
                       })}
                     </div>
-                  </section>
+                  </motion.section>
                 )}
 
                 {/* СВЯЗАНО С */}
                 {content.relatedSubtopics && content.relatedSubtopics.length > 0 && (
-                  <section style={{ ...CARD, padding: "20px 20px" }}>
+                  <motion.section variants={fadeInUp} style={{ ...CARD, padding: "20px 20px" }}>
                     <div style={LABEL}>СВЯЗАНО С</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                       {content.relatedSubtopics.map((r, i) => (
-                        <button
+                        <motion.button
                           key={i}
+                          whileHover={{ x: 3 }}
+                          whileTap={{ scale: 0.97 }}
                           onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(r.name)}`)}
                           style={{ textAlign: "left", display: "flex", flexDirection: "column", gap: 3, padding: "11px 14px", borderRadius: 12, cursor: "pointer", background: "rgba(155,107,255,0.07)", border: "1px solid rgba(155,107,255,0.18)", fontFamily: "inherit" }}
                         >
@@ -316,15 +333,15 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                             <span style={{ fontSize: 13, color: "rgba(155,107,255,0.55)", flexShrink: 0 }}>→</span>
                           </div>
                           <span style={{ fontSize: 12.5, color: "rgba(255,255,255,0.45)", lineHeight: 1.4 }}>{r.relation}</span>
-                        </button>
+                        </motion.button>
                       ))}
                     </div>
-                  </section>
+                  </motion.section>
                 )}
 
                 {/* ГЛОССАРИЙ ПОДТЕМЫ */}
                 {subtopic && subtopic.definitions.length > 0 && (
-                  <section style={{ ...CARD, padding: "20px 20px" }}>
+                  <motion.section variants={fadeInUp} style={{ ...CARD, padding: "20px 20px" }}>
                     <div style={LABEL}>ГЛОССАРИЙ ПОДТЕМЫ</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       {subtopic.definitions.map((d) => (
@@ -334,10 +351,10 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                         </div>
                       ))}
                     </div>
-                  </section>
+                  </motion.section>
                 )}
 
-              </div>
+              </motion.div>
             </div>
 
           </div>

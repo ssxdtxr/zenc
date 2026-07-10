@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import type { RefObject } from "react"
 import type { Message, TutorResponse } from "@/entities/session/model/types"
-import type { GlossaryTerm, SessionRecord } from "@/entities/topic/model/types"
+import type { SessionRecord } from "@/entities/topic/model/types"
 import type { ConfidenceLevel } from "@/features/confidence-picker/ui/confidence-picker"
 import { fetchTutorResponse } from "../api/tutor-api"
 
@@ -174,7 +174,7 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSu
       const data = await res.json()
       if (!res.ok || data.error) throw new Error(data.error)
 
-      const sessionResults: Omit<SessionRecord, "id" | "date"> & { glossary: GlossaryTerm[] } = {
+      const sessionResults: Omit<SessionRecord, "id" | "date"> = {
         score: finalCorrect,
         total: MAX_QUESTIONS,
         overallLevel: data.overallLevel,
@@ -183,7 +183,6 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSu
         strengths: data.strengths ?? [],
         toStudyMore: data.toStudyMore ?? [],
         toStudyDeeper: data.toStudyDeeper ?? [],
-        glossary: data.glossary ?? [],
       }
       setResults(sessionResults)
       setSessionState("results")

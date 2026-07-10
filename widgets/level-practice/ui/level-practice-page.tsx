@@ -1,11 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
 import { ChevronLeftIcon } from "@/shared/ui/icons"
 import { useRouter } from "next/navigation"
 import { apiClient } from "@/shared/lib/api-client"
 import { SUBTOPIC_STATUS_CONFIG } from "@/entities/topic/config"
 import type { Topic } from "@/entities/topic/model/types"
+import { fadeInUp, staggerContainer } from "@/shared/lib/motion"
 
 type Props = { topicId: string; subtopicName: string; level: string }
 
@@ -141,24 +143,24 @@ export const LevelPracticePage = ({ topicId, subtopicName, level }: Props) => {
 
         {/* SUMMARY when all done */}
         {allDone && (
-          <div style={{ marginTop: 20, padding: "24px 26px", borderRadius: 22, background: avgScore >= 80 ? "linear-gradient(135deg,rgba(94,224,138,0.15),rgba(43,217,227,0.06))" : avgScore >= 50 ? "linear-gradient(135deg,rgba(255,187,92,0.15),rgba(255,150,50,0.05))" : "linear-gradient(135deg,rgba(255,126,146,0.12),rgba(255,80,80,0.04))", border: `1px solid ${avgScore >= 80 ? "rgba(94,224,138,0.3)" : avgScore >= 50 ? "rgba(255,187,92,0.3)" : "rgba(255,126,146,0.3)"}`, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}>
+          <motion.div initial={{ opacity: 0, y: 12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: "spring", stiffness: 300, damping: 28 }} style={{ marginTop: 20, padding: "24px 26px", borderRadius: 22, background: avgScore >= 80 ? "linear-gradient(135deg,rgba(94,224,138,0.15),rgba(43,217,227,0.06))" : avgScore >= 50 ? "linear-gradient(135deg,rgba(255,187,92,0.15),rgba(255,150,50,0.05))" : "linear-gradient(135deg,rgba(255,126,146,0.12),rgba(255,80,80,0.04))", border: `1px solid ${avgScore >= 80 ? "rgba(94,224,138,0.3)" : avgScore >= 50 ? "rgba(255,187,92,0.3)" : "rgba(255,126,146,0.3)"}`, backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: "rgba(255,255,255,0.4)", marginBottom: 8 }}>ИТОГ ПРАКТИКИ · {lvl.label.toUpperCase()}</div>
             <div className="font-display" style={{ fontSize: 42, fontWeight: 800, color: avgScore >= 80 ? "#5ee08a" : avgScore >= 50 ? "#ffbb5c" : "#ff7e92", lineHeight: 1 }}>{avgScore}<span style={{ fontSize: 20, opacity: 0.6 }}>%</span></div>
             <p style={{ margin: "8px 0 0", fontSize: 14.5, color: "rgba(255,255,255,0.65)" }}>
               {avgScore >= 80 ? "Отличная работа — практические навыки сильные" : avgScore >= 50 ? "Базовое понимание есть, но стоит доработать детали" : "Нужно ещё поработать с материалом и попробовать снова"}
             </p>
-          </div>
+          </motion.div>
         )}
 
         {/* EXERCISES */}
         {!loadingExercises && exercises.length > 0 && (
-          <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 16 }}>
+          <motion.div variants={staggerContainer(0.08)} initial="hidden" animate="show" style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 16 }}>
             {exercises.map((ex, i) => {
               const s = states[i]
               const v = s?.result ? VERDICT_CONFIG[s.result.verdict] : null
 
               return (
-                <div key={i} style={{ borderRadius: 22, background: "rgba(255,255,255,0.06)", backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 12px 40px rgba(0,0,0,0.4)", overflow: "hidden" }}>
+                <motion.div key={i} variants={fadeInUp} style={{ borderRadius: 22, background: "rgba(255,255,255,0.06)", backdropFilter: "blur(26px)", WebkitBackdropFilter: "blur(26px)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 12px 40px rgba(0,0,0,0.4)", overflow: "hidden" }}>
 
                   {/* Exercise header */}
                   <div style={{ padding: "18px 22px 14px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
@@ -185,17 +187,19 @@ export const LevelPracticePage = ({ topicId, subtopicName, level }: Props) => {
                         />
                         <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                           <span style={{ fontSize: 12.5, color: "rgba(255,255,255,0.35)" }}>⌘ Enter — отправить</span>
-                          <button
+                          <motion.button
+                            whileHover={(!s?.answer.trim() || s?.loading) ? undefined : { scale: 1.02 }}
+                            whileTap={(!s?.answer.trim() || s?.loading) ? undefined : { scale: 0.96 }}
                             onClick={() => submit(i)}
                             disabled={!s?.answer.trim() || s?.loading}
                             style={{ padding: "12px 22px", borderRadius: 12, border: "none", cursor: (!s?.answer.trim() || s?.loading) ? "default" : "pointer", background: `linear-gradient(135deg,${lvl.color},${lvl.color}cc)`, color: "#08070f", fontWeight: 700, fontSize: 14, boxShadow: `0 8px 20px ${lvl.color}44`, opacity: (!s?.answer.trim() || s?.loading) ? 0.5 : 1, fontFamily: "inherit" }}
                           >
                             {s?.loading ? "Проверяю…" : "Проверить →"}
-                          </button>
+                          </motion.button>
                         </div>
                       </>
                     ) : (
-                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                         {/* User's answer recap */}
                         <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
                           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "rgba(255,255,255,0.35)", marginBottom: 6 }}>МОЁ РЕШЕНИЕ</div>
@@ -223,30 +227,32 @@ export const LevelPracticePage = ({ topicId, subtopicName, level }: Props) => {
                         )}
 
                         {/* Retry */}
-                        <button
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.96 }}
                           onClick={() => setStates(prev => prev.map((st, idx) => idx === i ? { ...st, result: null, answer: "" } : st))}
                           style={{ alignSelf: "flex-start", padding: "9px 16px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}
                         >
                           Попробовать снова
-                        </button>
-                      </div>
+                        </motion.button>
+                      </motion.div>
                     )}
                   </div>
-                </div>
+                </motion.div>
               )
             })}
-          </div>
+          </motion.div>
         )}
 
         {/* BOTTOM NAV */}
         {!loadingExercises && (
           <div style={{ marginTop: 24, display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <button onClick={() => router.back()} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 20px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.16)", cursor: "pointer", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", fontWeight: 600, fontSize: 15, fontFamily: "inherit" }}>
+            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={() => router.back()} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 20px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.16)", cursor: "pointer", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", fontWeight: 600, fontSize: 15, fontFamily: "inherit" }}>
               ← Вернуться
-            </button>
-            <button onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(subtopicName)}/level/${level}`)} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 20px", borderRadius: 14, border: "1px solid rgba(155,107,255,0.35)", cursor: "pointer", background: "rgba(155,107,255,0.08)", color: "#c4adff", fontWeight: 600, fontSize: 15, fontFamily: "inherit" }}>
+            </motion.button>
+            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(subtopicName)}/level/${level}`)} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 20px", borderRadius: 14, border: "1px solid rgba(155,107,255,0.35)", cursor: "pointer", background: "rgba(155,107,255,0.08)", color: "#c4adff", fontWeight: 600, fontSize: 15, fontFamily: "inherit" }}>
               Тест этого уровня →
-            </button>
+            </motion.button>
           </div>
         )}
       </div>

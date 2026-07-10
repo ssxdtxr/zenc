@@ -1,4 +1,4 @@
-import type { GlossaryTerm, SessionRecord, Topic } from "@/entities/topic/model/types"
+import type { SessionRecord, Topic } from "@/entities/topic/model/types"
 
 type DbTopic = Topic & {
   sessions: (Omit<SessionRecord, "subtopics"> & {
@@ -7,7 +7,6 @@ type DbTopic = Topic & {
     toStudyDeeper: string[]
   })[]
   subtopics: { id: string; name: string; status: string; recommendation: string; definitions: { term: string; definition: string }[]; nextReviewAt: string | null }[]
-  glossary: { id: string; term: string; definition: string }[]
 }
 
 function mapDbTopic(t: DbTopic): Topic {
@@ -23,10 +22,6 @@ function mapDbTopic(t: DbTopic): Topic {
       recommendation: s.recommendation,
       definitions: (s.definitions as { term: string; definition: string }[]) ?? [],
       nextReviewAt: s.nextReviewAt as string | null,
-    })),
-    glossary: (t.glossary ?? []).map((g): GlossaryTerm => ({
-      term: g.term,
-      definition: g.definition,
     })),
     sessions: (t.sessions ?? []).map((s) => ({
       id: s.id,

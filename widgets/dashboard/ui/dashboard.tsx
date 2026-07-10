@@ -2,10 +2,12 @@
 
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { XIcon, SearchIcon, PlusIcon } from "@/shared/ui/icons"
 import { useDashboard } from "../model/use-dashboard"
 import { OVERALL_LEVEL_CONFIG } from "@/entities/topic/config"
 import type { Topic } from "@/entities/topic/model/types"
+import { fadeInUp, staggerContainer } from "@/shared/lib/motion"
 
 function calcProgress(topic: Topic) {
   const total = topic.currentSubtopics.length
@@ -78,18 +80,26 @@ export const Dashboard = () => {
         </nav>
 
         {/* ADD BAR */}
-        {creating && (
-          <div className="anim-rise" style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderRadius: 16, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", border: "1px solid rgba(155,107,255,0.4)", boxShadow: "0 12px 40px rgba(109,60,255,0.25)" }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.7)", whiteSpace: "nowrap" }}>Новая тема</span>
-            <input value={newTopicName} onChange={e => setNewTopicName(e.target.value)} onKeyDown={e => e.key === "Enter" && handleCreate()} placeholder="TypeScript, System Design, PostgreSQL…" autoFocus style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 11, padding: "10px 12px", outline: "none", color: "#fff", fontSize: 13, fontWeight: 500, fontFamily: "inherit" }} />
-            <button onClick={handleCreate} disabled={!newTopicName.trim()} style={{ padding: "10px 18px", borderRadius: 11, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap", fontFamily: "inherit" }}>Добавить</button>
-            <button onClick={() => { setCreating(false); setNewTopicName("") }} style={{ padding: "10px 12px", borderRadius: 11, border: "1px solid rgba(255,255,255,0.14)", cursor: "pointer", background: "transparent", color: "rgba(255,255,255,0.6)", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Отмена</button>
-          </div>
-        )}
+        <AnimatePresence>
+          {creating && (
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderRadius: 16, background: "rgba(255,255,255,0.07)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", border: "1px solid rgba(155,107,255,0.4)", boxShadow: "0 12px 40px rgba(109,60,255,0.25)" }}
+            >
+              <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.7)", whiteSpace: "nowrap" }}>Новая тема</span>
+              <input value={newTopicName} onChange={e => setNewTopicName(e.target.value)} onKeyDown={e => e.key === "Enter" && handleCreate()} placeholder="TypeScript, System Design, PostgreSQL…" autoFocus style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 11, padding: "10px 12px", outline: "none", color: "#fff", fontSize: 13, fontWeight: 500, fontFamily: "inherit" }} />
+              <motion.button whileTap={{ scale: 0.95 }} onClick={handleCreate} disabled={!newTopicName.trim()} style={{ padding: "10px 18px", borderRadius: 11, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap", fontFamily: "inherit" }}>Добавить</motion.button>
+              <motion.button whileTap={{ scale: 0.95 }} onClick={() => { setCreating(false); setNewTopicName("") }} style={{ padding: "10px 12px", borderRadius: 11, border: "1px solid rgba(255,255,255,0.14)", cursor: "pointer", background: "transparent", color: "rgba(255,255,255,0.6)", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Отмена</motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* HERO */}
         <header style={{ marginTop: 36 }}>
-          <div className="anim-rise">
+          <motion.div variants={fadeInUp} initial="hidden" animate="show">
             {totalSessions > 0 && (
               <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "5px 12px", borderRadius: 999, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)", marginBottom: 14 }}>
                 <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 10px #4ade80", display: "inline-block", flexShrink: 0 }} />
@@ -102,7 +112,7 @@ export const Dashboard = () => {
             <p style={{ margin: 0, fontSize: 15, color: "rgba(255,255,255,0.55)" }}>
               {topics.length > 0 ? `${topics.length} ${topics.length === 1 ? "тема" : topics.length < 5 ? "темы" : "тем"} · продолжай учиться` : "Добавь первую тему и начни учиться."}
             </p>
-          </div>
+          </motion.div>
         </header>
 
         {/* ERROR */}
@@ -122,7 +132,7 @@ export const Dashboard = () => {
 
         {/* TOPICS GRID */}
         {!loading && filtered.length > 0 && (
-          <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 14 }}>
+          <motion.div variants={staggerContainer(0.05)} initial="hidden" animate="show" style={{ marginTop: 24, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 14 }}>
             {filtered.map(t => {
               const progress = calcProgress(t)
               const started = t.sessions.length > 0
@@ -131,8 +141,15 @@ export const Dashboard = () => {
                 s => s.nextReviewAt && new Date(s.nextReviewAt).getTime() <= now
               ).length
               return (
-                <article key={t.id} className="anim-pop" style={{ position: "relative", borderRadius: 20, background: "rgba(255,255,255,0.055)", backdropFilter: "blur(22px) saturate(140%)", WebkitBackdropFilter: "blur(22px) saturate(140%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.14)", padding: "20px" }}>
-                  <button onClick={() => deleteTopic(t.id)} style={{ position: "absolute", top: 14, right: 14, width: 26, height: 26, borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.5)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><XIcon size={12} color="rgba(255,255,255,0.5)" /></button>
+                <motion.article
+                  key={t.id}
+                  layout
+                  variants={fadeInUp}
+                  whileHover={{ y: -4, boxShadow: "0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.16)" }}
+                  transition={{ type: "spring", stiffness: 300, damping: 26 }}
+                  style={{ position: "relative", borderRadius: 20, background: "rgba(255,255,255,0.055)", backdropFilter: "blur(22px) saturate(140%)", WebkitBackdropFilter: "blur(22px) saturate(140%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.14)", padding: "20px" }}
+                >
+                  <motion.button whileTap={{ scale: 0.9 }} onClick={() => deleteTopic(t.id)} style={{ position: "absolute", top: 14, right: 14, width: 26, height: 26, borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.5)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><XIcon size={12} color="rgba(255,255,255,0.5)" /></motion.button>
 
                   <div style={{ display: "flex", alignItems: "center", gap: 8, paddingRight: 32, marginBottom: 4 }}>
                     <h3 className="font-display" style={{ fontWeight: 600, fontSize: 17, letterSpacing: "-0.01em", margin: 0, color: "#fff" }}>{t.name}</h3>
@@ -156,22 +173,22 @@ export const Dashboard = () => {
                         <div style={{ height: "100%", borderRadius: 999, background: "linear-gradient(90deg,#9b6bff,#2bd9e3)", width: `${progress}%`, transition: "width .6s ease" }} />
                       </div>
                       <div style={{ marginTop: 10, fontSize: 12, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}>{t.sessions.length} сессий</div>
-                      <button onClick={() => router.push(`/topic/${t.id}`)} style={{ marginTop: 12, width: "100%", padding: "10px", borderRadius: 11, border: "1px solid rgba(255,255,255,0.16)", background: "rgba(255,255,255,0.05)", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
+                      <motion.button whileTap={{ scale: 0.97 }} onClick={() => router.push(`/topic/${t.id}`)} style={{ marginTop: 12, width: "100%", padding: "10px", borderRadius: 11, border: "1px solid rgba(255,255,255,0.16)", background: "rgba(255,255,255,0.05)", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>
                         Продолжить →
-                      </button>
+                      </motion.button>
                     </div>
                   ) : (
                     <div style={{ marginTop: 14 }}>
                       <p style={{ margin: "0 0 14px", fontSize: 13, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}>Ещё не начато · {t.currentSubtopics.length > 0 ? `${t.currentSubtopics.length} тем` : "добавлена"}</p>
-                      <button onClick={() => router.push(`/topic/${t.id}`)} style={{ width: "100%", padding: "10px", borderRadius: 11, border: "none", cursor: "pointer", background: "linear-gradient(135deg,rgba(155,107,255,0.9),rgba(109,60,255,0.9))", color: "#fff", fontWeight: 700, fontSize: 13, fontFamily: "inherit" }}>
+                      <motion.button whileTap={{ scale: 0.97 }} onClick={() => router.push(`/topic/${t.id}`)} style={{ width: "100%", padding: "10px", borderRadius: 11, border: "none", cursor: "pointer", background: "linear-gradient(135deg,rgba(155,107,255,0.9),rgba(109,60,255,0.9))", color: "#fff", fontWeight: 700, fontSize: 13, fontFamily: "inherit" }}>
                         Начать →
-                      </button>
+                      </motion.button>
                     </div>
                   )}
-                </article>
+                </motion.article>
               )
             })}
-          </div>
+          </motion.div>
         )}
 
         {/* EMPTY */}

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { motion } from "framer-motion"
 import { ChevronLeftIcon } from "@/shared/ui/icons"
 import { useRouter } from "next/navigation"
 import { apiClient } from "@/shared/lib/api-client"
@@ -12,6 +13,7 @@ import { AnswerForm } from "@/features/answer-question/ui/answer-form"
 import { RichText } from "@/features/theory-view/ui/rich-text"
 import { CheckIcon, CrossIcon } from "@/shared/ui/icons"
 import type { ConfidenceLevel } from "@/features/confidence-picker/ui/confidence-picker"
+import { fadeInUp, staggerContainer } from "@/shared/lib/motion"
 
 type Props = { topicId: string; subtopicName: string }
 
@@ -41,7 +43,7 @@ function StatusResult({ prev, next, summary, recommendation, onRetry, onBack }: 
   )
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <motion.div variants={staggerContainer(0.08)} initial="hidden" animate="show" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       {/* Status hero */}
       <div style={{ padding: "28px 26px", borderRadius: 20, background: cfg?.bg ?? "rgba(255,255,255,0.08)", border: `1.5px solid ${cfg?.border ?? "rgba(255,255,255,0.2)"}`, textAlign: "center" }}>
         {prevCfg && prev !== next && (
@@ -65,14 +67,14 @@ function StatusResult({ prev, next, summary, recommendation, onRetry, onBack }: 
 
       {/* Actions */}
       <div style={{ display: "flex", gap: 10 }}>
-        <button onClick={onRetry} style={{ flex: 1, padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, fontFamily: "inherit", boxShadow: "0 8px 22px rgba(109,60,255,0.4)" }}>
+        <motion.button whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.97 }} onClick={onRetry} style={{ flex: 1, padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, fontFamily: "inherit", boxShadow: "0 8px 22px rgba(109,60,255,0.4)" }}>
           Пройти снова →
-        </button>
-        <button onClick={onBack} style={{ flex: 1, padding: "14px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.16)", cursor: "pointer", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.85)", fontWeight: 600, fontSize: 15, fontFamily: "inherit" }}>
+        </motion.button>
+        <motion.button whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.97 }} onClick={onBack} style={{ flex: 1, padding: "14px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.16)", cursor: "pointer", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.85)", fontWeight: 600, fontSize: 15, fontFamily: "inherit" }}>
           ← К теории
-        </button>
+        </motion.button>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -284,7 +286,7 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
 
       {/* Question */}
       {currentResponse && sessionState === "session" && (
-        <div>
+        <motion.div key={`q-${questionCount}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 16 }}>
             <span style={{ width: 28, height: 28, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, background: levelTheme.bg, color: levelTheme.color, border: `1px solid ${levelTheme.border}`, fontFamily: "inherit" }}>{questionCount}</span>
             <span style={{ fontWeight: 700, fontSize: 14.5, color: levelTheme.color }}>
@@ -295,17 +297,17 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
           {currentResponse.questionType === "choice" && currentResponse.options ? (
             <>
               <p style={{ margin: "0 0 20px", fontSize: 18, lineHeight: 1.6, color: "rgba(255,255,255,0.92)" }}>{currentResponse.question}</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <motion.div variants={staggerContainer(0.05)} initial="hidden" animate="show" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {currentResponse.options.map((opt, i) => {
                   const isSelected = answer === opt
                   return (
-                    <button key={i} onClick={() => setAnswer(opt)} style={{ textAlign: "left", padding: "14px 18px", borderRadius: 14, border: `1.5px solid ${isSelected ? "rgba(155,107,255,0.5)" : "rgba(255,255,255,0.1)"}`, background: isSelected ? "rgba(155,107,255,0.15)" : "rgba(255,255,255,0.04)", color: isSelected ? "#fff" : "rgba(255,255,255,0.75)", fontWeight: isSelected ? 600 : 500, fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", gap: 12, fontFamily: "inherit" }}>
+                    <motion.button key={i} variants={fadeInUp} whileHover={{ x: 2 }} whileTap={{ scale: 0.985 }} onClick={() => setAnswer(opt)} style={{ textAlign: "left", padding: "14px 18px", borderRadius: 14, border: `1.5px solid ${isSelected ? "rgba(155,107,255,0.5)" : "rgba(255,255,255,0.1)"}`, background: isSelected ? "rgba(155,107,255,0.15)" : "rgba(255,255,255,0.04)", color: isSelected ? "#fff" : "rgba(255,255,255,0.75)", fontWeight: isSelected ? 600 : 500, fontSize: 15, cursor: "pointer", display: "flex", alignItems: "center", gap: 12, fontFamily: "inherit" }}>
                       <span style={{ width: 24, height: 24, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, background: isSelected ? "#9b6bff" : "rgba(255,255,255,0.08)", color: isSelected ? "#fff" : "rgba(255,255,255,0.4)", border: `1px solid ${isSelected ? "transparent" : "rgba(255,255,255,0.12)"}` }}>{String.fromCharCode(65 + i)}</span>
                       {opt}
-                    </button>
+                    </motion.button>
                   )
                 })}
-              </div>
+              </motion.div>
             </>
           ) : (
             <p style={{ margin: "0 0 0", fontSize: 18, lineHeight: 1.6, color: "rgba(255,255,255,0.92)" }}>{currentResponse.question}</p>
@@ -317,10 +319,10 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
             {CONFIDENCE_OPTIONS.map(c => {
               const isSel = selectedConfidence === c.level
               return (
-                <button key={c.level} onClick={() => handleConfidence(c.level)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "14px 10px", borderRadius: 14, cursor: "pointer", background: isSel ? c.iconBg : "rgba(255,255,255,0.04)", border: `1.5px solid ${isSel ? c.iconColor : "rgba(255,255,255,0.1)"}`, fontFamily: "inherit" }}>
+                <motion.button key={c.level} whileHover={{ y: -2 }} whileTap={{ scale: 0.93 }} animate={isSel ? { scale: [1, 1.06, 1] } : {}} transition={{ duration: 0.25 }} onClick={() => handleConfidence(c.level)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "14px 10px", borderRadius: 14, cursor: "pointer", background: isSel ? c.iconBg : "rgba(255,255,255,0.04)", border: `1.5px solid ${isSel ? c.iconColor : "rgba(255,255,255,0.1)"}`, fontFamily: "inherit" }}>
                   <span style={{ width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, background: c.iconBg, color: c.iconColor }}>{c.icon}</span>
                   <span style={{ fontWeight: 600, fontSize: 13, color: isSel ? "#fff" : "rgba(255,255,255,0.55)" }}>{c.label}</span>
-                </button>
+                </motion.button>
               )
             })}
           </div>
@@ -331,24 +333,24 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
 
           {error && <div style={{ marginTop: 10, padding: "10px 14px", borderRadius: 12, background: "rgba(220,38,38,0.15)", border: "1px solid rgba(220,38,38,0.35)", color: "#fca5a5", fontSize: 13 }}>{error}</div>}
 
-          <button onClick={handleDontKnow} disabled={loading} style={{ marginTop: 12, width: "100%", padding: "11px", borderRadius: 12, border: "1px dashed rgba(255,255,255,0.18)", background: "transparent", color: "rgba(255,255,255,0.45)", fontSize: 13.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+          <motion.button whileTap={{ scale: 0.97 }} onClick={handleDontKnow} disabled={loading} style={{ marginTop: 12, width: "100%", padding: "11px", borderRadius: 12, border: "1px dashed rgba(255,255,255,0.18)", background: "transparent", color: "rgba(255,255,255,0.45)", fontSize: 13.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
             Не знаю / Пропустить
-          </button>
+          </motion.button>
 
           <div style={{ marginTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 6 }}>
               <span style={{ padding: "3px 8px", borderRadius: 7, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", fontSize: 12 }}>⌘ Enter</span>
             </span>
-            <button onClick={handleAnswer} disabled={(!answer.trim() && currentResponse.questionType === "text") || loading} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 26px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 10px 26px rgba(109,60,255,0.4)", opacity: ((!answer.trim() && currentResponse.questionType === "text") || loading) ? 0.5 : 1, fontFamily: "inherit" }}>
+            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.96 }} onClick={handleAnswer} disabled={(!answer.trim() && currentResponse.questionType === "text") || loading} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 26px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 10px 26px rgba(109,60,255,0.4)", opacity: ((!answer.trim() && currentResponse.questionType === "text") || loading) ? 0.5 : 1, fontFamily: "inherit" }}>
               {loading ? "Проверяю…" : "Ответить →"}
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Feedback */}
       {currentResponse && sessionState === "feedback" && (
-        <div>
+        <motion.div key={`f-${questionCount}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}>
           {/* Question */}
           {lastQuestion && (
             <div style={{ padding: "14px 18px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", marginBottom: 10 }}>
@@ -435,15 +437,15 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
           </div>
 
           {!isLastQuestion ? (
-            <button onClick={nextQuestion} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 22px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
+            <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.97 }} onClick={nextQuestion} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 22px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
               Следующий вопрос →
-            </button>
+            </motion.button>
           ) : (
-            <button onClick={nextQuestion} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 22px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
+            <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.97 }} onClick={nextQuestion} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 22px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
               Завершить тест →
-            </button>
+            </motion.button>
           )}
-        </div>
+        </motion.div>
       )}
     </div>
   )

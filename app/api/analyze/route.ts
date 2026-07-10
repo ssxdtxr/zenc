@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk"
 import { NextRequest, NextResponse } from "next/server"
 import type { Message } from "@/entities/session/model/types"
-import type { GlossaryTerm, OverallLevel, SessionRecord, Subtopic } from "@/entities/topic/model/types"
+import type { OverallLevel, SessionRecord, Subtopic } from "@/entities/topic/model/types"
 import { extractJson } from "@/lib/extract-json"
 
 const client = new Anthropic()
@@ -32,8 +32,7 @@ const SYSTEM_PROMPT = `Ты — эксперт в оценке знаний. П�
   ],
   "strengths": ["в чём пользователь силён"],
   "toStudyMore": ["что нужно изучить базово"],
-  "toStudyDeeper": ["что нужно углубить для экспертного уровня"],
-  "glossary": []
+  "toStudyDeeper": ["что нужно углубить для экспертного уровня"]
 }`
 
 export async function POST(req: NextRequest) {
@@ -68,7 +67,7 @@ ${conversationMessages.map((m) => `[${m.role === "user" ? "Пользовате�
       console.error("Analyze truncated by max_tokens, raw length:", rawContent.length)
     }
 
-    let parsed: Omit<SessionRecord, "id" | "date" | "score" | "total"> & { glossary: GlossaryTerm[] }
+    let parsed: Omit<SessionRecord, "id" | "date" | "score" | "total">
     try {
       parsed = extractJson(rawContent) as typeof parsed
     } catch {
@@ -80,7 +79,6 @@ ${conversationMessages.map((m) => `[${m.role === "user" ? "Пользовате�
         strengths: [],
         toStudyMore: [],
         toStudyDeeper: [],
-        glossary: [] as GlossaryTerm[],
       }
     }
 
