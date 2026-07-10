@@ -112,7 +112,7 @@ export const LevelPracticePage = ({ topicId, subtopicName, level }: Props) => {
         <div style={{ position: "absolute", bottom: "-12%", left: "34%", width: "40vw", height: "40vw", borderRadius: "50%", background: `radial-gradient(circle at 30% 30%, ${lvl.color}, transparent 70%)`, opacity: 0.16, animation: "drift3 34s ease-in-out infinite" }} />
       </div>
 
-      <div style={{ position: "relative", zIndex: 1, maxWidth: 860, margin: "0 auto", padding: "22px 28px 80px" }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 1040, margin: "0 auto", padding: "22px 28px 80px" }}>
 
         {/* NAV */}
         <nav style={{ display: "flex", alignItems: "center", gap: 12, padding: "11px 16px", borderRadius: 20, background: "rgba(255,255,255,0.06)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 10px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18)" }}>

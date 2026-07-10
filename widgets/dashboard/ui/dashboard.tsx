@@ -55,7 +55,7 @@ export const Dashboard = () => {
         <div style={{ position: "absolute", top: "42%", left: "-8%", width: "30vw", height: "30vw", borderRadius: "50%", background: "radial-gradient(circle at 30% 30%, #ffae3b, transparent 70%)", opacity: 0.22, animation: "drift4 28s ease-in-out infinite" }} />
       </div>
 
-      <div style={{ position: "relative", zIndex: 1, maxWidth: 780, margin: "0 auto", padding: "16px 16px 100px" }}>
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 960, margin: "0 auto", padding: "16px 16px 100px" }}>
 
         {/* NAV */}
         <nav style={{ position: "sticky", top: "calc(env(safe-area-inset-top, 8px) + 8px)", zIndex: 20, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "10px 12px 10px 14px", borderRadius: 18, background: "rgba(255,255,255,0.06)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 10px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18)" }}>
