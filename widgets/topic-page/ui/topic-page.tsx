@@ -246,18 +246,18 @@ export const TopicPage = ({ id }: Props) => {
 
             {/* CTAs */}
             <motion.div variants={staggerContainer(0.07)} initial="hidden" animate="show" style={{ marginTop: 14, display: "flex", gap: 12, flexWrap: "wrap" }}>
-              <motion.button variants={fadeInUp} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} onClick={startNewSession} style={{ flex: 1, minWidth: 200, padding: "18px 20px", borderRadius: 18, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 17, boxShadow: "0 14px 38px rgba(109,60,255,0.45)", textAlign: "left", fontFamily: "inherit" }}>
+              <motion.button variants={fadeInUp} whileHover={{ y: -2 }} whileTap={{ scale: 0.985 }} onClick={startNewSession} style={{ flex: 1, minWidth: 200, padding: "18px 20px", borderRadius: 18, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 17, boxShadow: "0 14px 38px rgba(109,60,255,0.45)", textAlign: "left", fontFamily: "inherit" }}>
                 <div className="font-display">{lastSession ? "Новая сессия →" : "Начать →"}</div>
                 <div style={{ fontWeight: 500, fontSize: 12.5, opacity: 0.8, marginTop: 3 }}>10 вопросов · адаптивно</div>
               </motion.button>
               {dueForReview.length > 0 && (
-                <motion.button variants={fadeInUp} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} onClick={startReview} style={{ flex: 1, minWidth: 200, padding: "18px 20px", borderRadius: 18, cursor: "pointer", background: "rgba(255,187,92,0.1)", backdropFilter: "blur(22px)", WebkitBackdropFilter: "blur(22px)", border: "1px solid rgba(255,187,92,0.4)", color: "#fff", fontWeight: 700, fontSize: 17, textAlign: "left", fontFamily: "inherit" }}>
+                <motion.button variants={fadeInUp} whileHover={{ y: -2 }} whileTap={{ scale: 0.985 }} onClick={startReview} style={{ flex: 1, minWidth: 200, padding: "18px 20px", borderRadius: 18, cursor: "pointer", background: "rgba(255,187,92,0.1)", backdropFilter: "blur(22px)", WebkitBackdropFilter: "blur(22px)", border: "1px solid rgba(255,187,92,0.4)", color: "#fff", fontWeight: 700, fontSize: 17, textAlign: "left", fontFamily: "inherit" }}>
                   <div className="font-display" style={{ color: "#ffbb5c" }}>Повторить →</div>
                   <div style={{ fontWeight: 500, fontSize: 12.5, color: "rgba(255,255,255,0.6)", marginTop: 3 }}>{dueForReview.length} подтем пора повторить</div>
                 </motion.button>
               )}
               {(weakCount > 0 || goodCount > 0 || progCount > 0) && dueForReview.length === 0 && (
-                <motion.button variants={fadeInUp} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} onClick={startFocused} style={{ flex: 1, minWidth: 200, padding: "18px 20px", borderRadius: 18, cursor: "pointer", background: "rgba(255,255,255,0.08)", backdropFilter: "blur(22px)", WebkitBackdropFilter: "blur(22px)", border: "1px solid rgba(255,255,255,0.18)", color: "#fff", fontWeight: 700, fontSize: 17, textAlign: "left", fontFamily: "inherit" }}>
+                <motion.button variants={fadeInUp} whileHover={{ y: -2 }} whileTap={{ scale: 0.985 }} onClick={startFocused} style={{ flex: 1, minWidth: 200, padding: "18px 20px", borderRadius: 18, cursor: "pointer", background: "rgba(255,255,255,0.08)", backdropFilter: "blur(22px)", WebkitBackdropFilter: "blur(22px)", border: "1px solid rgba(255,255,255,0.18)", color: "#fff", fontWeight: 700, fontSize: 17, textAlign: "left", fontFamily: "inherit" }}>
                   <div className="font-display">До мастерства →</div>
                   <div style={{ fontWeight: 500, fontSize: 12.5, color: "rgba(255,255,255,0.6)", marginTop: 3 }}>{total - expertCount} подтем · {nextWeak?.name ?? ""}</div>
                 </motion.button>
@@ -300,7 +300,7 @@ export const TopicPage = ({ id }: Props) => {
                   {FILTERS.map(f => {
                     const on = filter === f.key
                     return (
-                      <motion.button key={f.key} whileTap={{ scale: 0.94 }} onClick={() => setFilter(f.key)} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 15px", borderRadius: 999, cursor: "pointer", background: on ? "rgba(155,107,255,0.18)" : "rgba(255,255,255,0.05)", border: `1px solid ${on ? "rgba(155,107,255,0.45)" : "rgba(255,255,255,0.12)"}`, color: on ? "#fff" : "rgba(255,255,255,0.7)", fontWeight: 600, fontSize: 13.5, fontFamily: "inherit" }}>
+                      <motion.button key={f.key} whileTap={{ scale: 0.93 }} onClick={() => setFilter(f.key)} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 15px", borderRadius: 999, cursor: "pointer", background: on ? "rgba(155,107,255,0.18)" : "rgba(255,255,255,0.05)", border: `1px solid ${on ? "rgba(155,107,255,0.45)" : "rgba(255,255,255,0.12)"}`, color: on ? "#fff" : "rgba(255,255,255,0.7)", fontWeight: 600, fontSize: 13.5, fontFamily: "inherit" }}>
                         {f.label}<span style={{ opacity: 0.65, fontWeight: 700 }}>{f.count}</span>
                       </motion.button>
                     )

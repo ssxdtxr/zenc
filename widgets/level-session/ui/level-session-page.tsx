@@ -230,11 +230,11 @@ export const LevelSessionPage = ({ topicId, subtopicName, level }: Props) => {
 
                 {/* Actions */}
                 <motion.div variants={fadeInUp} style={{ display: "flex", gap: 10 }}>
-                  <motion.button whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.97 }} onClick={() => { started.current = false; setMessages([]); setCurrent(null); setQuestionCount(0); setCorrectCount(0); setPhase("session"); setLastQuestion(null); setLastAnswer(null); setSavedStatus(null); started.current = true; ask([]) }}
+                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={() => { started.current = false; setMessages([]); setCurrent(null); setQuestionCount(0); setCorrectCount(0); setPhase("session"); setLastQuestion(null); setLastAnswer(null); setSavedStatus(null); started.current = true; ask([]) }}
                     style={{ flex: 1, padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${lvl.color},${lvl.color}aa)`, color: "#08070f", fontWeight: 700, fontSize: 15, fontFamily: "inherit" }}>
                     Пройти снова →
                   </motion.button>
-                  <motion.button whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.97 }} onClick={() => router.back()}
+                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={() => router.back()}
                     style={{ flex: 1, padding: "14px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.16)", cursor: "pointer", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.82)", fontWeight: 600, fontSize: 15, fontFamily: "inherit" }}>
                     ← К теории
                   </motion.button>
@@ -322,7 +322,7 @@ export const LevelSessionPage = ({ topicId, subtopicName, level }: Props) => {
                         </div>
                       )}
 
-                      <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.97 }} onClick={next} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: `linear-gradient(135deg,#9b6bff,#6d3cff)`, color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 22px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
+                      <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={next} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: `linear-gradient(135deg,#9b6bff,#6d3cff)`, color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 22px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
                         Следующий вопрос →
                       </motion.button>
                     </div>

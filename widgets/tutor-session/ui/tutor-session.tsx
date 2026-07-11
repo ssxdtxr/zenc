@@ -8,7 +8,7 @@ import { RichText } from "@/features/theory-view/ui/rich-text"
 import type { SessionRecord } from "@/entities/topic/model/types"
 import { MAX_QUESTIONS, useTutorSession } from "../model/use-tutor-session"
 import type { ConfidenceLevel } from "@/features/confidence-picker/ui/confidence-picker"
-import { fadeInUp, staggerContainer } from "@/shared/lib/motion"
+import { fadeInUp, staggerContainer, springSnappy } from "@/shared/lib/motion"
 
 const LEVEL_THEME: Record<string, { color: string; bg: string; border: string }> = {
   basic:        { color: "#86efac", bg: "rgba(74,222,128,0.14)",   border: "rgba(74,222,128,0.3)" },
@@ -151,7 +151,7 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
             {CONFIDENCE_OPTIONS.map(c => {
               const isSelected = selectedConfidence === c.level
               return (
-                <motion.button key={c.level} whileHover={{ y: -2 }} whileTap={{ scale: 0.93 }} animate={isSelected ? { scale: [1, 1.06, 1] } : {}} transition={{ duration: 0.25 }} onClick={() => handleConfidence(c.level)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "16px 12px", borderRadius: 15, cursor: "pointer", background: isSelected ? c.iconBg : c.bg, border: `1.5px solid ${isSelected ? c.iconColor : c.border}`, fontFamily: "inherit" }}>
+                <motion.button key={c.level} whileHover={{ y: -2 }} whileTap={{ scale: 0.93 }} animate={{ scale: isSelected ? 1.05 : 1 }} transition={springSnappy} onClick={() => handleConfidence(c.level)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "16px 12px", borderRadius: 15, cursor: "pointer", background: isSelected ? c.iconBg : c.bg, border: `1.5px solid ${isSelected ? c.iconColor : c.border}`, fontFamily: "inherit" }}>
                   <span style={{ width: 30, height: 30, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 700, background: c.iconBg, color: c.iconColor }}>{c.icon}</span>
                   <span style={{ fontWeight: 600, fontSize: 14, color: isSelected ? "#fff" : c.textColor }}>{c.label}</span>
                 </motion.button>
@@ -299,14 +299,14 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
             <>
               <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", color: "rgba(255,255,255,0.42)", marginBottom: 11 }}>КАК ПРОШЛО?</div>
               <div style={{ display: "flex", gap: 11, flexWrap: "wrap" }}>
-                <motion.button whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.97 }} onClick={nextQuestion} style={{ flex: 1, minWidth: 180, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 9, padding: 15, borderRadius: 14, cursor: "pointer", background: "rgba(94,224,138,0.14)", border: "1.5px solid rgba(94,224,138,0.4)", color: "#86efac", fontWeight: 700, fontSize: 15, fontFamily: "inherit" }}>
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={nextQuestion} style={{ flex: 1, minWidth: 180, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 9, padding: 15, borderRadius: 14, cursor: "pointer", background: "rgba(94,224,138,0.14)", border: "1.5px solid rgba(94,224,138,0.4)", color: "#86efac", fontWeight: 700, fontSize: 15, fontFamily: "inherit" }}>
                   <span style={{ width: 22, height: 22, borderRadius: "50%", background: "rgba(94,224,138,0.3)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>✓</span>
                   Следующий вопрос →
                 </motion.button>
               </div>
             </>
           ) : (
-            <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} onClick={nextQuestion} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 16, boxShadow: "0 10px 26px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
+            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.985 }} onClick={nextQuestion} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 16, boxShadow: "0 10px 26px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
               Завершить сессию →
             </motion.button>
           )}

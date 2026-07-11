@@ -229,7 +229,7 @@ export const LevelPracticePage = ({ topicId, subtopicName, level }: Props) => {
                         {/* Retry */}
                         <motion.button
                           whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.96 }}
+                          whileTap={{ scale: 0.97 }}
                           onClick={() => setStates(prev => prev.map((st, idx) => idx === i ? { ...st, result: null, answer: "" } : st))}
                           style={{ alignSelf: "flex-start", padding: "9px 16px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)", fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}
                         >

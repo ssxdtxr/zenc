@@ -13,7 +13,7 @@ import { AnswerForm } from "@/features/answer-question/ui/answer-form"
 import { RichText } from "@/features/theory-view/ui/rich-text"
 import { CheckIcon, CrossIcon } from "@/shared/ui/icons"
 import type { ConfidenceLevel } from "@/features/confidence-picker/ui/confidence-picker"
-import { fadeInUp, staggerContainer } from "@/shared/lib/motion"
+import { fadeInUp, staggerContainer, springSnappy } from "@/shared/lib/motion"
 
 type Props = { topicId: string; subtopicName: string }
 
@@ -67,10 +67,10 @@ function StatusResult({ prev, next, summary, recommendation, onRetry, onBack }: 
 
       {/* Actions */}
       <div style={{ display: "flex", gap: 10 }}>
-        <motion.button whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.97 }} onClick={onRetry} style={{ flex: 1, padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, fontFamily: "inherit", boxShadow: "0 8px 22px rgba(109,60,255,0.4)" }}>
+        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={onRetry} style={{ flex: 1, padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, fontFamily: "inherit", boxShadow: "0 8px 22px rgba(109,60,255,0.4)" }}>
           Пройти снова →
         </motion.button>
-        <motion.button whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.97 }} onClick={onBack} style={{ flex: 1, padding: "14px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.16)", cursor: "pointer", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.85)", fontWeight: 600, fontSize: 15, fontFamily: "inherit" }}>
+        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={onBack} style={{ flex: 1, padding: "14px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.16)", cursor: "pointer", background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.85)", fontWeight: 600, fontSize: 15, fontFamily: "inherit" }}>
           ← К теории
         </motion.button>
       </div>
@@ -319,7 +319,7 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
             {CONFIDENCE_OPTIONS.map(c => {
               const isSel = selectedConfidence === c.level
               return (
-                <motion.button key={c.level} whileHover={{ y: -2 }} whileTap={{ scale: 0.93 }} animate={isSel ? { scale: [1, 1.06, 1] } : {}} transition={{ duration: 0.25 }} onClick={() => handleConfidence(c.level)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "14px 10px", borderRadius: 14, cursor: "pointer", background: isSel ? c.iconBg : "rgba(255,255,255,0.04)", border: `1.5px solid ${isSel ? c.iconColor : "rgba(255,255,255,0.1)"}`, fontFamily: "inherit" }}>
+                <motion.button key={c.level} whileHover={{ y: -2 }} whileTap={{ scale: 0.93 }} animate={{ scale: isSel ? 1.05 : 1 }} transition={springSnappy} onClick={() => handleConfidence(c.level)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "14px 10px", borderRadius: 14, cursor: "pointer", background: isSel ? c.iconBg : "rgba(255,255,255,0.04)", border: `1.5px solid ${isSel ? c.iconColor : "rgba(255,255,255,0.1)"}`, fontFamily: "inherit" }}>
                   <span style={{ width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, background: c.iconBg, color: c.iconColor }}>{c.icon}</span>
                   <span style={{ fontWeight: 600, fontSize: 13, color: isSel ? "#fff" : "rgba(255,255,255,0.55)" }}>{c.label}</span>
                 </motion.button>
@@ -341,7 +341,7 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
             <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 6 }}>
               <span style={{ padding: "3px 8px", borderRadius: 7, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", fontSize: 12 }}>⌘ Enter</span>
             </span>
-            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.96 }} onClick={handleAnswer} disabled={(!answer.trim() && currentResponse.questionType === "text") || loading} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 26px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 10px 26px rgba(109,60,255,0.4)", opacity: ((!answer.trim() && currentResponse.questionType === "text") || loading) ? 0.5 : 1, fontFamily: "inherit" }}>
+            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={handleAnswer} disabled={(!answer.trim() && currentResponse.questionType === "text") || loading} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 26px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 10px 26px rgba(109,60,255,0.4)", opacity: ((!answer.trim() && currentResponse.questionType === "text") || loading) ? 0.5 : 1, fontFamily: "inherit" }}>
               {loading ? "Проверяю…" : "Ответить →"}
             </motion.button>
           </div>
@@ -437,11 +437,11 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
           </div>
 
           {!isLastQuestion ? (
-            <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.97 }} onClick={nextQuestion} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 22px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
+            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={nextQuestion} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 22px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
               Следующий вопрос →
             </motion.button>
           ) : (
-            <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.97 }} onClick={nextQuestion} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 22px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
+            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={nextQuestion} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 22px rgba(109,60,255,0.4)", fontFamily: "inherit" }}>
               Завершить тест →
             </motion.button>
           )}

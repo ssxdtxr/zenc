@@ -7,7 +7,7 @@ import { XIcon, SearchIcon, PlusIcon } from "@/shared/ui/icons"
 import { useDashboard } from "../model/use-dashboard"
 import { OVERALL_LEVEL_CONFIG } from "@/entities/topic/config"
 import type { Topic } from "@/entities/topic/model/types"
-import { fadeInUp, staggerContainer } from "@/shared/lib/motion"
+import { fadeInUp, springSnappy, springSoft } from "@/shared/lib/motion"
 
 function calcProgress(topic: Topic) {
   const total = topic.currentSubtopics.length
@@ -91,8 +91,8 @@ export const Dashboard = () => {
             >
               <span style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.7)", whiteSpace: "nowrap" }}>Новая тема</span>
               <input value={newTopicName} onChange={e => setNewTopicName(e.target.value)} onKeyDown={e => e.key === "Enter" && handleCreate()} placeholder="TypeScript, System Design, PostgreSQL…" autoFocus style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 11, padding: "10px 12px", outline: "none", color: "#fff", fontSize: 13, fontWeight: 500, fontFamily: "inherit" }} />
-              <motion.button whileTap={{ scale: 0.95 }} onClick={handleCreate} disabled={!newTopicName.trim()} style={{ padding: "10px 18px", borderRadius: 11, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap", fontFamily: "inherit" }}>Добавить</motion.button>
-              <motion.button whileTap={{ scale: 0.95 }} onClick={() => { setCreating(false); setNewTopicName("") }} style={{ padding: "10px 12px", borderRadius: 11, border: "1px solid rgba(255,255,255,0.14)", cursor: "pointer", background: "transparent", color: "rgba(255,255,255,0.6)", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Отмена</motion.button>
+              <motion.button whileTap={{ scale: 0.93 }} onClick={handleCreate} disabled={!newTopicName.trim()} style={{ padding: "10px 18px", borderRadius: 11, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 13, whiteSpace: "nowrap", fontFamily: "inherit" }}>Добавить</motion.button>
+              <motion.button whileTap={{ scale: 0.93 }} onClick={() => { setCreating(false); setNewTopicName("") }} style={{ padding: "10px 12px", borderRadius: 11, border: "1px solid rgba(255,255,255,0.14)", cursor: "pointer", background: "transparent", color: "rgba(255,255,255,0.6)", fontWeight: 600, fontSize: 13, fontFamily: "inherit" }}>Отмена</motion.button>
             </motion.div>
           )}
         </AnimatePresence>
@@ -132,8 +132,9 @@ export const Dashboard = () => {
 
         {/* TOPICS GRID */}
         {!loading && filtered.length > 0 && (
-          <motion.div variants={staggerContainer(0.05)} initial="hidden" animate="show" style={{ marginTop: 24, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 14 }}>
-            {filtered.map(t => {
+          <div style={{ marginTop: 24, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(290px, 1fr))", gap: 14 }}>
+            <AnimatePresence mode="popLayout">
+            {filtered.map((t, i) => {
               const progress = calcProgress(t)
               const started = t.sessions.length > 0
               const now = Date.now()
@@ -144,12 +145,13 @@ export const Dashboard = () => {
                 <motion.article
                   key={t.id}
                   layout
-                  variants={fadeInUp}
-                  whileHover={{ y: -4, boxShadow: "0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.16)" }}
-                  transition={{ type: "spring", stiffness: 300, damping: 26 }}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0, transition: { ...springSoft, delay: Math.min(i, 8) * 0.04 } }}
+                  exit={{ opacity: 0, scale: 0.92, transition: { duration: 0.15 } }}
+                  whileHover={{ y: -4, boxShadow: "0 18px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.16)", transition: springSnappy }}
                   style={{ position: "relative", borderRadius: 20, background: "rgba(255,255,255,0.055)", backdropFilter: "blur(22px) saturate(140%)", WebkitBackdropFilter: "blur(22px) saturate(140%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.14)", padding: "20px" }}
                 >
-                  <motion.button whileTap={{ scale: 0.9 }} onClick={() => deleteTopic(t.id)} style={{ position: "absolute", top: 14, right: 14, width: 26, height: 26, borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.5)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><XIcon size={12} color="rgba(255,255,255,0.5)" /></motion.button>
+                  <motion.button whileTap={{ scale: 0.93 }} onClick={() => deleteTopic(t.id)} style={{ position: "absolute", top: 14, right: 14, width: 26, height: 26, borderRadius: 8, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.5)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><XIcon size={12} color="rgba(255,255,255,0.5)" /></motion.button>
 
                   <div style={{ display: "flex", alignItems: "center", gap: 8, paddingRight: 32, marginBottom: 4 }}>
                     <h3 className="font-display" style={{ fontWeight: 600, fontSize: 17, letterSpacing: "-0.01em", margin: 0, color: "#fff" }}>{t.name}</h3>
@@ -188,7 +190,8 @@ export const Dashboard = () => {
                 </motion.article>
               )
             })}
-          </motion.div>
+            </AnimatePresence>
+          </div>
         )}
 
         {/* EMPTY */}

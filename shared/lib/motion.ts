@@ -3,6 +3,13 @@ import type { Transition, Variants } from "framer-motion"
 export const springSnappy: Transition = { type: "spring", stiffness: 420, damping: 32 }
 export const springSoft: Transition = { type: "spring", stiffness: 220, damping: 26 }
 
+// Shared press/hover feedback tiers — one scale per weight class so every
+// clickable element in the app compresses/lifts by the same amount as its peers.
+export const TAP_SM = { scale: 0.93 }   // compact controls: icon buttons, filter chips, pills
+export const TAP_MD = { scale: 0.97 }   // standard buttons and CTAs
+export const TAP_LG = { scale: 0.985 }  // large rows, list items, answer/choice options
+export const HOVER_MD = { scale: 1.02 } // standard button hover
+
 export const fadeIn: Variants = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { duration: 0.25, ease: "easeOut" } },
