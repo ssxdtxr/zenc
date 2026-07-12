@@ -16,6 +16,7 @@ self.addEventListener("activate", (e) => {
 
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET" || e.request.url.includes("/api/")) return
+  if (!e.request.url.startsWith("http")) return // skip chrome-extension:// and other schemes the Cache API can't store
 
   e.respondWith(
     fetch(e.request)

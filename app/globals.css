@@ -136,6 +136,9 @@ input::placeholder { color: var(--text-3); }
 .anim-rise { animation: rise .5s ease both; }
 .anim-pop  { animation: pop .5s ease both; }
 
+/* Nav search — too tight to share a row with the action buttons on phones */
+.nav-search { display: flex; }
+
 
 /* ── Mobile / iPhone ── */
 @media (max-width: 640px) {
@@ -147,6 +150,9 @@ input::placeholder { color: var(--text-3); }
 
   /* Hide desktop scrollbar on mobile */
   ::-webkit-scrollbar { display: none; }
+
+  /* Nav can't fit logo + search + actions on one row at phone widths */
+  .nav-search { display: none !important; }
 
   /* Prevent content from hiding behind notch/home bar */
   body {

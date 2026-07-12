@@ -27,7 +27,7 @@ export const ThemeToggle = () => {
       aria-label={theme === "light" ? "Включить тёмную тему" : "Включить светлую тему"}
       title={theme === "light" ? "Тёмная тема" : "Светлая тема"}
       style={{
-        width: 40, height: 40, flexShrink: 0, borderRadius: 12,
+        width: 40, height: 40, minHeight: 40, flexShrink: 0, borderRadius: 12,
         border: "1px solid var(--border)", background: "var(--surface-2)",
         cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
       }}

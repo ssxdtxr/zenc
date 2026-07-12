@@ -64,17 +64,17 @@ export const Dashboard = () => {
             <div className="font-display" style={{ width: 36, height: 36, borderRadius: 11, background: "linear-gradient(135deg,#9b6bff,#6d3cff)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 18, color: "#fff", boxShadow: "0 6px 18px rgba(109,60,255,0.5)" }}>Z</div>
             <span className="font-display" style={{ fontWeight: 600, fontSize: 17, letterSpacing: "-0.01em", color: "var(--text)" }}>Zerc</span>
           </div>
-          <div style={{ flex: 1, maxWidth: 320, display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 12, background: "rgba(var(--fg-rgb),0.05)", border: "1px solid rgba(var(--fg-rgb),0.1)" }}>
+          <div className="nav-search" style={{ flex: 1, maxWidth: 320, alignItems: "center", gap: 8, padding: "8px 12px", borderRadius: 12, background: "rgba(var(--fg-rgb),0.05)", border: "1px solid rgba(var(--fg-rgb),0.1)" }}>
             <SearchIcon size={14} color="rgba(var(--fg-rgb),0.4)" />
             <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Поиск по темам…" style={{ flex: 1, background: "transparent", border: "none", outline: "none", color: "var(--text)", fontSize: 13, fontWeight: 500, fontFamily: "inherit" }} />
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
             <ThemeToggle />
-            <button onClick={() => setCreating(true)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 16px", borderRadius: 12, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 13, boxShadow: "0 8px 22px rgba(109,60,255,0.45)", fontFamily: "inherit" }}>
+            <button onClick={() => setCreating(true)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 16px", borderRadius: 12, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#9b6bff,#6d3cff)", color: "#fff", fontWeight: 700, fontSize: 13, boxShadow: "0 8px 22px rgba(109,60,255,0.45)", fontFamily: "inherit", flexShrink: 0 }}>
               <PlusIcon size={14} color="#fff" /> Тема
             </button>
             {userEmail && (
-              <button onClick={logout} title={`Выйти (${userEmail})`} style={{ width: 36, height: 36, borderRadius: "50%", background: "linear-gradient(135deg,#2bd9e3,#3b82f6)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, color: "#06121a", cursor: "pointer", border: "1.5px solid rgba(var(--fg-rgb),0.25)", fontFamily: "inherit" }}>
+              <button onClick={logout} title={`Выйти (${userEmail})`} style={{ width: 36, height: 36, minHeight: 36, flexShrink: 0, borderRadius: "50%", background: "linear-gradient(135deg,#2bd9e3,#3b82f6)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, color: "#06121a", cursor: "pointer", border: "1.5px solid rgba(var(--fg-rgb),0.25)", fontFamily: "inherit" }}>
                 {userEmail[0].toUpperCase()}
               </button>
             )}
@@ -153,7 +153,7 @@ export const Dashboard = () => {
                   whileHover={{ y: -4, boxShadow: "0 18px 50px rgba(var(--shadow-rgb),0.45), inset 0 1px 0 rgba(var(--fg-rgb),0.16)", transition: springSnappy }}
                   style={{ position: "relative", borderRadius: 20, background: "rgba(var(--fg-rgb),0.055)", backdropFilter: "blur(22px) saturate(140%)", WebkitBackdropFilter: "blur(22px) saturate(140%)", border: "1px solid rgba(var(--fg-rgb),0.12)", boxShadow: "0 12px 40px rgba(var(--shadow-rgb),0.4), inset 0 1px 0 rgba(var(--fg-rgb),0.14)", padding: "20px" }}
                 >
-                  <motion.button whileTap={{ scale: 0.93 }} onClick={() => deleteTopic(t.id)} style={{ position: "absolute", top: 14, right: 14, width: 26, height: 26, borderRadius: 8, border: "1px solid rgba(var(--fg-rgb),0.12)", background: "rgba(var(--fg-rgb),0.04)", color: "rgba(var(--fg-rgb),0.5)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><XIcon size={12} color="rgba(var(--fg-rgb),0.5)" /></motion.button>
+                  <motion.button whileTap={{ scale: 0.93 }} onClick={() => deleteTopic(t.id)} style={{ position: "absolute", top: 14, right: 14, width: 26, height: 26, minHeight: 26, borderRadius: 8, border: "1px solid rgba(var(--fg-rgb),0.12)", background: "rgba(var(--fg-rgb),0.04)", color: "rgba(var(--fg-rgb),0.5)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><XIcon size={12} color="rgba(var(--fg-rgb),0.5)" /></motion.button>
 
                   <div style={{ display: "flex", alignItems: "center", gap: 8, paddingRight: 32, marginBottom: 4 }}>
                     <h3 className="font-display" style={{ fontWeight: 600, fontSize: 17, letterSpacing: "-0.01em", margin: 0, color: "var(--text)" }}>{t.name}</h3>
