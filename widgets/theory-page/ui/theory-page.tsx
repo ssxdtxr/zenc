@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { ChevronLeftIcon } from "@/shared/ui/icons"
+import { ThemeToggle } from "@/shared/ui/theme-toggle"
 import { useRouter } from "next/navigation"
 import { useTheory } from "../model/use-theory"
 import { apiClient } from "@/shared/lib/api-client"
@@ -29,18 +30,18 @@ const EXAMPLE_COLORS = [
 
 const CARD = {
   borderRadius: 20,
-  background: "rgba(255,255,255,0.06)",
+  background: "rgba(var(--fg-rgb),0.06)",
   backdropFilter: "blur(26px) saturate(150%)",
   WebkitBackdropFilter: "blur(26px) saturate(150%)",
-  border: "1px solid rgba(255,255,255,0.12)",
-  boxShadow: "0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.14)",
+  border: "1px solid rgba(var(--fg-rgb),0.12)",
+  boxShadow: "0 12px 40px rgba(var(--shadow-rgb),0.4), inset 0 1px 0 rgba(var(--fg-rgb),0.14)",
 } as const
 
 const LABEL = {
   fontSize: 11,
   fontWeight: 700,
   letterSpacing: "0.08em",
-  color: "rgba(255,255,255,0.38)",
+  color: "rgba(var(--fg-rgb),0.38)",
   marginBottom: 12,
 } as const
 
@@ -63,12 +64,12 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
     allSubtopics: topic?.currentSubtopics.map(s => s.name),
   })
 
-  const BG = "radial-gradient(1200px 800px at 80% -10%, rgba(109,60,255,0.18), transparent 60%), radial-gradient(900px 700px at 0% 100%, rgba(43,217,227,0.1), transparent 55%), #08070f"
+  const BG = "radial-gradient(1200px 800px at 80% -10%, rgba(109,60,255,0.18), transparent 60%), radial-gradient(900px 700px at 0% 100%, rgba(43,217,227,0.1), transparent 55%), var(--bg)"
 
   return (
     <div style={{ position: "relative", minHeight: "100vh", background: BG, overflow: "hidden" }}>
       {/* Blobs */}
-      <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", filter: "blur(70px)" }}>
+      <div className="bg-blobs" style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", filter: "blur(70px)" }}>
         <div style={{ position: "absolute", top: "-8%", left: "8%", width: "38vw", height: "38vw", borderRadius: "50%", background: "radial-gradient(circle at 30% 30%, #7c3cff, transparent 70%)", opacity: 0.42, animation: "drift1 26s ease-in-out infinite" }} />
         <div style={{ position: "absolute", top: "24%", right: "-6%", width: "32vw", height: "32vw", borderRadius: "50%", background: "radial-gradient(circle at 30% 30%, #2bd9e3, transparent 70%)", opacity: 0.22, animation: "drift2 30s ease-in-out infinite" }} />
         <div style={{ position: "absolute", bottom: "-12%", left: "34%", width: "40vw", height: "40vw", borderRadius: "50%", background: "radial-gradient(circle at 30% 30%, #ff4d8d, transparent 70%)", opacity: 0.18, animation: "drift3 34s ease-in-out infinite" }} />
@@ -77,13 +78,13 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
       <div style={{ position: "relative", zIndex: 1, maxWidth: 1480, margin: "0 auto", padding: "22px 28px 72px" }}>
 
         {/* NAV */}
-        <nav style={{ position: "sticky", top: 16, zIndex: 20, display: "flex", alignItems: "center", gap: 12, padding: "11px 16px", borderRadius: 20, background: "rgba(255,255,255,0.06)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 10px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.18)", marginBottom: 22 }}>
-          <button onClick={() => router.back()} style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 12, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.85)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <ChevronLeftIcon size={20} color="rgba(255,255,255,0.85)" />
+        <nav style={{ position: "sticky", top: 16, zIndex: 20, display: "flex", alignItems: "center", gap: 12, padding: "11px 16px", borderRadius: 20, background: "rgba(var(--fg-rgb),0.06)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", border: "1px solid rgba(var(--fg-rgb),0.12)", boxShadow: "0 10px 40px rgba(var(--shadow-rgb),0.45), inset 0 1px 0 rgba(var(--fg-rgb),0.18)", marginBottom: 22 }}>
+          <button onClick={() => router.back()} style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 12, border: "1px solid rgba(var(--fg-rgb),0.14)", background: "rgba(var(--fg-rgb),0.04)", color: "rgba(var(--fg-rgb),0.85)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <ChevronLeftIcon size={20} color="rgba(var(--fg-rgb),0.85)" />
           </button>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.42)" }}>{topic?.name}</div>
-            <h1 className="font-display" style={{ fontWeight: 700, fontSize: 20, letterSpacing: "-0.01em", margin: "1px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#fff" }}>{subtopicName}</h1>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(var(--fg-rgb),0.42)" }}>{topic?.name}</div>
+            <h1 className="font-display" style={{ fontWeight: 700, fontSize: 20, letterSpacing: "-0.01em", margin: "1px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "var(--text)" }}>{subtopicName}</h1>
           </div>
           {statusCfg && (
             <span style={{ padding: "7px 14px", borderRadius: 999, fontSize: 12.5, fontWeight: 700, background: statusCfg.bg, color: statusCfg.color, border: `1px solid ${statusCfg.border}`, whiteSpace: "nowrap", flexShrink: 0 }}>
@@ -103,6 +104,7 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
             >
               🧠 Тест
             </button>
+            <ThemeToggle />
           </div>
         </nav>
 
@@ -110,7 +112,7 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
         {loading && (
           <div style={{ paddingTop: 80, display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
             <div style={{ width: 32, height: 32, borderRadius: "50%", border: "2.5px solid transparent", borderTopColor: "#9b6bff", animation: "spin 0.8s linear infinite" }} />
-            <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,0.5)", fontWeight: 500 }}>Готовлю объяснение…</p>
+            <p style={{ margin: 0, fontSize: 14, color: "rgba(var(--fg-rgb),0.5)", fontWeight: 500 }}>Готовлю объяснение…</p>
             <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
           </div>
         )}
@@ -135,11 +137,11 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                   <div style={LABEL}>ГЛАВНАЯ ИДЕЯ</div>
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     {content.sections.map((s, i) => (
-                      <div key={i} style={{ padding: i === 0 ? "0 0 16px" : "16px 0 0", borderTop: i > 0 ? "1px solid rgba(255,255,255,0.07)" : "none", marginTop: i > 0 ? 16 : 0 }}>
+                      <div key={i} style={{ padding: i === 0 ? "0 0 16px" : "16px 0 0", borderTop: i > 0 ? "1px solid rgba(var(--fg-rgb),0.07)" : "none", marginTop: i > 0 ? 16 : 0 }}>
                         {content.sections.length > 1 && (
                           <h3 className="font-display" style={{ margin: "0 0 6px", fontWeight: 700, fontSize: 15.5, color: "#b69cff" }}>{s.heading}</h3>
                         )}
-                        <p style={{ margin: 0, fontSize: 16.5, lineHeight: 1.7, color: "rgba(255,255,255,0.88)" }}>{s.explanation}</p>
+                        <p style={{ margin: 0, fontSize: 16.5, lineHeight: 1.7, color: "rgba(var(--fg-rgb),0.88)" }}>{s.explanation}</p>
                       </div>
                     ))}
                   </div>
@@ -152,7 +154,7 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                       <span style={{ width: 20, height: 20, borderRadius: "50%", background: "rgba(255,187,92,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 12, color: "#ffbb5c", flexShrink: 0 }}>!</span>
                       <span style={{ ...LABEL, marginBottom: 0, color: "#ffbb5c" }}>НА ЧТО ОБРАТИТЬ ВНИМАНИЕ</span>
                     </div>
-                    <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.68, color: "rgba(255,255,255,0.82)" }}>{content.watchOut}</p>
+                    <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.68, color: "rgba(var(--fg-rgb),0.82)" }}>{content.watchOut}</p>
                   </motion.section>
                 )}
 
@@ -162,9 +164,9 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                     <div style={LABEL}>ОПРЕДЕЛЕНИЯ</div>
                     <div style={{ display: "flex", flexDirection: "column" }}>
                       {content.definitions.map((d, i) => (
-                        <div key={d.term} style={{ padding: "14px 0", borderBottom: i < content.definitions.length - 1 ? "1px solid rgba(255,255,255,0.07)" : "none" }}>
+                        <div key={d.term} style={{ padding: "14px 0", borderBottom: i < content.definitions.length - 1 ? "1px solid rgba(var(--fg-rgb),0.07)" : "none" }}>
                           <strong className="font-display" style={{ fontWeight: 700, fontSize: 15.5, color: "#b69cff" }}>{d.term}</strong>
-                          <p style={{ margin: "5px 0 0", fontSize: 14.5, lineHeight: 1.6, color: "rgba(255,255,255,0.68)" }}>{d.definition}</p>
+                          <p style={{ margin: "5px 0 0", fontSize: 14.5, lineHeight: 1.6, color: "rgba(var(--fg-rgb),0.68)" }}>{d.definition}</p>
                         </div>
                       ))}
                     </div>
@@ -179,13 +181,13 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                       {content.examples.map((ex, i) => {
                         const clr = EXAMPLE_COLORS[i % EXAMPLE_COLORS.length]
                         return (
-                          <div key={i} style={{ borderRadius: 16, overflow: "hidden", border: `1px solid ${clr.border}`, boxShadow: "0 8px 28px rgba(0,0,0,0.38)" }}>
-                            <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "13px 18px", background: "rgba(10,9,16,0.85)", borderBottom: ex.code ? "1px solid rgba(255,255,255,0.08)" : "none", flexWrap: "wrap" }}>
+                          <div key={i} style={{ borderRadius: 16, overflow: "hidden", border: `1px solid ${clr.border}`, boxShadow: "0 8px 28px rgba(var(--shadow-rgb),0.38)" }}>
+                            <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "13px 18px", background: "rgba(10,9,16,0.85)", borderBottom: ex.code ? "1px solid rgba(var(--fg-rgb),0.08)" : "none", flexWrap: "wrap" }}>
                               <span style={{ padding: "3px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: clr.bg, color: clr.color, border: `1px solid ${clr.border}`, flexShrink: 0, marginTop: 1 }}>{ex.label}</span>
-                              <span style={{ fontSize: 13.5, color: "rgba(255,255,255,0.65)", lineHeight: 1.5, flex: 1 }}>{ex.explanation}</span>
+                              <span style={{ fontSize: 13.5, color: "rgba(var(--fg-rgb),0.65)", lineHeight: 1.5, flex: 1 }}>{ex.explanation}</span>
                             </div>
                             {ex.code && (
-                              <pre className="font-mono" style={{ margin: 0, padding: "18px 22px", background: "rgba(8,7,15,0.92)", fontSize: 13, lineHeight: 1.72, color: "rgba(255,255,255,0.82)", overflowX: "auto", whiteSpace: "pre" }}>{ex.code}</pre>
+                              <pre className="font-mono" style={{ margin: 0, padding: "18px 22px", background: "rgba(8,7,15,0.92)", fontSize: 13, lineHeight: 1.72, color: "rgba(var(--fg-rgb),0.82)", overflowX: "auto", whiteSpace: "pre" }}>{ex.code}</pre>
                             )}
                           </div>
                         )
@@ -205,7 +207,7 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                       {content.antiPatterns.map((p, i) => (
                         <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                           <span style={{ width: 20, height: 20, borderRadius: 6, flexShrink: 0, background: "rgba(255,80,80,0.14)", display: "flex", alignItems: "center", justifyContent: "center", color: "#ff7070", fontWeight: 700, fontSize: 11, marginTop: 1 }}>✕</span>
-                          <span style={{ fontSize: 15, lineHeight: 1.62, color: "rgba(255,255,255,0.8)" }}>{p}</span>
+                          <span style={{ fontSize: 15, lineHeight: 1.62, color: "rgba(var(--fg-rgb),0.8)" }}>{p}</span>
                         </div>
                       ))}
                     </div>
@@ -220,7 +222,7 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                       {content.keyPoints.map((point, i) => (
                         <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
                           <span style={{ width: 22, height: 22, borderRadius: 7, flexShrink: 0, background: "rgba(155,107,255,0.22)", display: "flex", alignItems: "center", justifyContent: "center", color: "#c4adff", fontWeight: 700, fontSize: 11 }}>✓</span>
-                          <span style={{ fontSize: 15.5, lineHeight: 1.62, color: "rgba(255,255,255,0.86)" }}>{point}</span>
+                          <span style={{ fontSize: 15.5, lineHeight: 1.62, color: "rgba(var(--fg-rgb),0.86)" }}>{point}</span>
                         </div>
                       ))}
                     </div>
@@ -229,7 +231,7 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
 
                 {/* FOOTER NAV */}
                 <div style={{ marginTop: 8 }}>
-                  <button onClick={() => router.back()} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 20px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.16)", cursor: "pointer", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.8)", fontWeight: 600, fontSize: 15, fontFamily: "inherit" }}>
+                  <button onClick={() => router.back()} style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 20px", borderRadius: 14, border: "1px solid rgba(var(--fg-rgb),0.16)", cursor: "pointer", background: "rgba(var(--fg-rgb),0.04)", color: "rgba(var(--fg-rgb),0.8)", fontWeight: 600, fontSize: 15, fontFamily: "inherit" }}>
                     ← Вернуться
                   </button>
                 </div>
@@ -259,7 +261,7 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                         <span style={{ width: 8, height: 8, borderRadius: "50%", background: l.color, flexShrink: 0, boxShadow: `0 0 6px ${l.color}` }} />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontWeight: 700, fontSize: 14, color: l.color }}>{l.label}</div>
-                          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>{l.desc}</div>
+                          <div style={{ fontSize: 12, color: "rgba(var(--fg-rgb),0.45)", marginTop: 1 }}>{l.desc}</div>
                         </div>
                         <span style={{ fontSize: 13, color: l.color, opacity: 0.7 }}>→</span>
                       </motion.button>
@@ -286,7 +288,7 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                         <span style={{ width: 8, height: 8, borderRadius: "50%", background: l.color, flexShrink: 0, boxShadow: `0 0 6px ${l.color}` }} />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontWeight: 700, fontSize: 14, color: l.color }}>{l.label}</div>
-                          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 1 }}>{l.desc}</div>
+                          <div style={{ fontSize: 12, color: "rgba(var(--fg-rgb),0.45)", marginTop: 1 }}>{l.desc}</div>
                         </div>
                         <span style={{ fontSize: 13, color: l.color, opacity: 0.7 }}>→</span>
                       </motion.button>
@@ -302,12 +304,12 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                       {content.exercises.map((ex, i) => {
                         const d = DIFFICULTY_CONFIG[ex.difficulty] ?? DIFFICULTY_CONFIG.medium
                         return (
-                          <div key={i} style={{ padding: "14px 16px", borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)" }}>
+                          <div key={i} style={{ padding: "14px 16px", borderRadius: 14, background: "rgba(var(--fg-rgb),0.04)", border: "1px solid rgba(var(--fg-rgb),0.09)" }}>
                             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
                               <span style={{ padding: "2px 9px", borderRadius: 999, fontSize: 10.5, fontWeight: 700, background: d.bg, color: d.color, border: `1px solid ${d.border}`, flexShrink: 0 }}>{d.label}</span>
-                              <span className="font-display" style={{ fontWeight: 600, fontSize: 14, color: "#fff", lineHeight: 1.3 }}>{ex.title}</span>
+                              <span className="font-display" style={{ fontWeight: 600, fontSize: 14, color: "var(--text)", lineHeight: 1.3 }}>{ex.title}</span>
                             </div>
-                            <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.58, color: "rgba(255,255,255,0.58)" }}>{ex.description}</p>
+                            <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.58, color: "rgba(var(--fg-rgb),0.58)" }}>{ex.description}</p>
                           </div>
                         )
                       })}
@@ -332,7 +334,7 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                             <span className="font-display" style={{ fontWeight: 600, fontSize: 14, color: "#c4adff" }}>{r.name}</span>
                             <span style={{ fontSize: 13, color: "rgba(155,107,255,0.55)", flexShrink: 0 }}>→</span>
                           </div>
-                          <span style={{ fontSize: 12.5, color: "rgba(255,255,255,0.45)", lineHeight: 1.4 }}>{r.relation}</span>
+                          <span style={{ fontSize: 12.5, color: "rgba(var(--fg-rgb),0.45)", lineHeight: 1.4 }}>{r.relation}</span>
                         </motion.button>
                       ))}
                     </div>
@@ -347,7 +349,7 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                       {subtopic.definitions.map((d) => (
                         <div key={d.term}>
                           <span style={{ fontSize: 13.5, fontWeight: 700, color: "#b69cff" }}>{d.term}</span>
-                          <p style={{ margin: "3px 0 0", fontSize: 13, lineHeight: 1.55, color: "rgba(255,255,255,0.55)" }}>{d.definition}</p>
+                          <p style={{ margin: "3px 0 0", fontSize: 13, lineHeight: 1.55, color: "rgba(var(--fg-rgb),0.55)" }}>{d.definition}</p>
                         </div>
                       ))}
                     </div>

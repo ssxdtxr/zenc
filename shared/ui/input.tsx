@@ -7,8 +7,8 @@ export const Input = ({ className, ...props }: Props) => (
   <input
     className={cn("w-full rounded-2xl px-4 py-3.5 outline-none transition-all", className)}
     style={{
-      background: "rgba(255,255,255,0.06)",
-      border: "1px solid rgba(255,255,255,0.12)",
+      background: "rgba(var(--fg-rgb),0.06)",
+      border: "1px solid rgba(var(--fg-rgb),0.12)",
       color: "#fff",
       fontSize: "16px",
       borderRadius: "12px",

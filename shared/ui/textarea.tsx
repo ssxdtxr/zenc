@@ -10,8 +10,8 @@ export const Textarea = ({ className, ref, ...props }: Props) => (
     ref={ref}
     className={cn("w-full rounded-2xl px-4 py-3.5 leading-relaxed resize-none outline-none transition-all", className)}
     style={{
-      background: "rgba(255,255,255,0.06)",
-      border: "1px solid rgba(255,255,255,0.12)",
+      background: "rgba(var(--fg-rgb),0.06)",
+      border: "1px solid rgba(var(--fg-rgb),0.12)",
       color: "#fff",
       fontSize: "16px",
       borderRadius: "14px",

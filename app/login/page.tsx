@@ -7,6 +7,7 @@ import Link from "next/link"
 import { Input } from "@/shared/ui/input"
 import { Button } from "@/shared/ui/button"
 import { ErrorMessage } from "@/shared/ui/error-message"
+import { ThemeToggle } from "@/shared/ui/theme-toggle"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -37,7 +38,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-dvh flex items-center justify-center px-5" style={{ background: "var(--bg)" }}>
+    <div className="min-h-dvh flex items-center justify-center px-5" style={{ background: "var(--bg)", position: "relative" }}>
+      <div style={{ position: "absolute", top: 20, right: 20 }}><ThemeToggle /></div>
       <motion.div initial={{ opacity: 0, y: 16, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: "spring", stiffness: 280, damping: 26 }} className="w-full max-w-sm space-y-6 p-7 rounded-3xl" style={{ background: "var(--surface)", backdropFilter: "var(--glass)", WebkitBackdropFilter: "var(--glass)", boxShadow: "var(--shadow-lg)" }}>
         <div className="text-center space-y-1">
           <motion.div

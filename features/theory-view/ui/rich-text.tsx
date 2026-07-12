@@ -140,13 +140,13 @@ export const RichText = ({ text, className }: Props) => {
       {blocks.map((block, i) => {
         if (block.type === "code") {
           return (
-            <div key={i} className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.12)" }}>
+            <div key={i} className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(var(--fg-rgb),0.12)" }}>
               {block.lang && (
-                <div className="px-3 py-1.5 text-xs font-mono font-medium" style={{ background: "rgba(10,9,16,0.9)", color: "rgba(255,255,255,0.5)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                <div className="px-3 py-1.5 text-xs font-mono font-medium" style={{ background: "rgba(10,9,16,0.9)", color: "rgba(var(--fg-rgb),0.5)", borderBottom: "1px solid rgba(var(--fg-rgb),0.08)" }}>
                   {block.lang}
                 </div>
               )}
-              <pre className="px-4 py-3 text-sm font-mono overflow-x-auto leading-relaxed" style={{ background: "rgba(8,7,15,0.92)", color: "rgba(255,255,255,0.85)", margin: 0 }}>
+              <pre className="px-4 py-3 text-sm font-mono overflow-x-auto leading-relaxed" style={{ background: "rgba(8,7,15,0.92)", color: "rgba(var(--fg-rgb),0.85)", margin: 0 }}>
                 <code>{block.content}</code>
               </pre>
             </div>
@@ -170,7 +170,7 @@ export const RichText = ({ text, className }: Props) => {
         }
 
         if (block.type === "hr") {
-          return <hr key={i} style={{ border: "none", borderTop: "1px solid rgba(255,255,255,0.1)", margin: "4px 0" }} />
+          return <hr key={i} style={{ border: "none", borderTop: "1px solid rgba(var(--fg-rgb),0.1)", margin: "4px 0" }} />
         }
 
         if (block.type === "list") {
@@ -195,7 +195,7 @@ export const RichText = ({ text, className }: Props) => {
                   <thead>
                     <tr>
                       {header.map((cell, j) => (
-                        <th key={j} style={{ padding: "6px 10px", textAlign: "left", fontWeight: 700, color: "var(--text)", borderBottom: "1px solid rgba(255,255,255,0.15)", whiteSpace: "nowrap" }}>
+                        <th key={j} style={{ padding: "6px 10px", textAlign: "left", fontWeight: 700, color: "var(--text)", borderBottom: "1px solid rgba(var(--fg-rgb),0.15)", whiteSpace: "nowrap" }}>
                           {parseInline(cell)}
                         </th>
                       ))}
@@ -206,7 +206,7 @@ export const RichText = ({ text, className }: Props) => {
                   {body.map((row, j) => (
                     <tr key={j}>
                       {row.map((cell, k) => (
-                        <td key={k} style={{ padding: "6px 10px", color: "var(--text-2)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                        <td key={k} style={{ padding: "6px 10px", color: "var(--text-2)", borderBottom: "1px solid rgba(var(--fg-rgb),0.06)" }}>
                           {parseInline(cell)}
                         </td>
                       ))}
