@@ -154,6 +154,9 @@ input::placeholder { color: var(--text-3); }
   /* Nav can't fit logo + search + actions on one row at phone widths */
   .nav-search { display: none !important; }
 
+  /* Nav rows that don't fit alongside each other wrap onto their own line */
+  .theory-nav-row { flex-basis: 100% !important; }
+
   /* Prevent content from hiding behind notch/home bar */
   body {
     padding-left: env(safe-area-inset-left);
@@ -182,6 +185,9 @@ input::placeholder { color: var(--text-3); }
 
 @media (max-width: 960px) {
   .theory-layout { flex-direction: column; }
+  /* align-items: flex-start makes column-mode children shrink-to-fit instead of
+     filling the width — force both panes to take the full row. */
+  .theory-main { width: 100%; }
   .theory-sidebar { width: 100%; position: static; max-height: none; }
 }
 

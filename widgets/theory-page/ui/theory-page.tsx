@@ -78,29 +78,31 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
       <div style={{ position: "relative", zIndex: 1, maxWidth: 1480, margin: "0 auto", padding: "22px 28px 72px" }}>
 
         {/* NAV */}
-        <nav style={{ position: "sticky", top: 16, zIndex: 20, display: "flex", alignItems: "center", gap: 12, padding: "11px 16px", borderRadius: 20, background: "rgba(var(--fg-rgb),0.06)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", border: "1px solid rgba(var(--fg-rgb),0.12)", boxShadow: "0 10px 40px rgba(var(--shadow-rgb),0.45), inset 0 1px 0 rgba(var(--fg-rgb),0.18)", marginBottom: 22 }}>
-          <button onClick={() => router.back()} style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 12, border: "1px solid rgba(var(--fg-rgb),0.14)", background: "rgba(var(--fg-rgb),0.04)", color: "rgba(var(--fg-rgb),0.85)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <ChevronLeftIcon size={20} color="rgba(var(--fg-rgb),0.85)" />
-          </button>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(var(--fg-rgb),0.42)" }}>{topic?.name}</div>
-            <h1 className="font-display" style={{ fontWeight: 700, fontSize: 20, letterSpacing: "-0.01em", margin: "1px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "var(--text)" }}>{subtopicName}</h1>
+        <nav className="theory-nav" style={{ position: "sticky", top: 16, zIndex: 20, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12, padding: "11px 16px", borderRadius: 20, background: "rgba(var(--fg-rgb),0.06)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", border: "1px solid rgba(var(--fg-rgb),0.12)", boxShadow: "0 10px 40px rgba(var(--shadow-rgb),0.45), inset 0 1px 0 rgba(var(--fg-rgb),0.18)", marginBottom: 22 }}>
+          <div className="theory-nav-row" style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 }}>
+            <button onClick={() => router.back()} style={{ width: 40, height: 40, minHeight: 40, flexShrink: 0, borderRadius: 12, border: "1px solid rgba(var(--fg-rgb),0.14)", background: "rgba(var(--fg-rgb),0.04)", color: "rgba(var(--fg-rgb),0.85)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <ChevronLeftIcon size={20} color="rgba(var(--fg-rgb),0.85)" />
+            </button>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(var(--fg-rgb),0.42)" }}>{topic?.name}</div>
+              <h1 className="font-display" style={{ fontWeight: 700, fontSize: 20, letterSpacing: "-0.01em", margin: "1px 0 0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "var(--text)" }}>{subtopicName}</h1>
+            </div>
           </div>
-          {statusCfg && (
-            <span style={{ padding: "7px 14px", borderRadius: 999, fontSize: 12.5, fontWeight: 700, background: statusCfg.bg, color: statusCfg.color, border: `1px solid ${statusCfg.border}`, whiteSpace: "nowrap", flexShrink: 0 }}>
-              {statusCfg.label}
-            </span>
-          )}
-          <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+          <div className="theory-nav-row" style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+            {statusCfg && (
+              <span style={{ padding: "7px 14px", borderRadius: 999, fontSize: 12.5, fontWeight: 700, background: statusCfg.bg, color: statusCfg.color, border: `1px solid ${statusCfg.border}`, whiteSpace: "nowrap", flexShrink: 0 }}>
+                {statusCfg.label}
+              </span>
+            )}
             <button
               onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(subtopicName)}/practice`)}
-              style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 12, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#2bd9e3,#1bb8c4)", color: "#08070f", fontWeight: 700, fontSize: 13.5, boxShadow: "0 4px 14px rgba(43,217,227,0.3)", fontFamily: "inherit", whiteSpace: "nowrap" }}
+              style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 16px", minHeight: 40, borderRadius: 12, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#2bd9e3,#1bb8c4)", color: "#08070f", fontWeight: 700, fontSize: 13.5, boxShadow: "0 4px 14px rgba(43,217,227,0.3)", fontFamily: "inherit", whiteSpace: "nowrap" }}
             >
               ✏️ Практика
             </button>
             <button
               onClick={() => router.push(`/topic/${topicId}/subtopic/${encodeURIComponent(subtopicName)}/test`)}
-              style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 12, border: "1px solid rgba(155,107,255,0.4)", cursor: "pointer", background: "rgba(155,107,255,0.12)", color: "#c4adff", fontWeight: 600, fontSize: 13.5, fontFamily: "inherit", whiteSpace: "nowrap" }}
+              style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 16px", minHeight: 40, borderRadius: 12, border: "1px solid rgba(155,107,255,0.4)", cursor: "pointer", background: "rgba(155,107,255,0.12)", color: "#c4adff", fontWeight: 600, fontSize: 13.5, fontFamily: "inherit", whiteSpace: "nowrap" }}
             >
               🧠 Тест
             </button>
@@ -182,12 +184,12 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                         const clr = EXAMPLE_COLORS[i % EXAMPLE_COLORS.length]
                         return (
                           <div key={i} style={{ borderRadius: 16, overflow: "hidden", border: `1px solid ${clr.border}`, boxShadow: "0 8px 28px rgba(var(--shadow-rgb),0.38)" }}>
-                            <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "13px 18px", background: "rgba(10,9,16,0.85)", borderBottom: ex.code ? "1px solid rgba(var(--fg-rgb),0.08)" : "none", flexWrap: "wrap" }}>
+                            <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "13px 18px", background: "rgba(10,9,16,0.85)", borderBottom: ex.code ? "1px solid rgba(255,255,255,0.08)" : "none", flexWrap: "wrap" }}>
                               <span style={{ padding: "3px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: clr.bg, color: clr.color, border: `1px solid ${clr.border}`, flexShrink: 0, marginTop: 1 }}>{ex.label}</span>
-                              <span style={{ fontSize: 13.5, color: "rgba(var(--fg-rgb),0.65)", lineHeight: 1.5, flex: 1 }}>{ex.explanation}</span>
+                              <span style={{ fontSize: 13.5, color: "rgba(255,255,255,0.65)", lineHeight: 1.5, flex: 1 }}>{ex.explanation}</span>
                             </div>
                             {ex.code && (
-                              <pre className="font-mono" style={{ margin: 0, padding: "18px 22px", background: "rgba(8,7,15,0.92)", fontSize: 13, lineHeight: 1.72, color: "rgba(var(--fg-rgb),0.82)", overflowX: "auto", whiteSpace: "pre" }}>{ex.code}</pre>
+                              <pre className="font-mono" style={{ margin: 0, padding: "18px 22px", background: "rgba(8,7,15,0.92)", fontSize: 13, lineHeight: 1.72, color: "rgba(255,255,255,0.82)", overflowX: "auto", whiteSpace: "pre" }}>{ex.code}</pre>
                             )}
                           </div>
                         )
