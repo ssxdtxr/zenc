@@ -260,7 +260,7 @@ export const TopicPage = ({ id }: Props) => {
                 )}
 
                 {/* TWO-COLUMN BODY */}
-                <div style={{ marginTop: 28, display: "grid", gridTemplateColumns: "1fr", gap: 28 }} className="lg:grid-cols-12">
+                <div style={{ marginTop: 28, display: "grid", gap: 28 }} className="grid-cols-1 lg:grid-cols-12">
                   <div className="lg:col-span-8" style={{ minWidth: 0 }}>
                     {/* KNOWLEDGE MAP */}
                     {total > 0 && (
@@ -324,53 +324,6 @@ export const TopicPage = ({ id }: Props) => {
                         </motion.div>
                       </>
                     )}
-
-                    {/* GLOSSARY BY SUBTOPIC */}
-                    {subs.some(s => s.definitions.length > 0) && (() => {
-                      const subsWithDefs = subs.filter(s => s.definitions.length > 0)
-                      const totalDefs = subsWithDefs.reduce((n, s) => n + s.definitions.length, 0)
-                      return (
-                        <>
-                          <div style={{ marginTop: 38, paddingBottom: 12, borderBottom: "1px solid var(--border)" }}>
-                            <h2 className="font-display" style={{ fontWeight: 600, fontSize: 13, letterSpacing: "0.07em", color: "var(--text-2)", margin: 0 }}>
-                              ГЛОССАРИЙ <span style={{ color: "var(--text-3)" }}>· {totalDefs} терминов</span>
-                            </h2>
-                          </div>
-
-                          <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
-                            {subsWithDefs.map(s => {
-                              const th = getTheme(s.status)
-                              const isOpen = !!openTerms[s.name]
-                              return (
-                                <div key={s.name} style={{ borderRadius: 14, background: "var(--surface-2)", border: "1px solid var(--border)", borderLeft: `3px solid ${th.border}`, overflow: "hidden" }}>
-                                  <button
-                                    onClick={() => setOpenTerms(prev => ({ ...prev, [s.name]: !prev[s.name] }))}
-                                    style={{ width: "100%", textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "14px 18px", cursor: "pointer", background: "transparent", border: "none", fontFamily: "inherit" }}
-                                  >
-                                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                                      <span style={{ width: 7, height: 7, borderRadius: "50%", background: th.dot, flexShrink: 0 }} />
-                                      <span className="font-display" style={{ fontWeight: 600, fontSize: 15, color: "var(--text)" }}>{s.name}</span>
-                                      <span style={{ fontSize: 11, fontWeight: 600, color: "var(--text-3)" }}>{s.definitions.length} {s.definitions.length === 1 ? "термин" : "термина"}</span>
-                                    </div>
-                                    <span style={{ fontSize: 15, color: "var(--text-3)", display: "inline-block", transform: isOpen ? "rotate(180deg)" : "rotate(0)", transition: "transform .2s ease", flexShrink: 0 }}><ChevronDownIcon size={15} color="var(--text-3)" /></span>
-                                  </button>
-                                  {isOpen && (
-                                    <div style={{ borderTop: "1px solid var(--border)", padding: "14px 18px 18px", display: "flex", flexDirection: "column", gap: 14 }}>
-                                      {s.definitions.map(d => (
-                                        <div key={d.term}>
-                                          <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>{d.term}</p>
-                                          <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.6, color: "var(--text-2)" }}>{d.definition}</p>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-                              )
-                            })}
-                          </div>
-                        </>
-                      )
-                    })()}
 
                     {/* HISTORY */}
                     {topic.sessions.length > 1 && (
@@ -443,6 +396,52 @@ export const TopicPage = ({ id }: Props) => {
                         })}
                       </div>
                     </div>
+
+                    {/* GLOSSARY BY SUBTOPIC */}
+                    {subs.some(s => s.definitions.length > 0) && (() => {
+                      const subsWithDefs = subs.filter(s => s.definitions.length > 0)
+                      const totalDefs = subsWithDefs.reduce((n, s) => n + s.definitions.length, 0)
+                      return (
+                        <div style={{ padding: "18px 20px", borderRadius: 16, background: "var(--surface)", border: "1px solid var(--border)" }}>
+                          <h3 className="font-display" style={{ fontWeight: 600, fontSize: 12, letterSpacing: "0.07em", color: "var(--text-2)", margin: "0 0 14px" }}>
+                            ГЛОССАРИЙ <span style={{ color: "var(--text-3)" }}>· {totalDefs}</span>
+                          </h3>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                            {subsWithDefs.map(s => {
+                              const th = getTheme(s.status)
+                              const isOpen = !!openTerms[s.name]
+                              return (
+                                <div key={s.name} style={{ borderRadius: 12, background: "var(--surface-2)", border: "1px solid var(--border)", borderLeft: `3px solid ${th.border}`, overflow: "hidden" }}>
+                                  <button
+                                    onClick={() => setOpenTerms(prev => ({ ...prev, [s.name]: !prev[s.name] }))}
+                                    style={{ width: "100%", textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "11px 14px", cursor: "pointer", background: "transparent", border: "none", fontFamily: "inherit" }}
+                                  >
+                                    <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+                                      <span style={{ width: 6, height: 6, borderRadius: "50%", background: th.dot, flexShrink: 0 }} />
+                                      <span className="font-display" style={{ fontWeight: 600, fontSize: 13.5, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.name}</span>
+                                    </div>
+                                    <span style={{ fontSize: 13, color: "var(--text-3)", display: "inline-flex", alignItems: "center", gap: 5, flexShrink: 0 }}>
+                                      {s.definitions.length}
+                                      <span style={{ display: "inline-block", transform: isOpen ? "rotate(180deg)" : "rotate(0)", transition: "transform .2s ease" }}><ChevronDownIcon size={13} color="var(--text-3)" /></span>
+                                    </span>
+                                  </button>
+                                  {isOpen && (
+                                    <div style={{ borderTop: "1px solid var(--border)", padding: "12px 14px 14px", display: "flex", flexDirection: "column", gap: 12 }}>
+                                      {s.definitions.map(d => (
+                                        <div key={d.term}>
+                                          <p style={{ margin: "0 0 3px", fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{d.term}</p>
+                                          <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: "var(--text-2)" }}>{d.definition}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )
+                    })()}
                   </div>
                 </div>
               </motion.div>

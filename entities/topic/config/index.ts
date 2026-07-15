@@ -17,6 +17,13 @@ export const SUBTOPIC_STATUS_CONFIG: Record<SubtopicStatus, StatusMeta> = {
   expert:     { label: "Экспертно",       color: "#149330", bg: "rgba(20,147,48,0.16)",  dot: "#149330", border: "rgba(20,147,48,0.35)" },
 }
 
+// Same macOS traffic-light palette, reused for right/partial/wrong answer verdicts.
+export const VERDICT_COLORS = {
+  correct:   { color: "#28c840", bg: "rgba(40,200,64,0.14)",  border: "rgba(40,200,64,0.32)" },
+  partial:   { color: "#ffbd2e", bg: "rgba(255,189,46,0.14)", border: "rgba(255,189,46,0.32)" },
+  incorrect: { color: "#ff5f57", bg: "rgba(255,95,87,0.14)",  border: "rgba(255,95,87,0.32)" },
+}
+
 export type LevelMeta = { label: string; color: string; bg: string; border: string }
 
 export const OVERALL_LEVEL_CONFIG: Record<OverallLevel, LevelMeta> = {

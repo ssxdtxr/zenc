@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeftIcon } from "@/shared/ui/icons"
 import { useRouter } from "next/navigation"
 import { apiClient } from "@/shared/lib/api-client"
-import { SUBTOPIC_STATUS_CONFIG } from "@/entities/topic/config"
+import { SUBTOPIC_STATUS_CONFIG, VERDICT_COLORS } from "@/entities/topic/config"
 import { RichText } from "@/features/theory-view/ui/rich-text"
 import type { Topic } from "@/entities/topic/model/types"
 import type { Message } from "@/entities/session/model/types"
@@ -200,9 +200,9 @@ export const LevelSessionPage = ({ topicId, subtopicName, level }: Props) => {
               ) : (
                 <motion.div variants={staggerContainer(0.08)} initial="hidden" animate="show" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                   {/* Hero */}
-                  <motion.div variants={fadeInUp} style={{ padding: "26px 24px", borderRadius: 18, background: current.isComplete ? "var(--surface-2)" : "var(--surface-hover)", border: `1px solid ${current.isComplete ? "var(--border)" : "var(--border-strong)"}`, textAlign: "center" }}>
+                  <motion.div variants={fadeInUp} style={{ padding: "26px 24px", borderRadius: 18, background: current.isComplete ? VERDICT_COLORS.correct.bg : VERDICT_COLORS.partial.bg, border: `1px solid ${current.isComplete ? VERDICT_COLORS.correct.border : VERDICT_COLORS.partial.border}`, textAlign: "center" }}>
                     <div style={{ fontSize: 40 }}>{current.isComplete ? "🎯" : "📚"}</div>
-                    <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: "var(--text)", marginTop: 10, marginBottom: 6 }}>
+                    <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: current.isComplete ? VERDICT_COLORS.correct.color : VERDICT_COLORS.partial.color, marginTop: 10, marginBottom: 6 }}>
                       {current.isComplete ? `${lvl.label} уровень освоен` : "Нужно больше практики"}
                     </div>
                     <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6, color: "var(--text-2)" }}>{current.finishSummary}</p>
@@ -293,18 +293,18 @@ export const LevelSessionPage = ({ topicId, subtopicName, level }: Props) => {
                   {!loading && current.evaluation && (() => {
                     const isRight = current.isCorrect === true
                     const isWrong = current.isCorrect === false
+                    const c = isRight ? VERDICT_COLORS.correct : isWrong ? VERDICT_COLORS.incorrect : VERDICT_COLORS.partial
                     const v = {
                       icon: isRight ? "✓" : isWrong ? "✗" : "~",
                       label: isRight ? "Верно" : isWrong ? "Не верно" : "Частично",
-                      bg: isWrong ? "var(--surface-hover)" : "var(--surface-2)",
-                      border: isWrong ? "var(--border-strong)" : "var(--border)",
+                      ...c,
                     }
                     return (
                       <div>
                         <div style={{ padding: "16px 18px", borderRadius: 14, background: v.bg, border: `1.5px solid ${v.border}`, marginBottom: 10 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 7 }}>
-                            <span style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--surface)", border: "2px solid var(--text)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, color: "var(--text)", flexShrink: 0 }}>{v.icon}</span>
-                            <span style={{ fontWeight: 700, fontSize: 14, color: "var(--text)" }}>{v.label}</span>
+                            <span style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--surface)", border: `2px solid ${v.color}`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, color: v.color, flexShrink: 0 }}>{v.icon}</span>
+                            <span style={{ fontWeight: 700, fontSize: 14, color: v.color }}>{v.label}</span>
                           </div>
                           <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "var(--text-2)" }}>{current.evaluation}</p>
                         </div>

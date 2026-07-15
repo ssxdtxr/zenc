@@ -9,6 +9,7 @@ import type { SessionRecord } from "@/entities/topic/model/types"
 import { MAX_QUESTIONS, useTutorSession } from "../model/use-tutor-session"
 import type { ConfidenceLevel } from "@/features/confidence-picker/ui/confidence-picker"
 import { fadeInUp, staggerContainer, springSnappy } from "@/shared/lib/motion"
+import { VERDICT_COLORS } from "@/entities/topic/config"
 
 const CONFIDENCE_OPTIONS: { level: ConfidenceLevel; label: string; icon: string }[] = [
   { level: 1, label: "Не уверен", icon: "?" },
@@ -208,17 +209,17 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
           {/* VERDICT — главный сигнал */}
           {currentResponse.evaluation && (() => {
             const isWrong = currentResponse.isCorrect === false
+            const c = currentResponse.isCorrect === true ? VERDICT_COLORS.correct : isWrong ? VERDICT_COLORS.incorrect : VERDICT_COLORS.partial
             const verdict = {
               icon: currentResponse.isCorrect === true ? "✓" : isWrong ? "✗" : "~",
               label: currentResponse.isCorrect === true ? "Верно" : isWrong ? "Не совсем" : "Частично",
-              bg: isWrong ? "var(--surface-hover)" : "var(--surface-2)",
-              border: isWrong ? "var(--border-strong)" : "var(--border)",
+              ...c,
             }
             return (
               <div style={{ padding: "18px 20px", borderRadius: 16, background: verdict.bg, border: `1.5px solid ${verdict.border}`, marginBottom: 14 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-                  <span style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--surface)", border: "2px solid var(--text)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14, color: "var(--text)", flexShrink: 0 }}>{verdict.icon}</span>
-                  <span style={{ fontWeight: 700, fontSize: 15, color: "var(--text)" }}>{verdict.label}</span>
+                  <span style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--surface)", border: `2px solid ${verdict.color}`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 14, color: verdict.color, flexShrink: 0 }}>{verdict.icon}</span>
+                  <span style={{ fontWeight: 700, fontSize: 15, color: verdict.color }}>{verdict.label}</span>
                 </div>
                 <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.6, color: "var(--text-2)" }}>{currentResponse.evaluation}</p>
               </div>

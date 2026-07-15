@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import { ChevronLeftIcon } from "@/shared/ui/icons"
 import { useRouter } from "next/navigation"
 import { apiClient } from "@/shared/lib/api-client"
-import { SUBTOPIC_STATUS_CONFIG } from "@/entities/topic/config"
+import { SUBTOPIC_STATUS_CONFIG, VERDICT_COLORS } from "@/entities/topic/config"
 import type { Topic, TheoryExercise } from "@/entities/topic/model/types"
 import { fadeInUp, staggerContainer } from "@/shared/lib/motion"
 import { AppShell } from "@/widgets/app-shell/ui/app-shell"
@@ -32,9 +32,9 @@ const DIFFICULTY_CONFIG = {
 }
 
 const VERDICT_CONFIG = {
-  correct:   { label: "Верно",     icon: "✓", bg: "var(--surface-2)",     border: "var(--border)" },
-  partial:   { label: "Частично",  icon: "~", bg: "var(--surface)",       border: "var(--border)" },
-  incorrect: { label: "Не верно",  icon: "✕", bg: "var(--surface-hover)", border: "var(--border-strong)" },
+  correct:   { label: "Верно",     icon: "✓", ...VERDICT_COLORS.correct },
+  partial:   { label: "Частично",  icon: "~", ...VERDICT_COLORS.partial },
+  incorrect: { label: "Не верно",  icon: "✕", ...VERDICT_COLORS.incorrect },
 }
 
 function statusTheme(status: string) {
@@ -148,15 +148,18 @@ export const SubtopicPracticePage = ({ topicId, subtopicName }: Props) => {
           )}
 
           {/* SUMMARY when all done */}
-          {allDone && (
-            <motion.div initial={{ opacity: 0, y: 12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: "spring", stiffness: 300, damping: 28 }} style={{ marginTop: 20, padding: "24px 26px", borderRadius: 18, background: avgScore >= 50 ? "var(--surface-2)" : "var(--surface-hover)", border: `1px solid ${avgScore >= 50 ? "var(--border)" : "var(--border-strong)"}` }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: "var(--text-3)", marginBottom: 8 }}>ИТОГ ПРАКТИКИ</div>
-              <div className="font-display" style={{ fontSize: 42, fontWeight: 800, color: "var(--text)", lineHeight: 1 }}>{avgScore}<span style={{ fontSize: 20, opacity: 0.6 }}>%</span></div>
-              <p style={{ margin: "8px 0 0", fontSize: 14.5, color: "var(--text-2)" }}>
-                {avgScore >= 80 ? "Отличная работа — практические навыки сильные" : avgScore >= 50 ? "Базовое понимание есть, но стоит доработать детали" : "Нужно ещё поработать с материалом и попробовать снова"}
-              </p>
-            </motion.div>
-          )}
+          {allDone && (() => {
+            const c = avgScore >= 80 ? VERDICT_COLORS.correct : avgScore >= 50 ? VERDICT_COLORS.partial : VERDICT_COLORS.incorrect
+            return (
+              <motion.div initial={{ opacity: 0, y: 12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: "spring", stiffness: 300, damping: 28 }} style={{ marginTop: 20, padding: "24px 26px", borderRadius: 18, background: c.bg, border: `1px solid ${c.border}` }}>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: "var(--text-3)", marginBottom: 8 }}>ИТОГ ПРАКТИКИ</div>
+                <div className="font-display" style={{ fontSize: 42, fontWeight: 800, color: c.color, lineHeight: 1 }}>{avgScore}<span style={{ fontSize: 20, opacity: 0.6 }}>%</span></div>
+                <p style={{ margin: "8px 0 0", fontSize: 14.5, color: "var(--text-2)" }}>
+                  {avgScore >= 80 ? "Отличная работа — практические навыки сильные" : avgScore >= 50 ? "Базовое понимание есть, но стоит доработать детали" : "Нужно ещё поработать с материалом и попробовать снова"}
+                </p>
+              </motion.div>
+            )
+          })()}
 
           {/* EXERCISES */}
           {!loadingTheory && exercises.length > 0 && (
@@ -174,7 +177,7 @@ export const SubtopicPracticePage = ({ topicId, subtopicName }: Props) => {
                       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
                         <span style={{ width: 24, height: 24, borderRadius: 8, background: "var(--surface-2)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 12, color: "var(--text-2)", flexShrink: 0 }}>{i + 1}</span>
                         <span style={{ padding: "3px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: d.bg, color: "var(--text-2)", border: `1px solid ${d.border}` }}>{d.label}</span>
-                        {v && <span style={{ padding: "3px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: v.bg, color: "var(--text)", border: `1px solid ${v.border}`, marginLeft: "auto" }}>{v.icon} {v.label}</span>}
+                        {v && <span style={{ padding: "3px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: v.bg, color: v.color, border: `1px solid ${v.border}`, marginLeft: "auto" }}>{v.icon} {v.label}</span>}
                       </div>
                       <h3 className="font-display" style={{ margin: "0 0 6px", fontSize: 17, fontWeight: 700, color: "var(--text)" }}>{ex.title}</h3>
                       <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.6, color: "var(--text-2)" }}>{ex.description}</p>
@@ -217,9 +220,9 @@ export const SubtopicPracticePage = ({ topicId, subtopicName }: Props) => {
                           {v && (
                             <div style={{ padding: "14px 16px", borderRadius: 14, background: v.bg, border: `1.5px solid ${v.border}` }}>
                               <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 8 }}>
-                                <span style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--surface)", border: "2px solid var(--text)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, color: "var(--text)", flexShrink: 0 }}>{v.icon}</span>
-                                <span style={{ fontWeight: 700, fontSize: 14, color: "var(--text)" }}>{v.label}</span>
-                                <span style={{ marginLeft: "auto", fontWeight: 800, fontSize: 16, color: "var(--text)" }}>{s.result.score}%</span>
+                                <span style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--surface)", border: `2px solid ${v.color}`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, color: v.color, flexShrink: 0 }}>{v.icon}</span>
+                                <span style={{ fontWeight: 700, fontSize: 14, color: v.color }}>{v.label}</span>
+                                <span style={{ marginLeft: "auto", fontWeight: 800, fontSize: 16, color: v.color }}>{s.result.score}%</span>
                               </div>
                               <p style={{ margin: 0, fontSize: 14, lineHeight: 1.62, color: "var(--text-2)" }}>{s.result.feedback}</p>
                             </div>

@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import { ChevronLeftIcon } from "@/shared/ui/icons"
 import { useRouter } from "next/navigation"
 import { apiClient } from "@/shared/lib/api-client"
-import { SUBTOPIC_STATUS_CONFIG } from "@/entities/topic/config"
+import { SUBTOPIC_STATUS_CONFIG, VERDICT_COLORS } from "@/entities/topic/config"
 import type { Topic } from "@/entities/topic/model/types"
 import type { Message } from "@/entities/session/model/types"
 import { useTutorSession, MAX_QUESTIONS } from "@/widgets/tutor-session/model/use-tutor-session"
@@ -355,12 +355,13 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
 
           {currentResponse.evaluation && (() => {
             const isWrong = currentResponse.isCorrect === false
-            const v = { icon: currentResponse.isCorrect === true ? "✓" : isWrong ? "✗" : "~", bg: isWrong ? "var(--surface-hover)" : "var(--surface-2)", border: isWrong ? "var(--border-strong)" : "var(--border)", label: currentResponse.isCorrect === true ? "Верно" : isWrong ? "Не верно" : "Частично" }
+            const c = currentResponse.isCorrect === true ? VERDICT_COLORS.correct : isWrong ? VERDICT_COLORS.incorrect : VERDICT_COLORS.partial
+            const v = { icon: currentResponse.isCorrect === true ? "✓" : isWrong ? "✗" : "~", label: currentResponse.isCorrect === true ? "Верно" : isWrong ? "Не верно" : "Частично", ...c }
             return (
               <div style={{ padding: "16px 18px", borderRadius: 14, background: v.bg, border: `1.5px solid ${v.border}`, marginBottom: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 7 }}>
-                  <span style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--surface)", border: "2px solid var(--text)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, color: "var(--text)", flexShrink: 0 }}>{v.icon}</span>
-                  <span style={{ fontWeight: 700, fontSize: 14, color: "var(--text)" }}>{v.label}</span>
+                  <span style={{ width: 26, height: 26, borderRadius: "50%", background: "var(--surface)", border: `2px solid ${v.color}`, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 13, color: v.color, flexShrink: 0 }}>{v.icon}</span>
+                  <span style={{ fontWeight: 700, fontSize: 14, color: v.color }}>{v.label}</span>
                 </div>
                 <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "var(--text-2)" }}>{currentResponse.evaluation}</p>
               </div>
