@@ -30,11 +30,11 @@ export const Button = ({ variant = "primary", size = "md", className, children, 
       className={cn("font-semibold transition-colors disabled:opacity-40", variants[variant], sizes[size], className)}
       style={{
         background: isPrimary
-          ? "linear-gradient(135deg, #9b6bff 0%, #6d3cff 100%)"
+          ? "var(--accent)"
           : isSecondary
           ? "rgba(var(--fg-rgb),0.08)"
           : "transparent",
-        boxShadow: isPrimary ? "0 8px 22px rgba(109,60,255,0.45)" : undefined,
+        boxShadow: isPrimary ? "0 8px 22px rgba(var(--shadow-rgb),0.25)" : undefined,
         border: isSecondary ? "1px solid rgba(var(--fg-rgb),0.16)" : undefined,
         color: isSecondary ? "rgba(var(--fg-rgb),0.85)" : undefined,
         ...style,

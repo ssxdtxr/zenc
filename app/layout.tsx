@@ -1,27 +1,22 @@
 import type { Metadata, Viewport } from "next"
-import { Space_Grotesk, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google"
+import { Geist, Space_Mono } from "next/font/google"
 import { SwRegister } from "@/shared/ui/sw-register"
 import { PageTransition } from "@/shared/ui/page-transition"
-import { DEFAULT_THEME, THEME_INIT_SCRIPT } from "@/shared/lib/theme"
 import "./globals.css"
 
-const spaceGrotesk = Space_Grotesk({
+const geist = Geist({
   subsets: ["latin", "latin-ext"],
   variable: "--font-display",
 })
 
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin", "latin-ext"],
-  variable: "--font-sans",
-})
-
-const jetbrainsMono = JetBrains_Mono({
+const spaceMono = Space_Mono({
   subsets: ["latin"],
+  weight: ["400", "700"],
   variable: "--font-mono",
 })
 
 export const viewport: Viewport = {
-  themeColor: "#f6f4fc",
+  themeColor: "#f9f9fb",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -42,10 +37,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru" data-theme={DEFAULT_THEME} suppressHydrationWarning className={`${spaceGrotesk.variable} ${plusJakarta.variable} ${jetbrainsMono.variable} h-full`}>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
-      </head>
+    <html lang="ru" className={`${geist.variable} ${spaceMono.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
         <PageTransition>{children}</PageTransition>
         <SwRegister />

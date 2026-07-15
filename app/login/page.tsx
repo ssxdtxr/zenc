@@ -7,7 +7,6 @@ import Link from "next/link"
 import { Input } from "@/shared/ui/input"
 import { Button } from "@/shared/ui/button"
 import { ErrorMessage } from "@/shared/ui/error-message"
-import { ThemeToggle } from "@/shared/ui/theme-toggle"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -39,7 +38,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-dvh flex items-center justify-center px-5" style={{ background: "var(--bg)", position: "relative" }}>
-      <div style={{ position: "absolute", top: 20, right: 20 }}><ThemeToggle /></div>
       <motion.div initial={{ opacity: 0, y: 16, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: "spring", stiffness: 280, damping: 26 }} className="w-full max-w-sm space-y-6 p-7 rounded-3xl" style={{ background: "var(--surface)", backdropFilter: "var(--glass)", WebkitBackdropFilter: "var(--glass)", boxShadow: "var(--shadow-lg)" }}>
         <div className="text-center space-y-1">
           <motion.div
@@ -47,7 +45,7 @@ export default function LoginPage() {
             animate={{ scale: 1, rotate: 0, opacity: 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 18, delay: 0.1 }}
             className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-lg mx-auto"
-            style={{ background: "linear-gradient(135deg,#9b6bff,#6d3cff)", boxShadow: "0 4px 16px rgba(109,60,255,0.5)" }}
+            style={{ background: "var(--accent)", boxShadow: "0 4px 16px rgba(var(--shadow-rgb),0.3)" }}
           >
             Z
           </motion.div>
