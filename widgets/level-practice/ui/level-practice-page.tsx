@@ -185,9 +185,9 @@ export const LevelPracticePage = ({ topicId, subtopicName, level }: Props) => {
                             value={s?.answer ?? ""}
                             onChange={e => setAnswer(i, e.target.value)}
                             onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && s?.answer.trim()) submit(i) }}
-                            placeholder="Напиши решение — код, объяснение или оба…"
+                            placeholder="Напиши свой ответ…"
                             rows={6}
-                            style={{ width: "100%", resize: "vertical", padding: "14px 16px", borderRadius: 14, background: "var(--surface-2)", border: `1.5px solid ${s?.answer ? "var(--border-strong)" : "var(--border)"}`, outline: "none", color: "var(--text)", fontSize: 13.5, lineHeight: 1.65, fontFamily: "var(--font-mono, monospace)", boxSizing: "border-box" }}
+                            style={{ width: "100%", resize: "vertical", padding: "14px 16px", borderRadius: 14, background: "var(--surface-2)", border: `1.5px solid ${s?.answer ? "var(--border-strong)" : "var(--border)"}`, outline: "none", color: "var(--text)", fontSize: 14, lineHeight: 1.65, fontFamily: "inherit", boxSizing: "border-box" }}
                           />
                           <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                             <span style={{ fontSize: 12.5, color: "var(--text-3)" }}>⌘ Enter — отправить</span>
@@ -206,8 +206,8 @@ export const LevelPracticePage = ({ topicId, subtopicName, level }: Props) => {
                         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                           {/* User's answer recap */}
                           <div style={{ padding: "12px 14px", borderRadius: 12, background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "var(--text-3)", marginBottom: 6 }}>МОЁ РЕШЕНИЕ</div>
-                            <pre style={{ margin: 0, fontSize: 13, lineHeight: 1.6, color: "var(--text-2)", whiteSpace: "pre-wrap", fontFamily: "var(--font-mono, monospace)" }}>{s.answer}</pre>
+                            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "var(--text-3)", marginBottom: 6 }}>МОЙ ОТВЕТ</div>
+                            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "var(--text-2)", whiteSpace: "pre-wrap" }}>{s.answer}</p>
                           </div>
 
                           {/* Verdict */}
