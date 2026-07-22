@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ChevronLeftIcon, ChevronDownIcon, HelpIcon } from "@/shared/ui/icons"
+import { ChevronLeftIcon, ChevronDownIcon, HelpIcon, PlusIcon } from "@/shared/ui/icons"
 import { useRouter } from "next/navigation"
 import type { Topic, SessionRecord } from "@/entities/topic/model/types"
 import { OVERALL_LEVEL_CONFIG, SUBTOPIC_STATUS_CONFIG } from "@/entities/topic/config"
@@ -33,6 +33,28 @@ export const TopicPage = ({ id }: Props) => {
 
   const [regenerating, setRegenerating] = useState(false)
   const [resetting, setResetting] = useState(false)
+
+  const [showAddSubtopic, setShowAddSubtopic] = useState(false)
+  const [newSubtopicName, setNewSubtopicName] = useState("")
+  const [addingSubtopic, setAddingSubtopic] = useState(false)
+  const [addSubtopicError, setAddSubtopicError] = useState<string | null>(null)
+
+  const addSubtopic = async () => {
+    const trimmed = newSubtopicName.trim()
+    if (!trimmed || addingSubtopic) return
+    setAddingSubtopic(true)
+    setAddSubtopicError(null)
+    try {
+      await apiClient.addSubtopic(id, trimmed)
+      setNewSubtopicName("")
+      setShowAddSubtopic(false)
+      await loadTopic()
+    } catch (err) {
+      setAddSubtopicError(err instanceof Error ? err.message : "Ошибка соединения")
+    } finally {
+      setAddingSubtopic(false)
+    }
+  }
 
   const regenerateSubtopics = async () => {
     if (regenerating) return
@@ -272,6 +294,12 @@ export const TopicPage = ({ id }: Props) => {
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                             <span style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 500 }}>нажми → читай теорию</span>
                             <button
+                              onClick={() => setShowAddSubtopic(v => !v)}
+                              style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: "pointer", background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text-2)", fontFamily: "inherit" }}
+                            >
+                              <PlusIcon size={12} color="currentColor" />Добавить
+                            </button>
+                            <button
                               onClick={regenerateSubtopics}
                               disabled={regenerating || resetting}
                               style={{ padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: (regenerating || resetting) ? "default" : "pointer", background: "var(--surface)", border: "1px solid var(--border)", color: (regenerating || resetting) ? "var(--text-3)" : "var(--text-2)", fontFamily: "inherit" }}
@@ -280,6 +308,29 @@ export const TopicPage = ({ id }: Props) => {
                             </button>
                           </div>
                         </div>
+
+                        {showAddSubtopic && (
+                          <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
+                            <div style={{ display: "flex", gap: 8 }}>
+                              <input
+                                autoFocus
+                                value={newSubtopicName}
+                                onChange={e => { setNewSubtopicName(e.target.value); setAddSubtopicError(null) }}
+                                onKeyDown={e => { if (e.key === "Enter") addSubtopic() }}
+                                placeholder="Название подтемы"
+                                style={{ flex: 1, minWidth: 0, padding: "9px 14px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text)", fontSize: 14, fontFamily: "inherit" }}
+                              />
+                              <button
+                                onClick={addSubtopic}
+                                disabled={addingSubtopic || !newSubtopicName.trim()}
+                                style={{ padding: "9px 16px", borderRadius: 10, border: "none", cursor: (addingSubtopic || !newSubtopicName.trim()) ? "default" : "pointer", background: "var(--accent)", color: "#fff", fontWeight: 700, fontSize: 13.5, opacity: (addingSubtopic || !newSubtopicName.trim()) ? 0.5 : 1, fontFamily: "inherit" }}
+                              >
+                                {addingSubtopic ? "Добавляем..." : "Добавить"}
+                              </button>
+                            </div>
+                            {addSubtopicError && <span style={{ fontSize: 12.5, color: "#e5484d" }}>{addSubtopicError}</span>}
+                          </div>
+                        )}
 
                         {/* Filters */}
                         <div style={{ marginTop: 16, display: "flex", gap: 9, flexWrap: "wrap" }}>

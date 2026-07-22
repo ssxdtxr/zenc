@@ -75,4 +75,16 @@ export const apiClient = {
     })
     if (!res.ok) throw new Error("Failed to save session")
   },
+
+  async addSubtopic(topicId: string, name: string): Promise<void> {
+    const res = await fetch(`/api/topics/${topicId}/subtopics`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error(data.error ?? "Failed to add subtopic")
+    }
+  },
 }
