@@ -281,7 +281,9 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
 
           {currentResponse.questionType === "choice" && currentResponse.options ? (
             <>
-              <p style={{ margin: "0 0 20px", fontSize: 18, lineHeight: 1.6, color: "var(--text)" }}>{currentResponse.question}</p>
+              <div style={{ marginBottom: 20 }}>
+                <RichText text={currentResponse.question} className="[&_p]:!m-0 [&_p]:!text-[18px] [&_p]:!leading-[1.6] [&_p]:!text-[var(--text)]" />
+              </div>
               <motion.div variants={staggerContainer(0.05)} initial="hidden" animate="show" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {currentResponse.options.map((opt, i) => {
                   const isSelected = answer === opt
@@ -295,7 +297,7 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
               </motion.div>
             </>
           ) : (
-            <p style={{ margin: "0 0 0", fontSize: 18, lineHeight: 1.6, color: "var(--text)" }}>{currentResponse.question}</p>
+            <RichText text={currentResponse.question} className="[&_p]:!m-0 [&_p]:!text-[18px] [&_p]:!leading-[1.6] [&_p]:!text-[var(--text)]" />
           )}
 
           {/* Confidence */}
@@ -343,7 +345,7 @@ function SubtopicSession({ topicId, topicName, subtopicName, onComplete }: {
                 <span style={{ width: 22, height: 22, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 11, background: "var(--surface)", color: "var(--text)", border: "1px solid var(--border)", fontFamily: "inherit" }}>{questionCount}</span>
                 <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "var(--text-3)" }}>ВОПРОС</span>
               </div>
-              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: "var(--text-2)" }}>{lastQuestion}</p>
+              <RichText text={lastQuestion} className="[&_p]:!m-0 [&_p]:!text-sm [&_p]:!leading-[1.55] [&_p]:!text-[var(--text-2)]" />
             </div>
           )}
 

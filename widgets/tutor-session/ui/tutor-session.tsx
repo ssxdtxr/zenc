@@ -118,9 +118,9 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
           </div>
 
           {/* Question text */}
-          <p style={{ margin: "0 0 26px", fontSize: 19, lineHeight: 1.6, color: "var(--text)", fontWeight: 400 }}>
-            {currentResponse.question}
-          </p>
+          <div style={{ marginBottom: 26 }}>
+            <RichText text={currentResponse.question} className="[&_p]:!m-0 [&_p]:!text-[19px] [&_p]:!leading-[1.6] [&_p]:!text-[var(--text)] [&_p]:!font-normal" />
+          </div>
 
           {/* CHOICE OPTIONS */}
           {currentResponse.questionType === "choice" && currentResponse.options && (
@@ -196,7 +196,7 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
                 <span style={{ width: 22, height: 22, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 11, background: "var(--surface)", color: "var(--text)", border: "1px solid var(--border)", fontFamily: "inherit" }}>{questionCount}</span>
                 <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "var(--text-3)" }}>ВОПРОС</span>
               </div>
-              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: "var(--text-2)" }}>{lastQuestion}</p>
+              <RichText text={lastQuestion} className="[&_p]:!m-0 [&_p]:!text-sm [&_p]:!leading-[1.55] [&_p]:!text-[var(--text-2)]" />
             </div>
           )}
 

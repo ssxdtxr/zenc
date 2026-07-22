@@ -273,7 +273,7 @@ export const LevelSessionPage = ({ topicId, subtopicName, level }: Props) => {
                   {lastQuestion && (
                     <div style={{ padding: "13px 16px", borderRadius: 14, background: "var(--surface-2)", border: "1px solid var(--border)", marginBottom: 10 }}>
                       <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: "var(--text-3)", marginBottom: 5 }}>ВОПРОС</div>
-                      <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: "var(--text-2)" }}>{lastQuestion}</p>
+                      <RichText text={lastQuestion} className="[&_p]:!m-0 [&_p]:!text-sm [&_p]:!leading-[1.55] [&_p]:!text-[var(--text-2)]" />
                     </div>
                   )}
                   {lastAnswer && (
@@ -335,7 +335,9 @@ export const LevelSessionPage = ({ topicId, subtopicName, level }: Props) => {
               {/* SESSION PHASE */}
               {phase === "session" && current?.question && !loading && (
                 <motion.div key="session" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}>
-                  <p style={{ margin: "0 0 20px", fontSize: 18, lineHeight: 1.65, color: "var(--text)" }}>{current.question}</p>
+                  <div style={{ marginBottom: 20 }}>
+                    <RichText text={current.question} className="[&_p]:!m-0 [&_p]:!text-[18px] [&_p]:!leading-[1.65] [&_p]:!text-[var(--text)]" />
+                  </div>
 
                   {current.questionType === "choice" && current.options ? (
                     <motion.div variants={staggerContainer(0.05)} initial="hidden" animate="show" style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
