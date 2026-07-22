@@ -140,13 +140,13 @@ export const RichText = ({ text, className }: Props) => {
       {blocks.map((block, i) => {
         if (block.type === "code") {
           return (
-            <div key={i} className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(var(--fg-rgb),0.12)" }}>
+            <div key={i} className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.12)" }}>
               {block.lang && (
-                <div className="px-3 py-1.5 text-xs font-mono font-medium" style={{ background: "rgba(10,9,16,0.9)", color: "rgba(var(--fg-rgb),0.5)", borderBottom: "1px solid rgba(var(--fg-rgb),0.08)" }}>
+                <div className="px-3 py-1.5 text-xs font-mono font-medium" style={{ background: "rgba(10,9,16,0.9)", color: "rgba(255,255,255,0.5)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
                   {block.lang}
                 </div>
               )}
-              <pre className="px-4 py-3 text-sm font-mono overflow-x-auto leading-relaxed" style={{ background: "rgba(8,7,15,0.92)", color: "rgba(var(--fg-rgb),0.85)", margin: 0 }}>
+              <pre className="px-4 py-3 text-sm font-mono overflow-x-auto leading-relaxed" style={{ background: "rgba(8,7,15,0.92)", color: "rgba(255,255,255,0.85)", margin: 0 }}>
                 <code>{block.content}</code>
               </pre>
             </div>
