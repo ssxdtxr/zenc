@@ -19,7 +19,7 @@ const parseInline = (text: string): React.ReactNode[] => {
       parts.push(<em key={match.index} style={{ color: "var(--accent)" }}>{match[3]}</em>)
     } else if (match[4]) {
       parts.push(
-        <code key={match.index} className="px-1.5 py-0.5 rounded-lg text-xs font-mono" style={{ background: "rgba(155,107,255,0.15)", color: "#6b3fd6" }}>
+        <code key={match.index} className="px-1.5 py-0.5 rounded-lg text-xs font-mono" style={{ background: "rgba(155,107,255,0.15)", color: "#4a2599" }}>
           {match[4]}
         </code>
       )
