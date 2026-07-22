@@ -1,20 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getOrCreateUserId } from "@/lib/user-id"
+import { upgradeOnly, nextReviewAt } from "@/lib/subtopic-status"
 import type { SessionRecord } from "@/entities/topic/model/types"
-
-function nextReviewAt(status: string): Date {
-  const daysMap: Record<string, number> = {
-    needs_work: 1,
-    learning:   3,
-    good:       7,
-    expert:     21,
-  }
-  const days = daysMap[status] ?? 3
-  const d = new Date()
-  d.setDate(d.getDate() + days)
-  return d
-}
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -40,15 +28,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       },
     })
 
-    // Upsert subtopics
+    // Upsert subtopics — never downgrade an existing status
+    const existingSubtopics = await prisma.topicSubtopic.findMany({
+      where: { topicId, name: { in: results.subtopics.map((s) => s.name) } },
+    })
+    const existingByName = new Map(existingSubtopics.map((s) => [s.name, s.status]))
+
     await Promise.all(
-      results.subtopics.map((s) =>
-        prisma.topicSubtopic.upsert({
+      results.subtopics.map((s) => {
+        const finalStatus = upgradeOnly(existingByName.get(s.name), s.status)
+        return prisma.topicSubtopic.upsert({
           where: { topicId_name: { topicId, name: s.name } },
-          update: { status: s.status, recommendation: s.recommendation, definitions: s.definitions ?? [], nextReviewAt: nextReviewAt(s.status) },
-          create: { topicId, name: s.name, status: s.status, recommendation: s.recommendation, definitions: s.definitions ?? [], nextReviewAt: nextReviewAt(s.status) },
+          update: { status: finalStatus, recommendation: s.recommendation, definitions: s.definitions ?? [], nextReviewAt: nextReviewAt(finalStatus) },
+          create: { topicId, name: s.name, status: finalStatus, recommendation: s.recommendation, definitions: s.definitions ?? [], nextReviewAt: nextReviewAt(finalStatus) },
         })
-      )
+      })
     )
 
     // Update topic level + lastSessionAt

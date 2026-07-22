@@ -3,16 +3,10 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { extractJson } from "@/lib/extract-json"
+import { statusFromScore, upgradeOnly, nextReviewAt } from "@/lib/subtopic-status"
 import type { Message } from "@/entities/session/model/types"
 
 const client = new Anthropic()
-
-function nextReviewAt(status: string): Date {
-  const days: Record<string, number> = { needs_work: 1, learning: 3, good: 7, expert: 21 }
-  const d = new Date()
-  d.setDate(d.getDate() + (days[status] ?? 3))
-  return d
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,12 +33,11 @@ export async function POST(req: NextRequest) {
 ${history}
 
 Задачи:
-1. Оцени уровень знания подтемы
-2. Составь 2-4 определения ключевых терминов, которые фигурировали в вопросах этой сессии. Определения должны быть экспертного уровня — точные, полные, без воды. Так, как их сформулировал бы senior-специалист: суть + механизм работы + чем отличается от похожих понятий.
+1. Составь 2-4 определения ключевых терминов, которые фигурировали в вопросах этой сессии. Определения должны быть экспертного уровня — точные, полные, без воды. Так, как их сформулировал бы senior-специалист: суть + механизм работы + чем отличается от похожих понятий.
+2. Дай краткую рекомендацию что делать дальше.
 
 Верни СТРОГО JSON без markdown:
 {
-  "status": "needs_work/learning/good/expert",
   "summary": "2-3 предложения об уровне понимания этой конкретной подтемы",
   "recommendation": "одно конкретное действие что сделать дальше",
   "definitions": [
@@ -59,7 +52,6 @@ ${history}
 
     const raw = response.content[0].type === "text" ? response.content[0].text : ""
     let parsed: {
-      status: string
       summary: string
       recommendation: string
       definitions: { term: string; definition: string }[]
@@ -68,29 +60,29 @@ ${history}
       parsed = extractJson(raw) as typeof parsed
     } catch {
       parsed = {
-        status: "learning",
         summary: "Сессия завершена.",
         recommendation: "Повтори материал и попробуй снова.",
         definitions: [],
       }
     }
 
-    const validStatuses = ["needs_work", "learning", "good", "expert"]
-    if (!validStatuses.includes(parsed.status)) parsed.status = "learning"
     if (!Array.isArray(parsed.definitions)) parsed.definitions = []
+
+    const existing = await prisma.topicSubtopic.findFirst({ where: { topicId, name: subtopicName } })
+    const finalStatus = upgradeOnly(existing?.status, statusFromScore(score, total))
 
     // Update subtopic: status + definitions
     await prisma.topicSubtopic.updateMany({
       where: { topicId, name: subtopicName },
       data: {
-        status: parsed.status,
+        status: finalStatus,
         recommendation: parsed.recommendation,
-        nextReviewAt: nextReviewAt(parsed.status),
+        nextReviewAt: nextReviewAt(finalStatus),
         ...(parsed.definitions.length > 0 && { definitions: parsed.definitions }),
       },
     })
 
-    return NextResponse.json(parsed)
+    return NextResponse.json({ ...parsed, status: finalStatus })
   } catch (err) {
     console.error("Subtopic eval error:", err)
     if (err instanceof Anthropic.APIError) {
