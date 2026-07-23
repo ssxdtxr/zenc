@@ -26,6 +26,17 @@ model AiUsageDaily {
   @@unique([userId, date])
 }
 
+// Personal invite links gating registration during the closed beta.
+// Created out-of-band (scripts/create-invite.ts), redeemed once at signup.
+model InviteToken {
+  id           String    @id @default(cuid())
+  token        String    @unique
+  note         String?
+  createdAt    DateTime  @default(now())
+  usedAt       DateTime?
+  usedByUserId String?
+}
+
 model Topic {
   id            String          @id @default(cuid())
   userId        String

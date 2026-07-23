@@ -1,15 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { motion } from "framer-motion"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Input } from "@/shared/ui/input"
 import { Button } from "@/shared/ui/button"
 import { ErrorMessage } from "@/shared/ui/error-message"
 
 export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterForm />
+    </Suspense>
+  )
+}
+
+function RegisterForm() {
   const router = useRouter()
+  const invite = useSearchParams().get("invite")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -23,7 +32,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, invite }),
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error); return }
@@ -34,6 +43,21 @@ export default function RegisterPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (!invite) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center px-5" style={{ background: "var(--bg)" }}>
+        <motion.div initial={{ opacity: 0, y: 16, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: "spring", stiffness: 280, damping: 26 }} className="w-full max-w-sm space-y-3 p-7 rounded-3xl text-center" style={{ background: "var(--surface)", backdropFilter: "var(--glass)", WebkitBackdropFilter: "var(--glass)", boxShadow: "var(--shadow-lg)" }}>
+          <h1 className="text-xl font-bold" style={{ color: "var(--text)" }}>Регистрация закрыта</h1>
+          <p className="text-sm" style={{ color: "var(--text-2)" }}>Zerc пока в закрытой бете — нужна персональная инвайт-ссылка.</p>
+          <p className="text-center text-sm pt-2" style={{ color: "var(--text-2)" }}>
+            Уже есть аккаунт?{" "}
+            <Link href="/login" className="font-semibold" style={{ color: "var(--accent)" }}>Войти</Link>
+          </p>
+        </motion.div>
+      </div>
+    )
   }
 
   return (
