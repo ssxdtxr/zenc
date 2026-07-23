@@ -10,8 +10,9 @@ const DIFFICULTY_LABELS: Record<string, string> = {
 }
 
 export async function POST(req: NextRequest) {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
     const limitResponse = await enforceAiUsageLimit(userId)
     if (limitResponse) return limitResponse
 
@@ -42,6 +43,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(parsed)
   } catch (err) {
-    return anthropicErrorResponse(err, "Level practice error")
+    return anthropicErrorResponse(err, "level-practice", { userId })
   }
 }

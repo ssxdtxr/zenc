@@ -10,7 +10,8 @@
     "lint": "eslint",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "invite": "tsx scripts/create-invite.ts"
+    "invite": "tsx scripts/create-invite.ts",
+    "usage": "tsx scripts/ai-usage-report.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.2",

@@ -5,11 +5,13 @@ import { extractJson } from "@/lib/extract-json"
 import { askClaudeText, anthropicErrorResponse } from "@/lib/anthropic"
 import { statusFromScore, upgradeOnly, nextReviewAt } from "@/lib/subtopic-status"
 import { enforceAiUsageLimit } from "@/lib/ai-usage"
+import { logError } from "@/lib/log"
 import type { Message } from "@/entities/session/model/types"
 
 export async function POST(req: NextRequest) {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
     const { topicId, topicName, subtopicName, messages, score, total } = await req.json()
 
     const topic = await prisma.topic.findFirst({ where: { id: topicId, userId } })
@@ -59,7 +61,8 @@ ${history}
     }
     try {
       parsed = extractJson(raw) as typeof parsed
-    } catch {
+    } catch (err) {
+      logError("subtopic-eval", err, { userId, subtopicName })
       parsed = {
         summary: "Сессия завершена.",
         recommendation: "Повтори материал и попробуй снова.",
@@ -85,6 +88,6 @@ ${history}
 
     return NextResponse.json({ ...parsed, status: finalStatus })
   } catch (err) {
-    return anthropicErrorResponse(err, "Subtopic eval error")
+    return anthropicErrorResponse(err, "subtopic-eval", { userId })
   }
 }

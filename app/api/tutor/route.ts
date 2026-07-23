@@ -4,6 +4,7 @@ import { extractJson } from "@/lib/extract-json"
 import { askClaudeText, anthropicErrorResponse } from "@/lib/anthropic"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { enforceAiUsageLimit } from "@/lib/ai-usage"
+import { logError } from "@/lib/log"
 
 const SYSTEM_PROMPT = `Ты — адаптивный тьютор-эксперт. Твоя задача — помочь пользователю глубоко изучить любую тему через интерактивный диалог.
 
@@ -37,8 +38,9 @@ const SYSTEM_PROMPT = `Ты — адаптивный тьютор-эксперт
 }`
 
 export async function POST(req: NextRequest) {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
     const limitResponse = await enforceAiUsageLimit(userId)
     if (limitResponse) return limitResponse
 
@@ -83,13 +85,13 @@ export async function POST(req: NextRequest) {
     let parsed: Omit<TutorResponse, "questionNumber" | "assistantMessage">
     try {
       parsed = extractJson(rawContent) as typeof parsed
-    } catch {
-      console.error("Tutor JSON parse failed, raw:", rawContent.slice(0, 200))
+    } catch (err) {
+      logError("tutor", err, { userId, raw: rawContent.slice(0, 200) })
       return NextResponse.json({ error: "Не удалось получить ответ, попробуй ещё раз" }, { status: 500 })
     }
 
     return NextResponse.json({ ...parsed, questionNumber: questionNumber ?? 1, assistantMessage: rawContent })
   } catch (err) {
-    return anthropicErrorResponse(err, "Tutor API error")
+    return anthropicErrorResponse(err, "tutor", { userId })
   }
 }

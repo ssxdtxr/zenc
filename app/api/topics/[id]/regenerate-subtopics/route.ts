@@ -4,6 +4,7 @@ import { getOrCreateUserId } from "@/lib/user-id"
 import { extractJson } from "@/lib/extract-json"
 import { askClaudeText, anthropicErrorResponse } from "@/lib/anthropic"
 import { enforceAiUsageLimit } from "@/lib/ai-usage"
+import { logError } from "@/lib/log"
 
 const SYSTEM_PROMPT = `Ты — эксперт в составлении карт знаний. Составь список подтем для учебной темы.
 
@@ -28,8 +29,9 @@ const SYSTEM_PROMPT = `Ты — эксперт в составлении кар�
 }`
 
 export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
     const { id } = await params
 
     const topic = await prisma.topic.findFirst({
@@ -67,8 +69,8 @@ ${topic.subtopics.length > 0 ? `\nТекущие подтемы (перегру�
     let parsed: { subtopics: { name: string; recommendation: string; definitions: { term: string; definition: string }[] }[] }
     try {
       parsed = extractJson(rawContent) as typeof parsed
-    } catch {
-      console.error("Regenerate: JSON parse failed, raw:", rawContent.slice(0, 500))
+    } catch (err) {
+      logError("regenerate-subtopics", err, { userId, topicId: id })
       return NextResponse.json({ error: "Ошибка генерации", detail: rawContent.slice(0, 200) }, { status: 500 })
     }
 
@@ -95,6 +97,6 @@ ${topic.subtopics.length > 0 ? `\nТекущие подтемы (перегру�
 
     return NextResponse.json({ ok: true, count: parsed.subtopics.length })
   } catch (err) {
-    return anthropicErrorResponse(err, "Regenerate subtopics error")
+    return anthropicErrorResponse(err, "regenerate-subtopics", { userId })
   }
 }

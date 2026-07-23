@@ -5,6 +5,7 @@ import { extractJson } from "@/lib/extract-json"
 import { askClaudeText, anthropicErrorResponse } from "@/lib/anthropic"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { enforceAiUsageLimit } from "@/lib/ai-usage"
+import { logError } from "@/lib/log"
 
 const SYSTEM_PROMPT = `Ты — эксперт в оценке знаний. Проанализируй сессию обучения и дай детальную карту знаний пользователя.
 
@@ -36,8 +37,9 @@ const SYSTEM_PROMPT = `Ты — эксперт в оценке знаний. П�
 }`
 
 export async function POST(req: NextRequest) {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
     const limitResponse = await enforceAiUsageLimit(userId)
     if (limitResponse) return limitResponse
 
@@ -68,8 +70,8 @@ ${conversationMessages.map((m) => `[${m.role === "user" ? "Пользовате�
     let parsed: Omit<SessionRecord, "id" | "date" | "score" | "total">
     try {
       parsed = extractJson(rawContent) as typeof parsed
-    } catch {
-      console.error("Analyze JSON parse failed, raw:", rawContent.slice(0, 500))
+    } catch (err) {
+      logError("analyze", err, { userId })
       parsed = {
         overallLevel: "beginner" as OverallLevel,
         summary: "Анализ завершён.",
@@ -82,6 +84,6 @@ ${conversationMessages.map((m) => `[${m.role === "user" ? "Пользовате�
 
     return NextResponse.json(parsed)
   } catch (err) {
-    return anthropicErrorResponse(err, "Analyze API error")
+    return anthropicErrorResponse(err, "analyze", { userId })
   }
 }

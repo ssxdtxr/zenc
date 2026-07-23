@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getOrCreateUserId } from "@/lib/user-id"
+import { logError } from "@/lib/log"
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
     const { id } = await params
 
     const topic = await prisma.topic.findFirst({
@@ -18,20 +20,21 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
     if (!topic) return NextResponse.json({ error: "Not found" }, { status: 404 })
     return NextResponse.json(topic)
   } catch (err) {
-    console.error(err)
-    return NextResponse.json({ error: "Failed" }, { status: 500 })
+    logError("topics/get", err, { userId })
+    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })
   }
 }
 
 export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
     const { id } = await params
 
     await prisma.topic.deleteMany({ where: { id, userId } })
     return NextResponse.json({ ok: true })
   } catch (err) {
-    console.error(err)
-    return NextResponse.json({ error: "Failed" }, { status: 500 })
+    logError("topics/delete", err, { userId })
+    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })
   }
 }

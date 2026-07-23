@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { upgradeOnly, nextReviewAt } from "@/lib/subtopic-status"
+import { logError } from "@/lib/log"
 import type { SessionRecord } from "@/entities/topic/model/types"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
     const { id: topicId } = await params
     const results: Omit<SessionRecord, "id" | "date"> = await req.json()
 
@@ -53,7 +55,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     return NextResponse.json({ sessionId: session.id })
   } catch (err) {
-    console.error(err)
-    return NextResponse.json({ error: "Failed" }, { status: 500 })
+    logError("topics/sessions", err, { userId })
+    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })
   }
 }

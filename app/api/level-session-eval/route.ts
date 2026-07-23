@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { upgradeOnly, nextReviewAt } from "@/lib/subtopic-status"
+import { logError } from "@/lib/log"
 import type { SubtopicStatus } from "@/entities/topic/model/types"
 
 // Maps difficulty + isComplete → subtopic status
@@ -12,8 +13,9 @@ const STATUS_MAP: Record<string, { complete: SubtopicStatus; incomplete: Subtopi
 }
 
 export async function POST(req: NextRequest) {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
     const { topicId, subtopicName, difficulty, isComplete, finishSummary } = await req.json()
 
     const topic = await prisma.topic.findFirst({ where: { id: topicId, userId } })
@@ -36,7 +38,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ status: finalStatus })
   } catch (err) {
-    console.error("Level session eval error:", err)
+    logError("level-session-eval", err, { userId })
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })
   }
 }

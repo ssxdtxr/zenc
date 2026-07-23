@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getOrCreateUserId } from "@/lib/user-id"
+import { logError } from "@/lib/log"
 
 export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
     const { id } = await params
 
     const topic = await prisma.topic.findFirst({ where: { id, userId } })
@@ -18,7 +20,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
 
     return NextResponse.json({ ok: true })
   } catch (err) {
-    console.error("Reset error:", err)
+    logError("topics/reset", err, { userId })
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })
   }
 }

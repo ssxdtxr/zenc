@@ -4,8 +4,9 @@ import { getOrCreateUserId } from "@/lib/user-id"
 import { enforceAiUsageLimit } from "@/lib/ai-usage"
 
 export async function POST(req: NextRequest) {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
     const { topicName, subtopicName, exerciseTitle, exerciseDescription, exerciseDifficulty, userAnswer } = await req.json()
 
     if (!userAnswer?.trim()) {
@@ -47,6 +48,6 @@ ${userAnswer}`,
 
     return NextResponse.json(parsed)
   } catch (err) {
-    return anthropicErrorResponse(err, "Practice eval error")
+    return anthropicErrorResponse(err, "subtopic-practice-eval", { userId })
   }
 }

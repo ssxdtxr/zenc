@@ -3,6 +3,7 @@ import { extractJson } from "@/lib/extract-json"
 import { askClaudeText, anthropicErrorResponse } from "@/lib/anthropic"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { enforceAiUsageLimit } from "@/lib/ai-usage"
+import { logError } from "@/lib/log"
 import type { Message } from "@/entities/session/model/types"
 
 const DIFFICULTY_LABELS: Record<string, string> = {
@@ -12,8 +13,9 @@ const DIFFICULTY_LABELS: Record<string, string> = {
 }
 
 export async function POST(req: NextRequest) {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
     const limitResponse = await enforceAiUsageLimit(userId)
     if (limitResponse) return limitResponse
 
@@ -68,13 +70,13 @@ export async function POST(req: NextRequest) {
     let parsed: Record<string, unknown>
     try {
       parsed = extractJson(raw) as Record<string, unknown>
-    } catch {
-      console.error("Level session JSON parse failed, raw:", raw.slice(0, 200))
+    } catch (err) {
+      logError("level-session", err, { userId, raw: raw.slice(0, 200) })
       return NextResponse.json({ error: "Не удалось получить ответ, попробуй ещё раз" }, { status: 500 })
     }
 
     return NextResponse.json({ ...parsed, questionNumber: questionNumber ?? 1 })
   } catch (err) {
-    return anthropicErrorResponse(err, "Level session error")
+    return anthropicErrorResponse(err, "level-session", { userId })
   }
 }

@@ -6,6 +6,7 @@ import { askClaudeText, anthropicErrorResponse } from "@/lib/anthropic"
 import { extractJson } from "@/lib/extract-json"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { enforceAiUsageLimit } from "@/lib/ai-usage"
+import { logError } from "@/lib/log"
 
 const SYSTEM_PROMPT = `Ты — наставник, который объясняет любую предметную область: технические дисциплины (программирование, математика, инженерия) и нетехнические (история, литература, языки, естественные науки, право и т.д.). Объясняй точно и по делу — только суть, без воды. Сначала определи природу темы и адаптируй формат под неё — не притягивай код и антипаттерны к темам, где их нет.
 
@@ -69,8 +70,9 @@ const levelHints: Record<OverallLevel, string> = {
 }
 
 export async function POST(req: NextRequest) {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
     const { topicName, subtopicName, userLevel, recommendation, allSubtopics } = await req.json()
     const level: OverallLevel = userLevel ?? "beginner"
     const trimmedRecommendation: string = (recommendation ?? "").trim()
@@ -100,14 +102,14 @@ ${otherSubtopics.length > 0 ? `\nДругие подтемы этой темы (
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
       maxTokens: 8000,
-      label: `theory:${subtopicName}`,
+      label: "theory",
     })
 
     let parsed: TheoryContent
     try {
       parsed = extractJson(rawContent) as TheoryContent
-    } catch {
-      console.error("Theory JSON parse failed for:", subtopicName, "raw:", rawContent.slice(0, 300))
+    } catch (err) {
+      logError("theory", err, { userId, subtopicName })
       return NextResponse.json({
         title: subtopicName,
         sections: [{ heading: "", explanation: "Не удалось разобрать ответ. Попробуй обновить страницу." }],
@@ -126,6 +128,6 @@ ${otherSubtopics.length > 0 ? `\nДругие подтемы этой темы (
 
     return NextResponse.json(parsed)
   } catch (err) {
-    return anthropicErrorResponse(err, "Theory API error")
+    return anthropicErrorResponse(err, "theory", { userId })
   }
 }

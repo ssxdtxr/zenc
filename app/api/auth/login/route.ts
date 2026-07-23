@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
 import { signToken } from "@/lib/jwt"
+import { logError } from "@/lib/log"
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
     })
     return res
   } catch (err) {
-    console.error("Login error:", err)
+    logError("auth/login", err)
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })
   }
 }

@@ -4,8 +4,9 @@ import { getOrCreateUserId } from "@/lib/user-id"
 import { enforceAiUsageLimit } from "@/lib/ai-usage"
 
 export async function POST(req: NextRequest) {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
     const limitResponse = await enforceAiUsageLimit(userId)
     if (limitResponse) return limitResponse
 
@@ -33,6 +34,6 @@ ${historyText ? `\nПредыдущие уточнения:\n${historyText}` : "
 
     return NextResponse.json({ answer })
   } catch (err) {
-    return anthropicErrorResponse(err, "Follow-up error")
+    return anthropicErrorResponse(err, "follow-up", { userId })
   }
 }

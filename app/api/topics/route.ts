@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getOrCreateUserId } from "@/lib/user-id"
+import { logError } from "@/lib/log"
 
 export async function GET() {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
 
     const topics = await prisma.topic.findMany({
       where: { userId },
@@ -14,15 +16,15 @@ export async function GET() {
 
     return NextResponse.json(topics)
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Unknown error"
-    console.error("[GET /api/topics]", msg)
-    return NextResponse.json({ error: msg }, { status: 500 })
+    logError("topics/list", err, { userId })
+    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })
   }
 }
 
 export async function POST(req: NextRequest) {
+  let userId: string | undefined
   try {
-    const userId = await getOrCreateUserId()
+    userId = await getOrCreateUserId()
     const { name } = await req.json()
 
     const topic = await prisma.topic.create({
@@ -32,8 +34,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(topic)
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Unknown error"
-    console.error("[POST /api/topics]", msg)
-    return NextResponse.json({ error: msg }, { status: 500 })
+    logError("topics/create", err, { userId })
+    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })
   }
 }

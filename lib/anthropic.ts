@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk"
 import { NextResponse } from "next/server"
 import { extractJson } from "@/lib/extract-json"
+import { logError } from "@/lib/log"
 
 export const anthropic = new Anthropic()
 
@@ -25,7 +26,7 @@ export async function askClaudeText(params: {
   const raw = response.content[0]?.type === "text" ? response.content[0].text : ""
 
   if (response.stop_reason === "max_tokens") {
-    console.error(`[${params.label ?? "claude"}] response truncated at max_tokens`)
+    console.warn(`[warn] claude response truncated at max_tokens label=${params.label ?? "claude"}`)
   }
 
   return raw
@@ -43,9 +44,9 @@ export async function askClaudeJson<T>(params: {
 }
 
 // Maps Anthropic API errors to the right HTTP status + a Russian user-facing
-// message. Use in a route's catch block: `catch (err) { return anthropicErrorResponse(err, "Tutor API error") }`
-export function anthropicErrorResponse(err: unknown, logLabel: string): NextResponse {
-  console.error(`${logLabel}:`, err)
+// message. Use in a route's catch block: `catch (err) { return anthropicErrorResponse(err, "tutor", { userId }) }`
+export function anthropicErrorResponse(err: unknown, route: string, context?: Record<string, string | undefined>): NextResponse {
+  logError(route, err, context)
 
   if (err instanceof Anthropic.APIError) {
     if (err.status === 529) {
