@@ -2,6 +2,8 @@ import Anthropic from "@anthropic-ai/sdk"
 import { NextRequest, NextResponse } from "next/server"
 import type { Message, TutorResponse } from "@/entities/session/model/types"
 import { extractJson } from "@/lib/extract-json"
+import { getOrCreateUserId } from "@/lib/user-id"
+import { enforceAiUsageLimit } from "@/lib/ai-usage"
 
 const client = new Anthropic()
 
@@ -38,6 +40,10 @@ const SYSTEM_PROMPT = `Ты — адаптивный тьютор-эксперт
 
 export async function POST(req: NextRequest) {
   try {
+    const userId = await getOrCreateUserId()
+    const limitResponse = await enforceAiUsageLimit(userId)
+    if (limitResponse) return limitResponse
+
     const { topic, messages, questionNumber, focusSubtopics, previousSubtopics, overallLevel, confidence } = await req.json()
     const conversationMessages: Message[] = messages ?? []
     const hasFocus = Array.isArray(focusSubtopics) && focusSubtopics.length > 0

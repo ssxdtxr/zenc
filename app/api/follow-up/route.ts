@@ -1,10 +1,16 @@
 import Anthropic from "@anthropic-ai/sdk"
 import { NextRequest, NextResponse } from "next/server"
+import { getOrCreateUserId } from "@/lib/user-id"
+import { enforceAiUsageLimit } from "@/lib/ai-usage"
 
 const client = new Anthropic()
 
 export async function POST(req: NextRequest) {
   try {
+    const userId = await getOrCreateUserId()
+    const limitResponse = await enforceAiUsageLimit(userId)
+    if (limitResponse) return limitResponse
+
     const { topicName, originalQuestion, userAnswer, evaluation, history, question } = await req.json()
 
     const historyText = (history as { question: string; answer: string }[])

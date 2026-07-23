@@ -7,11 +7,23 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String         @id @default(cuid())
+  email        String         @unique
   passwordHash String
-  createdAt    DateTime @default(now())
+  createdAt    DateTime       @default(now())
   topics       Topic[]
+  aiUsage      AiUsageDaily[]
+}
+
+// Per-user daily counter for Anthropic API calls — enforces the hard usage cap.
+model AiUsageDaily {
+  id     String   @id @default(cuid())
+  userId String
+  date   DateTime // truncated to UTC midnight
+  count  Int      @default(0)
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
 }
 
 model Topic {

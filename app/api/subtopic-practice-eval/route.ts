@@ -1,16 +1,22 @@
 import Anthropic from "@anthropic-ai/sdk"
 import { NextRequest, NextResponse } from "next/server"
 import { extractJson } from "@/lib/extract-json"
+import { getOrCreateUserId } from "@/lib/user-id"
+import { enforceAiUsageLimit } from "@/lib/ai-usage"
 
 const client = new Anthropic()
 
 export async function POST(req: NextRequest) {
   try {
+    const userId = await getOrCreateUserId()
     const { topicName, subtopicName, exerciseTitle, exerciseDescription, exerciseDifficulty, userAnswer } = await req.json()
 
     if (!userAnswer?.trim()) {
       return NextResponse.json({ error: "Пустой ответ" }, { status: 400 })
     }
+
+    const limitResponse = await enforceAiUsageLimit(userId)
+    if (limitResponse) return limitResponse
 
     const response = await client.messages.create({
       model: "claude-sonnet-4-6",

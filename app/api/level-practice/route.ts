@@ -1,6 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk"
 import { NextRequest, NextResponse } from "next/server"
 import { extractJson } from "@/lib/extract-json"
+import { getOrCreateUserId } from "@/lib/user-id"
+import { enforceAiUsageLimit } from "@/lib/ai-usage"
 
 const client = new Anthropic()
 
@@ -12,6 +14,10 @@ const DIFFICULTY_LABELS: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
+    const userId = await getOrCreateUserId()
+    const limitResponse = await enforceAiUsageLimit(userId)
+    if (limitResponse) return limitResponse
+
     const { topicName, subtopicName, difficulty } = await req.json()
     const diffLabel = DIFFICULTY_LABELS[difficulty] ?? difficulty
 

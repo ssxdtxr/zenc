@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { extractJson } from "@/lib/extract-json"
 import { statusFromScore, upgradeOnly, nextReviewAt } from "@/lib/subtopic-status"
+import { enforceAiUsageLimit } from "@/lib/ai-usage"
 import type { Message } from "@/entities/session/model/types"
 
 const client = new Anthropic()
@@ -15,6 +16,9 @@ export async function POST(req: NextRequest) {
 
     const topic = await prisma.topic.findFirst({ where: { id: topicId, userId } })
     if (!topic) return NextResponse.json({ error: "Not found" }, { status: 404 })
+
+    const limitResponse = await enforceAiUsageLimit(userId)
+    if (limitResponse) return limitResponse
 
     const msgs: Message[] = messages ?? []
     const history = msgs

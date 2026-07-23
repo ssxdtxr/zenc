@@ -5,6 +5,7 @@ import type { OverallLevel, TheoryContent } from "@/entities/topic/model/types"
 import { prisma } from "@/lib/prisma"
 import { extractJson } from "@/lib/extract-json"
 import { getOrCreateUserId } from "@/lib/user-id"
+import { enforceAiUsageLimit } from "@/lib/ai-usage"
 
 const client = new Anthropic()
 
@@ -71,6 +72,7 @@ const levelHints: Record<OverallLevel, string> = {
 
 export async function POST(req: NextRequest) {
   try {
+    const userId = await getOrCreateUserId()
     const { topicName, subtopicName, userLevel, recommendation, allSubtopics } = await req.json()
     const level: OverallLevel = userLevel ?? "beginner"
     const trimmedRecommendation: string = (recommendation ?? "").trim()
@@ -79,11 +81,14 @@ export async function POST(req: NextRequest) {
     // Once a subtopic has a personalized recommendation (from a prior test), scope the cache to this
     // user + this exact recommendation, so the theory actually reflects it and regenerates when it changes.
     const cacheKey = trimmedRecommendation
-      ? `v5:user:${await getOrCreateUserId()}:${topicName}:${subtopicName}:${level}:${createHash("sha256").update(trimmedRecommendation).digest("hex").slice(0, 16)}`
+      ? `v5:user:${userId}:${topicName}:${subtopicName}:${level}:${createHash("sha256").update(trimmedRecommendation).digest("hex").slice(0, 16)}`
       : `v5:shared:${topicName}:${subtopicName}:${level}`
 
     const cached = await prisma.theoryCache.findUnique({ where: { cacheKey } })
     if (cached) return NextResponse.json(cached.content)
+
+    const limitResponse = await enforceAiUsageLimit(userId)
+    if (limitResponse) return limitResponse
 
     const otherSubtopics = Array.isArray(allSubtopics)
       ? (allSubtopics as string[]).filter((s: string) => s !== subtopicName)

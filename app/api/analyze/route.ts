@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server"
 import type { Message } from "@/entities/session/model/types"
 import type { OverallLevel, SessionRecord, Subtopic } from "@/entities/topic/model/types"
 import { extractJson } from "@/lib/extract-json"
+import { getOrCreateUserId } from "@/lib/user-id"
+import { enforceAiUsageLimit } from "@/lib/ai-usage"
 
 const client = new Anthropic()
 
@@ -37,6 +39,10 @@ const SYSTEM_PROMPT = `Ты — эксперт в оценке знаний. П�
 
 export async function POST(req: NextRequest) {
   try {
+    const userId = await getOrCreateUserId()
+    const limitResponse = await enforceAiUsageLimit(userId)
+    if (limitResponse) return limitResponse
+
     const { topic, messages, score, total, existingSubtopics } = await req.json()
     const conversationMessages: Message[] = messages ?? []
     const hasExisting = Array.isArray(existingSubtopics) && existingSubtopics.length > 0

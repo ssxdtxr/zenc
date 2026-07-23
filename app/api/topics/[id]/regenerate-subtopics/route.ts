@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { extractJson } from "@/lib/extract-json"
+import { enforceAiUsageLimit } from "@/lib/ai-usage"
 
 const client = new Anthropic()
 
@@ -42,6 +43,9 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     })
 
     if (!topic) return NextResponse.json({ error: "Not found" }, { status: 404 })
+
+    const limitResponse = await enforceAiUsageLimit(userId)
+    if (limitResponse) return limitResponse
 
     const sessionContext = topic.sessions.length > 0
       ? topic.sessions.map(s =>
