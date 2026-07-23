@@ -1,11 +1,9 @@
-import Anthropic from "@anthropic-ai/sdk"
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { extractJson } from "@/lib/extract-json"
+import { askClaudeText, anthropicErrorResponse } from "@/lib/anthropic"
 import { enforceAiUsageLimit } from "@/lib/ai-usage"
-
-const client = new Anthropic()
 
 const SYSTEM_PROMPT = `Ты — эксперт в составлении карт знаний. Составь список подтем для учебной темы.
 
@@ -59,21 +57,19 @@ ${topic.subtopics.length > 0 ? `\nТекущие подтемы (перегру�
 
 Составь правильный сгруппированный список подтем.`
 
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 8000,
+    const rawContent = await askClaudeText({
+      maxTokens: 8000,
+      label: "regenerate-subtopics",
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
     })
-
-    const rawContent = response.content[0].type === "text" ? response.content[0].text : ""
 
     let parsed: { subtopics: { name: string; recommendation: string; definitions: { term: string; definition: string }[] }[] }
     try {
       parsed = extractJson(rawContent) as typeof parsed
     } catch {
-      console.error("Regenerate: JSON parse failed, stop_reason:", response.stop_reason, "raw:", rawContent.slice(0, 500))
-      return NextResponse.json({ error: "Ошибка генерации", detail: `stop=${response.stop_reason} raw=${rawContent.slice(0, 200)}` }, { status: 500 })
+      console.error("Regenerate: JSON parse failed, raw:", rawContent.slice(0, 500))
+      return NextResponse.json({ error: "Ошибка генерации", detail: rawContent.slice(0, 200) }, { status: 500 })
     }
 
     if (!parsed.subtopics?.length) {
@@ -99,8 +95,6 @@ ${topic.subtopics.length > 0 ? `\nТекущие подтемы (перегру�
 
     return NextResponse.json({ ok: true, count: parsed.subtopics.length })
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
-    console.error("Regenerate subtopics error:", msg)
-    return NextResponse.json({ error: "Ошибка сервера", detail: msg }, { status: 500 })
+    return anthropicErrorResponse(err, "Regenerate subtopics error")
   }
 }

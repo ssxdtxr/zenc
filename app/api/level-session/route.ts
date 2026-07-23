@@ -1,11 +1,9 @@
-import Anthropic from "@anthropic-ai/sdk"
 import { NextRequest, NextResponse } from "next/server"
 import { extractJson } from "@/lib/extract-json"
+import { askClaudeText, anthropicErrorResponse } from "@/lib/anthropic"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { enforceAiUsageLimit } from "@/lib/ai-usage"
 import type { Message } from "@/entities/session/model/types"
-
-const client = new Anthropic()
 
 const DIFFICULTY_LABELS: Record<string, string> = {
   basic: "базовый — определения, концепции, «что это такое»",
@@ -60,38 +58,23 @@ export async function POST(req: NextRequest) {
       ? [{ role: "user", content: firstMessage }, ...msgs]
       : msgs
 
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1200,
+    const raw = await askClaudeText({
+      maxTokens: 1200,
+      label: "level-session",
       system: systemPrompt,
       messages: apiMessages,
     })
-
-    const raw = response.content[0].type === "text" ? response.content[0].text : ""
-
-    if (response.stop_reason === "max_tokens") {
-      console.error("Level session truncated, raw length:", raw.length)
-    }
 
     let parsed: Record<string, unknown>
     try {
       parsed = extractJson(raw) as Record<string, unknown>
     } catch {
-      console.error("Level session JSON parse failed, stop_reason:", response.stop_reason, "raw:", raw.slice(0, 200))
+      console.error("Level session JSON parse failed, raw:", raw.slice(0, 200))
       return NextResponse.json({ error: "Не удалось получить ответ, попробуй ещё раз" }, { status: 500 })
     }
 
     return NextResponse.json({ ...parsed, questionNumber: questionNumber ?? 1 })
   } catch (err) {
-    console.error("Level session error:", err)
-    if (err instanceof Anthropic.APIError) {
-      if (err.status === 529) return NextResponse.json({ error: "Anthropic перегружен — попробуй через минуту" }, { status: 503 })
-      if (err.status === 429) return NextResponse.json({ error: "Превышен лимит запросов — подожди немного" }, { status: 429 })
-      const msg = err.message.toLowerCase()
-      if (err.status === 402 || msg.includes("credit") || msg.includes("billing") || msg.includes("balance")) {
-        return NextResponse.json({ error: "На аккаунте Anthropic закончились средства — пополни баланс" }, { status: 402 })
-      }
-    }
-    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })
+    return anthropicErrorResponse(err, "Level session error")
   }
 }

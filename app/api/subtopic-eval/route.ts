@@ -1,13 +1,11 @@
-import Anthropic from "@anthropic-ai/sdk"
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { extractJson } from "@/lib/extract-json"
+import { askClaudeText, anthropicErrorResponse } from "@/lib/anthropic"
 import { statusFromScore, upgradeOnly, nextReviewAt } from "@/lib/subtopic-status"
 import { enforceAiUsageLimit } from "@/lib/ai-usage"
 import type { Message } from "@/entities/session/model/types"
-
-const client = new Anthropic()
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,9 +23,9 @@ export async function POST(req: NextRequest) {
       .map(m => `[${m.role === "user" ? "Пользователь" : "Система"}]: ${m.content}`)
       .join("\n\n")
 
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 800,
+    const raw = await askClaudeText({
+      maxTokens: 800,
+      label: "subtopic-eval",
       messages: [{
         role: "user",
         content: `Оцени знание пользователя по подтеме "${subtopicName}" темы "${topicName}".
@@ -54,7 +52,6 @@ ${history}
       }],
     })
 
-    const raw = response.content[0].type === "text" ? response.content[0].text : ""
     let parsed: {
       summary: string
       recommendation: string
@@ -88,13 +85,6 @@ ${history}
 
     return NextResponse.json({ ...parsed, status: finalStatus })
   } catch (err) {
-    console.error("Subtopic eval error:", err)
-    if (err instanceof Anthropic.APIError) {
-      const msg = err.message.toLowerCase()
-      if (err.status === 402 || msg.includes("credit")) {
-        return NextResponse.json({ error: "На аккаунте Anthropic закончились средства" }, { status: 402 })
-      }
-    }
-    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })
+    return anthropicErrorResponse(err, "Subtopic eval error")
   }
 }

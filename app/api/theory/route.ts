@@ -1,13 +1,11 @@
-import Anthropic from "@anthropic-ai/sdk"
 import { createHash } from "crypto"
 import { NextRequest, NextResponse } from "next/server"
 import type { OverallLevel, TheoryContent } from "@/entities/topic/model/types"
 import { prisma } from "@/lib/prisma"
+import { askClaudeText, anthropicErrorResponse } from "@/lib/anthropic"
 import { extractJson } from "@/lib/extract-json"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { enforceAiUsageLimit } from "@/lib/ai-usage"
-
-const client = new Anthropic()
 
 const SYSTEM_PROMPT = `Ты — наставник, который объясняет любую предметную область: технические дисциплины (программирование, математика, инженерия) и нетехнические (история, литература, языки, естественные науки, право и т.д.). Объясняй точно и по делу — только суть, без воды. Сначала определи природу темы и адаптируй формат под неё — не притягивай код и антипаттерны к темам, где их нет.
 
@@ -98,18 +96,12 @@ export async function POST(req: NextRequest) {
 Уровень пользователя: ${level}. ${levelHints[level]}${recommendation ? ` Акцент: ${recommendation}` : ""}
 ${otherSubtopics.length > 0 ? `\nДругие подтемы этой темы (используй для relatedSubtopics): ${otherSubtopics.join(", ")}` : ""}`
 
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 8000,
+    const rawContent = await askClaudeText({
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
+      maxTokens: 8000,
+      label: `theory:${subtopicName}`,
     })
-
-    const rawContent = response.content[0].type === "text" ? response.content[0].text : ""
-
-    if (response.stop_reason === "max_tokens") {
-      console.error("Theory truncated for:", subtopicName)
-    }
 
     let parsed: TheoryContent
     try {
@@ -134,15 +126,6 @@ ${otherSubtopics.length > 0 ? `\nДругие подтемы этой темы (
 
     return NextResponse.json(parsed)
   } catch (err) {
-    console.error("Theory API error:", err)
-    if (err instanceof Anthropic.APIError) {
-      if (err.status === 529) return NextResponse.json({ error: "Anthropic перегружен — попробуй через минуту" }, { status: 503 })
-      if (err.status === 429) return NextResponse.json({ error: "Превышен лимит запросов" }, { status: 429 })
-      const msg = err.message.toLowerCase()
-      if (err.status === 402 || msg.includes("credit") || msg.includes("billing")) {
-        return NextResponse.json({ error: "На аккаунте Anthropic закончились средства" }, { status: 402 })
-      }
-    }
-    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })
+    return anthropicErrorResponse(err, "Theory API error")
   }
 }

@@ -1,10 +1,7 @@
-import Anthropic from "@anthropic-ai/sdk"
 import { NextRequest, NextResponse } from "next/server"
-import { extractJson } from "@/lib/extract-json"
+import { askClaudeJson, anthropicErrorResponse } from "@/lib/anthropic"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { enforceAiUsageLimit } from "@/lib/ai-usage"
-
-const client = new Anthropic()
 
 const DIFFICULTY_LABELS: Record<string, string> = {
   basic: "базовый — определения, концепции, «что это такое»",
@@ -21,9 +18,9 @@ export async function POST(req: NextRequest) {
     const { topicName, subtopicName, difficulty } = await req.json()
     const diffLabel = DIFFICULTY_LABELS[difficulty] ?? difficulty
 
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1200,
+    const parsed = await askClaudeJson<{ exercises: { title: string; description: string }[] }>({
+      maxTokens: 1200,
+      label: "level-practice",
       system: `Ты — наставник по любой предметной области (техническая или гуманитарная). Придумай практические задания по подтеме, все строго одного уровня сложности. Подбирай тип задания под характер темы: код/задача — для технических тем, разбор текста/аргументация/сравнение — для гуманитарных.
 
 Формат ответа — СТРОГО JSON без markdown:
@@ -43,11 +40,8 @@ export async function POST(req: NextRequest) {
       }],
     })
 
-    const raw = response.content[0].type === "text" ? response.content[0].text : ""
-    const parsed = extractJson(raw) as { exercises: { title: string; description: string }[] }
     return NextResponse.json(parsed)
   } catch (err) {
-    console.error("Level practice error:", err)
-    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })
+    return anthropicErrorResponse(err, "Level practice error")
   }
 }

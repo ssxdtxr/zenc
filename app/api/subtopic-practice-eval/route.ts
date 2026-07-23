@@ -1,10 +1,7 @@
-import Anthropic from "@anthropic-ai/sdk"
 import { NextRequest, NextResponse } from "next/server"
-import { extractJson } from "@/lib/extract-json"
+import { askClaudeJson, anthropicErrorResponse } from "@/lib/anthropic"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { enforceAiUsageLimit } from "@/lib/ai-usage"
-
-const client = new Anthropic()
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,9 +15,9 @@ export async function POST(req: NextRequest) {
     const limitResponse = await enforceAiUsageLimit(userId)
     if (limitResponse) return limitResponse
 
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1000,
+    const parsed = await askClaudeJson<{ verdict: string; score: number; feedback: string; betterApproach: string | null }>({
+      maxTokens: 1000,
+      label: "subtopic-practice-eval",
       system: `Ты — строгий, но справедливый ментор по любой предметной области. Оцени решение практического задания по теме — будь то код, задача, разбор текста или аргументация.
 
 Формат ответа — СТРОГО JSON без markdown:
@@ -48,11 +45,8 @@ ${userAnswer}`,
       }],
     })
 
-    const raw = response.content[0].type === "text" ? response.content[0].text : ""
-    const parsed = extractJson(raw) as { verdict: string; score: number; feedback: string; betterApproach: string | null }
     return NextResponse.json(parsed)
   } catch (err) {
-    console.error("Practice eval error:", err)
-    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })
+    return anthropicErrorResponse(err, "Practice eval error")
   }
 }

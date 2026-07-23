@@ -1,9 +1,7 @@
-import Anthropic from "@anthropic-ai/sdk"
 import { NextRequest, NextResponse } from "next/server"
+import { askClaudeText, anthropicErrorResponse } from "@/lib/anthropic"
 import { getOrCreateUserId } from "@/lib/user-id"
 import { enforceAiUsageLimit } from "@/lib/ai-usage"
-
-const client = new Anthropic()
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,9 +15,9 @@ export async function POST(req: NextRequest) {
       .map(m => `Вопрос: ${m.question}\nОтвет: ${m.answer}`)
       .join("\n\n")
 
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 600,
+    const answer = await askClaudeText({
+      maxTokens: 600,
+      label: "follow-up",
       system: `Ты — наставник по теме "${topicName}". Студент только что ответил на вопрос и теперь задаёт уточняющие вопросы, чтобы лучше разобраться. Отвечай точно, кратко, по существу. Не задавай встречных вопросов — только объясняй.`,
       messages: [{
         role: "user",
@@ -33,16 +31,8 @@ ${historyText ? `\nПредыдущие уточнения:\n${historyText}` : "
       }],
     })
 
-    const answer = response.content[0].type === "text" ? response.content[0].text : ""
     return NextResponse.json({ answer })
   } catch (err) {
-    console.error("Follow-up error:", err)
-    if (err instanceof Anthropic.APIError) {
-      const msg = err.message.toLowerCase()
-      if (err.status === 402 || msg.includes("credit")) {
-        return NextResponse.json({ error: "На аккаунте Anthropic закончились средства" }, { status: 402 })
-      }
-    }
-    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 })
+    return anthropicErrorResponse(err, "Follow-up error")
   }
 }
