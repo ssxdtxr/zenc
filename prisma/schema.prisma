@@ -10,6 +10,10 @@ model User {
   id           String         @id @default(cuid())
   email        String         @unique
   passwordHash String
+  // Free-form plan slug (e.g. "beta", later "free"/"pro"/...) — drives the
+  // daily AI call cap in lib/ai-usage.ts. String, not an enum, so adding a
+  // plan later doesn't need a migration to alter a Postgres enum type.
+  plan         String         @default("beta")
   createdAt    DateTime       @default(now())
   topics       Topic[]
   aiUsage      AiUsageDaily[]

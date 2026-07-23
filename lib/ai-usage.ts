@@ -1,7 +1,17 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
-export const DAILY_AI_CALL_LIMIT = 50
+// Daily Anthropic call cap per user, keyed by User.plan. Everyone is "beta"
+// during the closed beta; add real tiers here once pricing is decided —
+// no schema change needed, just a new entry.
+export const PLAN_LIMITS: Record<string, number> = {
+  beta: 50,
+}
+const DEFAULT_PLAN = "beta"
+
+export function limitForPlan(plan: string): number {
+  return PLAN_LIMITS[plan] ?? PLAN_LIMITS[DEFAULT_PLAN]
+}
 
 function todayUtc(): Date {
   const d = new Date()
@@ -21,10 +31,15 @@ async function incrementUsage(userId: string): Promise<number> {
 // Call once per Anthropic request, before making it. Returns a 429 response
 // to short-circuit the route if the user is over their daily cap, else null.
 export async function enforceAiUsageLimit(userId: string): Promise<NextResponse | null> {
-  const count = await incrementUsage(userId)
-  if (count > DAILY_AI_CALL_LIMIT) {
+  const [count, user] = await Promise.all([
+    incrementUsage(userId),
+    prisma.user.findUnique({ where: { id: userId }, select: { plan: true } }),
+  ])
+
+  const limit = limitForPlan(user?.plan ?? DEFAULT_PLAN)
+  if (count > limit) {
     return NextResponse.json(
-      { error: `Дневной лимит запросов исчерпан (${DAILY_AI_CALL_LIMIT}/день). Попробуй завтра.` },
+      { error: `Дневной лимит запросов исчерпан (${limit}/день). Попробуй завтра.` },
       { status: 429 }
     )
   }
