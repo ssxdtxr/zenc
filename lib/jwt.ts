@@ -1,6 +1,10 @@
 import { SignJWT, jwtVerify } from "jose"
 
-const secret = () => new TextEncoder().encode(process.env.JWT_SECRET ?? "fallback-secret-change-me")
+const secret = () => {
+  const value = process.env.JWT_SECRET
+  if (!value) throw new Error("JWT_SECRET env var is not set")
+  return new TextEncoder().encode(value)
+}
 
 export type JwtPayload = {
   sub: string  // userId
