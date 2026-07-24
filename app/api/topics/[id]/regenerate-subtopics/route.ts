@@ -80,25 +80,38 @@ ${topic.subtopics.length > 0 ? `\nТекущие подтемы (перегру�
       return NextResponse.json({ error: "Пустой результат" }, { status: 500 })
     }
 
+    // De-dupe by name (case-insensitive) — createMany fails its whole batch on a
+    // unique-constraint hit, and the model occasionally emits near-duplicates.
+    const seen = new Set<string>()
+    const deduped = parsed.subtopics.filter(s => {
+      const key = s.name.toLowerCase()
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+
     // Map old statuses/nextReviewAt by lowercase name match
     const oldStatusMap = new Map(topic.subtopics.map(s => [s.name.toLowerCase(), s.status]))
     const oldReviewMap = new Map(topic.subtopics.map(s => [s.name.toLowerCase(), s.nextReviewAt]))
 
-    await prisma.topicSubtopic.deleteMany({ where: { topicId: id } })
+    // Delete + recreate must be atomic — if createMany throws after deleteMany
+    // already committed, the topic is left with zero subtopics and no way back.
+    await prisma.$transaction([
+      prisma.topicSubtopic.deleteMany({ where: { topicId: id } }),
+      prisma.topicSubtopic.createMany({
+        data: deduped.map(s => ({
+          topicId: id,
+          name: s.name,
+          status: oldStatusMap.get(s.name.toLowerCase()) ?? "needs_work",
+          recommendation: s.recommendation,
+          definitions: s.definitions ?? [],
+          prerequisites: s.prerequisites ?? [],
+          nextReviewAt: oldReviewMap.get(s.name.toLowerCase()) ?? null,
+        })),
+      }),
+    ])
 
-    await prisma.topicSubtopic.createMany({
-      data: parsed.subtopics.map(s => ({
-        topicId: id,
-        name: s.name,
-        status: oldStatusMap.get(s.name.toLowerCase()) ?? "needs_work",
-        recommendation: s.recommendation,
-        definitions: s.definitions ?? [],
-        prerequisites: s.prerequisites ?? [],
-        nextReviewAt: oldReviewMap.get(s.name.toLowerCase()) ?? null,
-      })),
-    })
-
-    return NextResponse.json({ ok: true, count: parsed.subtopics.length })
+    return NextResponse.json({ ok: true, count: deduped.length })
   } catch (err) {
     return anthropicErrorResponse(err, "regenerate-subtopics", { userId })
   }
