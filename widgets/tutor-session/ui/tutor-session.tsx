@@ -62,7 +62,7 @@ export const TutorSession = ({ topicId, topicName, focusSubtopics, previousSubto
   }
 
   if (sessionState === "results" && results) {
-    return <SessionResults topicName={topicName} results={results} onNewSession={onNewSession} onBack={onBack} />
+    return <SessionResults topicId={topicId} topicName={topicName} results={results} onNewSession={onNewSession} onBack={onBack} />
   }
 
   return (

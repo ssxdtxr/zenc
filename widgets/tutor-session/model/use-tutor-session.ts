@@ -183,6 +183,7 @@ export const useTutorSession = ({ topicId, topicName, focusSubtopics, previousSu
         strengths: data.strengths ?? [],
         toStudyMore: data.toStudyMore ?? [],
         toStudyDeeper: data.toStudyDeeper ?? [],
+        suggestedNewSubtopics: data.suggestedNewSubtopics ?? [],
       }
       setResults(sessionResults)
       setSessionState("results")
