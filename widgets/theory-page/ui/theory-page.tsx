@@ -51,6 +51,26 @@ function sectionAnchor(i: number) {
   return `theory-section-${i}`
 }
 
+// Model writes **bold**/`code` inline despite the prompt asking for plain text
+// (long-form prose habit) — parse it instead of showing literal asterisks/backticks.
+function parseInline(text: string): React.ReactNode[] {
+  const parts: React.ReactNode[] = []
+  const regex = /(\*\*(.+?)\*\*|`([^`]+)`)/g
+  let last = 0
+  let match: RegExpExecArray | null
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > last) parts.push(text.slice(last, match.index))
+    if (match[2]) {
+      parts.push(<strong key={match.index} style={{ color: "var(--text)", fontWeight: 700 }}>{match[2]}</strong>)
+    } else if (match[3]) {
+      parts.push(<code key={match.index} className="font-mono" style={{ background: "var(--surface-hover)", padding: "1px 5px", borderRadius: 5, fontSize: "0.92em" }}>{match[3]}</code>)
+    }
+    last = match.index + match[0].length
+  }
+  if (last < text.length) parts.push(text.slice(last))
+  return parts
+}
+
 // Model separates paragraphs with \n\n — render each as its own <p> instead of
 // collapsing them into one block (HTML whitespace would otherwise swallow the breaks).
 function Paragraphs({ text, style }: { text: string; style: React.CSSProperties }) {
@@ -58,7 +78,7 @@ function Paragraphs({ text, style }: { text: string; style: React.CSSProperties 
   return (
     <>
       {paragraphs.map((p, i) => (
-        <p key={i} style={{ ...style, marginTop: i === 0 ? 0 : "0.9em" }}>{p}</p>
+        <p key={i} style={{ ...style, marginTop: i === 0 ? 0 : "0.9em" }}>{parseInline(p)}</p>
       ))}
     </>
   )
