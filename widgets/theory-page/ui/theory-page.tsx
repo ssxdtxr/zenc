@@ -47,6 +47,23 @@ function statusTheme(status: string) {
   return { bg: cfg.bg, border: cfg.border, text: cfg.color }
 }
 
+function sectionAnchor(i: number) {
+  return `theory-section-${i}`
+}
+
+// Model separates paragraphs with \n\n — render each as its own <p> instead of
+// collapsing them into one block (HTML whitespace would otherwise swallow the breaks).
+function Paragraphs({ text, style }: { text: string; style: React.CSSProperties }) {
+  const paragraphs = text.split(/\n\n+/).map(p => p.trim()).filter(Boolean)
+  return (
+    <>
+      {paragraphs.map((p, i) => (
+        <p key={i} style={{ ...style, marginTop: i === 0 ? 0 : "0.9em" }}>{p}</p>
+      ))}
+    </>
+  )
+}
+
 export const TheoryPage = ({ topicId, subtopicName }: Props) => {
   const router = useRouter()
   const [topic, setTopic] = useState<Topic | null>(null)
@@ -130,16 +147,33 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
               <div className="theory-main">
                 <motion.div variants={staggerContainer(0.07)} initial="hidden" animate="show" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
+                  {/* ОГЛАВЛЕНИЕ — только если секций несколько */}
+                  {content.sections.length > 2 && (
+                    <motion.nav variants={fadeInUp} style={{ ...CARD, padding: "14px 18px" }}>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                        {content.sections.map((s, i) => (
+                          <a
+                            key={i}
+                            href={`#${sectionAnchor(i)}`}
+                            style={{ padding: "6px 12px", borderRadius: 999, fontSize: 12.5, fontWeight: 600, background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--text-2)", textDecoration: "none" }}
+                          >
+                            {i + 1}. {s.heading}
+                          </a>
+                        ))}
+                      </div>
+                    </motion.nav>
+                  )}
+
                   {/* ГЛАВНАЯ ИДЕЯ */}
                   <motion.section variants={fadeInUp} style={{ ...CARD, padding: "22px 24px" }}>
                     <div style={LABEL}>ГЛАВНАЯ ИДЕЯ</div>
                     <div style={{ display: "flex", flexDirection: "column" }}>
                       {content.sections.map((s, i) => (
-                        <div key={i} style={{ padding: i === 0 ? "0 0 16px" : "16px 0 0", borderTop: i > 0 ? "1px solid var(--border)" : "none", marginTop: i > 0 ? 16 : 0 }}>
+                        <div key={i} id={sectionAnchor(i)} style={{ padding: i === 0 ? "0 0 16px" : "16px 0 0", borderTop: i > 0 ? "1px solid var(--border)" : "none", marginTop: i > 0 ? 16 : 0, scrollMarginTop: 90 }}>
                           {content.sections.length > 1 && (
                             <h3 className="font-display" style={{ margin: "0 0 6px", fontWeight: 700, fontSize: 15.5, color: "var(--text)" }}>{s.heading}</h3>
                           )}
-                          <p style={{ margin: 0, fontSize: 16.5, lineHeight: 1.7, color: "var(--text)" }}>{s.explanation}</p>
+                          <Paragraphs text={s.explanation} style={{ margin: 0, fontSize: 16.5, lineHeight: 1.7, color: "var(--text)" }} />
                         </div>
                       ))}
                     </div>
@@ -152,7 +186,7 @@ export const TheoryPage = ({ topicId, subtopicName }: Props) => {
                         <span style={{ width: 20, height: 20, borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: 12, color: "#fff", flexShrink: 0 }}>!</span>
                         <span style={{ ...LABEL, marginBottom: 0, color: "var(--text)" }}>НА ЧТО ОБРАТИТЬ ВНИМАНИЕ</span>
                       </div>
-                      <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.68, color: "var(--text-2)" }}>{content.watchOut}</p>
+                      <Paragraphs text={content.watchOut} style={{ margin: 0, fontSize: 15.5, lineHeight: 1.68, color: "var(--text-2)" }} />
                     </motion.section>
                   )}
 

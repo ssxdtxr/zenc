@@ -7,12 +7,12 @@ import { useRouter } from "next/navigation"
 import type { Topic, SessionRecord } from "@/entities/topic/model/types"
 import { OVERALL_LEVEL_CONFIG, SUBTOPIC_STATUS_CONFIG } from "@/entities/topic/config"
 import { TutorSession } from "@/widgets/tutor-session/ui/tutor-session"
+import { SubtopicMap } from "@/features/subtopic-map/ui/subtopic-map"
 import { apiClient } from "@/shared/lib/api-client"
-import { fadeInUp, staggerContainer } from "@/shared/lib/motion"
+import { fadeInUp } from "@/shared/lib/motion"
 import { AppShell } from "@/widgets/app-shell/ui/app-shell"
 
 type Props = { id: string }
-type Filter = "all" | "needs_work" | "learning" | "good" | "expert"
 
 const CIRC = 282.74
 const DAY_LABELS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
@@ -28,7 +28,6 @@ export const TopicPage = ({ id }: Props) => {
   const router = useRouter()
   const [topic, setTopic] = useState<Topic | null>(null)
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<Filter>("all")
   const [openTerms, setOpenTerms] = useState<Record<string, boolean>>({})
 
   const [regenerating, setRegenerating] = useState(false)
@@ -163,11 +162,6 @@ export const TopicPage = ({ id }: Props) => {
   const mastery = total ? Math.round((expertCount / total) * 100) : 0
   const dashOffset = CIRC * (1 - mastery / 100)
 
-  const filtered = subs.filter(s => {
-    if (filter === "all") return true
-    return s.status === filter
-  })
-
   const levelCfg = topic.overallLevel ? OVERALL_LEVEL_CONFIG[topic.overallLevel] : null
   const lastSession = topic.sessions[0] ?? null
   const nextWeak = subs.find(s => s.status !== "expert")
@@ -186,14 +180,6 @@ export const TopicPage = ({ id }: Props) => {
     count: topic.sessions.filter(s => new Date(s.date).toDateString() === d.toDateString()).length,
   }))
   const maxActivity = Math.max(1, ...activity.map(a => a.count))
-
-  const FILTERS: { key: Filter; label: string; count: number }[] = [
-    { key: "all", label: "Все", count: total },
-    { key: "needs_work", label: "Слабые", count: weakCount },
-    { key: "learning", label: "В процессе", count: progCount },
-    { key: "good", label: "Хорошо", count: goodCount },
-    { key: "expert", label: "Освоено", count: expertCount },
-  ]
 
   const STATUS_LEGEND: { key: string; label: string; count: number }[] = [
     { key: "needs_work", label: "Нужно подтянуть", count: weakCount },
@@ -283,7 +269,7 @@ export const TopicPage = ({ id }: Props) => {
 
                 {/* TWO-COLUMN BODY */}
                 <div style={{ marginTop: 28, display: "grid", gap: 28 }} className="grid-cols-1 lg:grid-cols-12">
-                  <div className="lg:col-span-8" style={{ minWidth: 0 }}>
+                  <div className="lg:col-span-8 order-2 lg:order-none" style={{ minWidth: 0 }}>
                     {/* KNOWLEDGE MAP */}
                     {total > 0 && (
                       <>
@@ -332,47 +318,10 @@ export const TopicPage = ({ id }: Props) => {
                           </div>
                         )}
 
-                        {/* Filters */}
-                        <div style={{ marginTop: 16, display: "flex", gap: 9, flexWrap: "wrap" }}>
-                          {FILTERS.map(f => {
-                            const on = filter === f.key
-                            return (
-                              <motion.button key={f.key} whileTap={{ scale: 0.93 }} onClick={() => setFilter(f.key)} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "9px 15px", borderRadius: 999, cursor: "pointer", background: on ? "var(--accent)" : "var(--surface)", border: `1px solid ${on ? "var(--accent)" : "var(--border)"}`, color: on ? "#fff" : "var(--text-2)", fontWeight: 600, fontSize: 13.5, fontFamily: "inherit" }}>
-                                {f.label}<span style={{ opacity: 0.65, fontWeight: 700 }}>{f.count}</span>
-                              </motion.button>
-                            )
-                          })}
+                        {/* Dependency graph — replaces the old flat list+filters */}
+                        <div style={{ marginTop: 16 }}>
+                          <SubtopicMap subtopics={subs} onSelect={(name) => router.push(`/topic/${id}/subtopic/${encodeURIComponent(name)}`)} />
                         </div>
-
-                        {/* Subtopic rows */}
-                        <motion.div key={filter} variants={staggerContainer(0.04)} initial="hidden" animate="show" style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
-                          {filtered.map(s => {
-                            const th = getTheme(s.status)
-                            const isDue = s.nextReviewAt && new Date(s.nextReviewAt).getTime() <= now
-                            return (
-                              <motion.button key={s.name} variants={fadeInUp} whileHover={{ x: 3, background: "var(--surface-hover)" }} whileTap={{ scale: 0.985 }} onClick={() => router.push(`/topic/${id}/subtopic/${encodeURIComponent(s.name)}`)} style={{ textAlign: "left", display: "block", width: "100%", padding: "17px 20px", borderRadius: 14, cursor: "pointer", background: "var(--surface)", border: "1px solid var(--border)", borderLeft: `3px solid ${th.border}`, fontFamily: "inherit" }}>
-                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
-                                  <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
-                                    <span className="font-display" style={{ fontWeight: 600, fontSize: 16.5, color: "var(--text)" }}>{s.name}</span>
-                                    {isDue && <span style={{ fontSize: 11, fontWeight: 700, color: "var(--text)", background: "var(--surface-hover)", padding: "2px 8px", borderRadius: 999, flexShrink: 0 }}>пора повторить</span>}
-                                  </div>
-                                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 11px", borderRadius: 999, background: th.bg, border: `1px solid ${th.border}`, fontWeight: 700, fontSize: 12, color: th.text, whiteSpace: "nowrap", flexShrink: 0 }}>
-                                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: th.dot }} />{th.label}
-                                  </span>
-                                </div>
-                                {s.recommendation && (
-                                  <p style={{ margin: "7px 0 0", fontSize: 13.5, lineHeight: 1.55, color: "var(--text-2)" }}>{s.recommendation}</p>
-                                )}
-                                <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 14, fontSize: 12.5, color: "var(--text-3)", fontWeight: 500 }}>
-                                  <span style={{ color: "var(--text)", fontWeight: 700 }}>Читать теорию →</span>
-                                </div>
-                              </motion.button>
-                            )
-                          })}
-                          {filtered.length === 0 && (
-                            <div style={{ padding: "28px", textAlign: "center", borderRadius: 14, border: "1px dashed var(--border)", background: "var(--surface-2)", color: "var(--text-3)", fontSize: 14 }}>Нет подтем в этой категории</div>
-                          )}
-                        </motion.div>
                       </>
                     )}
 
@@ -397,8 +346,8 @@ export const TopicPage = ({ id }: Props) => {
                     )}
                   </div>
 
-                  {/* SIDEBAR */}
-                  <div className="lg:col-span-4" style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 0 }}>
+                  {/* SIDEBAR — order-1 on mobile so the primary CTA sits above the knowledge map, not below it */}
+                  <div className="lg:col-span-4 order-1 lg:order-none" style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 0 }}>
                     <motion.button whileHover={{ y: -2 }} whileTap={{ scale: 0.985 }} onClick={startNewSession} style={{ padding: "18px 20px", borderRadius: 16, border: "none", cursor: "pointer", background: "var(--accent)", color: "#fff", fontWeight: 700, fontSize: 16, boxShadow: "var(--shadow)", textAlign: "left", fontFamily: "inherit" }}>
                       <div className="font-display">{lastSession ? "Новая сессия →" : "Начать →"}</div>
                       <div style={{ fontWeight: 500, fontSize: 12.5, opacity: 0.75, marginTop: 3 }}>10 вопросов · адаптивно</div>
