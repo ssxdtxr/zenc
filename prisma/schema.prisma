@@ -60,6 +60,10 @@ model TopicSubtopic {
   status         String
   recommendation String    @db.Text
   definitions    Json      @default("[]")
+  // Names of other subtopics (within the same topic) that should be understood
+  // first — drives the dependency graph on the topic page. String[] of names,
+  // not ids, since names are the stable identity subtopics are keyed on.
+  prerequisites  Json      @default("[]")
   nextReviewAt   DateTime?
   topic          Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
 

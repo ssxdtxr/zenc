@@ -41,8 +41,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         const finalStatus = upgradeOnly(existingByName.get(s.name), s.status)
         return prisma.topicSubtopic.upsert({
           where: { topicId_name: { topicId, name: s.name } },
-          update: { status: finalStatus, recommendation: s.recommendation, definitions: s.definitions ?? [], nextReviewAt: nextReviewAt(finalStatus) },
-          create: { topicId, name: s.name, status: finalStatus, recommendation: s.recommendation, definitions: s.definitions ?? [], nextReviewAt: nextReviewAt(finalStatus) },
+          update: { status: finalStatus, recommendation: s.recommendation, definitions: s.definitions ?? [], prerequisites: s.prerequisites ?? [], nextReviewAt: nextReviewAt(finalStatus) },
+          create: { topicId, name: s.name, status: finalStatus, recommendation: s.recommendation, definitions: s.definitions ?? [], prerequisites: s.prerequisites ?? [], nextReviewAt: nextReviewAt(finalStatus) },
         })
       })
     )

@@ -12,7 +12,13 @@ export type Subtopic = {
   status: SubtopicStatus
   recommendation: string
   definitions: SubtopicDefinition[]
+  prerequisites: string[]
   nextReviewAt: string | null
+}
+
+export type SuggestedSubtopic = {
+  name: string
+  reason: string
 }
 
 export type SessionRecord = {
@@ -26,6 +32,10 @@ export type SessionRecord = {
   strengths: string[]
   toStudyMore: string[]
   toStudyDeeper: string[]
+  // Only present on the raw /api/analyze response — candidates the model
+  // noticed outside the existing knowledge map. Not persisted to the DB;
+  // the user accepts/rejects them right on the session-results screen.
+  suggestedNewSubtopics?: SuggestedSubtopic[]
 }
 
 export type TheoryDefinition = {
