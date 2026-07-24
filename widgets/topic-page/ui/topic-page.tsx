@@ -258,13 +258,15 @@ export const TopicPage = ({ id }: Props) => {
 
                   {/* Last session — folded into the hero instead of its own card */}
                   {lastSession && (
-                    <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-                      <span style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: "0.07em", color: "var(--text-3)", whiteSpace: "nowrap" }}>ПОСЛЕДНЯЯ СЕССИЯ</span>
-                      <div style={{ flex: 1, minWidth: 100, height: 6, borderRadius: 999, background: "var(--border)", overflow: "hidden" }}>
-                        <div style={{ height: "100%", width: `${Math.round((lastSession.score / lastSession.total) * 100)}%`, borderRadius: 999, background: "var(--accent)" }} />
+                    <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+                        <span style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: "0.07em", color: "var(--text-3)", whiteSpace: "nowrap" }}>ПОСЛЕДНЯЯ СЕССИЯ</span>
+                        <div style={{ flex: 1, minWidth: 100, height: 6, borderRadius: 999, background: "var(--border)", overflow: "hidden" }}>
+                          <div style={{ height: "100%", width: `${Math.round((lastSession.score / lastSession.total) * 100)}%`, borderRadius: 999, background: "var(--accent)" }} />
+                        </div>
+                        <span className="font-display" style={{ fontWeight: 700, fontSize: 15, color: "var(--text)" }}>{lastSession.score}/{lastSession.total}</span>
                       </div>
-                      <span style={{ fontSize: 13.5, color: "var(--text-2)" }}>{lastSession.summary?.slice(0, 40) || "Анализ завершён"}</span>
-                      <span className="font-display" style={{ fontWeight: 700, fontSize: 15, color: "var(--text)" }}>{lastSession.score}/{lastSession.total}</span>
+                      <p style={{ margin: "8px 0 0", fontSize: 13.5, lineHeight: 1.5, color: "var(--text-2)" }}>{lastSession.summary || "Анализ завершён"}</p>
                     </div>
                   )}
                 </motion.div>
