@@ -39,13 +39,22 @@ function chronological(subtopics: Subtopic[]): Ordered[] {
     return level
   }
 
-  return subtopics
+  const result = subtopics
     .map((s, i) => ({ s, i, level: levelOf(s.name) }))
     .sort((a, b) => a.level - b.level || a.i - b.i)
     .map(({ s }, orderIdx) => {
       const blockedBy = (s.prerequisites ?? []).filter(p => byName.get(p)?.status === "needs_work")
       return { subtopic: s, order: orderIdx + 1, locked: blockedBy.length > 0, blockedBy }
     })
+
+  // Safety valve: a mutual-prerequisite cycle (A needs B, B needs A — a model
+  // mistake, prompt asks for direct/non-transitive deps only) could lock
+  // every subtopic at once with no way in. Fail open rather than deadlock.
+  if (result.length > 0 && result.every(r => r.locked)) {
+    return result.map(r => ({ ...r, locked: false, blockedBy: [] }))
+  }
+
+  return result
 }
 
 export const SubtopicMap = ({ subtopics, onSelect }: Props) => {
@@ -66,15 +75,17 @@ export const SubtopicMap = ({ subtopics, onSelect }: Props) => {
           return (
             <button
               key={s.name}
-              onClick={() => onSelect(s.name)}
+              onClick={locked ? undefined : () => onSelect(s.name)}
+              disabled={locked}
+              aria-disabled={locked}
               title={locked ? `${s.name} — сначала пройди: ${blockedBy.join(", ")}` : s.name}
               style={{
                 textAlign: "left",
-                cursor: "pointer",
+                cursor: locked ? "not-allowed" : "pointer",
                 fontFamily: "inherit",
                 background: "var(--surface)",
                 border: `1.5px solid ${cfg.border}`,
-                opacity: locked ? 0.6 : 1,
+                opacity: locked ? 0.55 : 1,
                 borderRadius: 16,
                 padding: "18px 20px",
                 display: "flex",
