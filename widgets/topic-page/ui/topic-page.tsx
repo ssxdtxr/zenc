@@ -225,47 +225,49 @@ export const TopicPage = ({ id }: Props) => {
             {!inSession && (
               <motion.div key="overview" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.22 }}>
                 {/* PROGRESS HERO */}
-                <motion.div variants={fadeInUp} initial="hidden" animate="show" style={{ marginTop: 22, padding: "24px 26px", borderRadius: 20, background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow)", display: "flex", alignItems: "center", gap: 26, flexWrap: "wrap" }}>
-                  <div title={MASTERY_TOOLTIP} style={{ position: "relative", width: 104, height: 104, flexShrink: 0, cursor: "help" }}>
-                    <svg width="104" height="104" viewBox="0 0 104 104" style={{ transform: "rotate(-90deg)" }}>
-                      <circle cx="52" cy="52" r="45" fill="none" stroke="var(--border)" strokeWidth="9" />
-                      <circle cx="52" cy="52" r="45" fill="none" stroke="var(--text)" strokeWidth="9" strokeLinecap="round" strokeDasharray={CIRC} strokeDashoffset={dashOffset} style={{ transition: "stroke-dashoffset .7s cubic-bezier(.2,.8,.2,1)" }} />
-                    </svg>
-                    <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-                      <span className="font-display" style={{ fontWeight: 700, fontSize: 25, lineHeight: 1, color: "var(--text)" }}>{mastery}%</span>
-                      <span style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 500, marginTop: 2, display: "inline-flex", alignItems: "center", gap: 3 }}>
-                        освоено <HelpIcon size={11} color="var(--text-3)" />
-                      </span>
+                <motion.div variants={fadeInUp} initial="hidden" animate="show" style={{ marginTop: 22, padding: "24px 26px", borderRadius: 20, background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 26, flexWrap: "wrap" }}>
+                    <div title={MASTERY_TOOLTIP} style={{ position: "relative", width: 104, height: 104, flexShrink: 0, cursor: "help" }}>
+                      <svg width="104" height="104" viewBox="0 0 104 104" style={{ transform: "rotate(-90deg)" }}>
+                        <circle cx="52" cy="52" r="45" fill="none" stroke="var(--border)" strokeWidth="9" />
+                        <circle cx="52" cy="52" r="45" fill="none" stroke="var(--text)" strokeWidth="9" strokeLinecap="round" strokeDasharray={CIRC} strokeDashoffset={dashOffset} style={{ transition: "stroke-dashoffset .7s cubic-bezier(.2,.8,.2,1)" }} />
+                      </svg>
+                      <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                        <span className="font-display" style={{ fontWeight: 700, fontSize: 25, lineHeight: 1, color: "var(--text)" }}>{mastery}%</span>
+                        <span style={{ fontSize: 10.5, color: "var(--text-3)", fontWeight: 500, marginTop: 2, display: "inline-flex", alignItems: "center", gap: 3 }}>
+                          освоено <HelpIcon size={11} color="var(--text-3)" />
+                        </span>
+                      </div>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 240 }}>
+                      <div className="font-display" style={{ fontWeight: 600, fontSize: 17, marginBottom: 12, color: "var(--text)" }}>
+                        Освоено {expertCount} из {total} подтем
+                      </div>
+                      <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
+                        {STATUS_LEGEND.map(s => {
+                          const th = getTheme(s.key)
+                          return (
+                            <span key={s.key} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "6px 12px", borderRadius: 999, background: th.bg, border: `1px solid ${th.border}`, fontSize: 13, fontWeight: 600, color: th.text }}>
+                              <span style={{ width: 7, height: 7, borderRadius: "50%", background: th.dot, flexShrink: 0 }} />{s.count} {s.label.toLowerCase()}
+                            </span>
+                          )
+                        })}
+                      </div>
                     </div>
                   </div>
-                  <div style={{ flex: 1, minWidth: 240 }}>
-                    <div className="font-display" style={{ fontWeight: 600, fontSize: 17, marginBottom: 12, color: "var(--text)" }}>
-                      Освоено {expertCount} из {total} подтем
-                    </div>
-                    <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
-                      {STATUS_LEGEND.map(s => {
-                        const th = getTheme(s.key)
-                        return (
-                          <span key={s.key} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "6px 12px", borderRadius: 999, background: th.bg, border: `1px solid ${th.border}`, fontSize: 13, fontWeight: 600, color: th.text }}>
-                            <span style={{ width: 7, height: 7, borderRadius: "50%", background: th.dot, flexShrink: 0 }} />{s.count} {s.label.toLowerCase()}
-                          </span>
-                        )
-                      })}
-                    </div>
-                  </div>
-                </motion.div>
 
-                {/* LAST SESSION */}
-                {lastSession && (
-                  <div style={{ marginTop: 14, padding: "16px 20px", borderRadius: 16, background: "var(--surface-2)", border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.07em", color: "var(--text-3)", whiteSpace: "nowrap" }}>ПОСЛЕДНЯЯ СЕССИЯ</span>
-                    <div style={{ flex: 1, minWidth: 100, height: 7, borderRadius: 999, background: "var(--border)", overflow: "hidden" }}>
-                      <div style={{ height: "100%", width: `${Math.round((lastSession.score / lastSession.total) * 100)}%`, borderRadius: 999, background: "var(--accent)" }} />
+                  {/* Last session — folded into the hero instead of its own card */}
+                  {lastSession && (
+                    <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: "0.07em", color: "var(--text-3)", whiteSpace: "nowrap" }}>ПОСЛЕДНЯЯ СЕССИЯ</span>
+                      <div style={{ flex: 1, minWidth: 100, height: 6, borderRadius: 999, background: "var(--border)", overflow: "hidden" }}>
+                        <div style={{ height: "100%", width: `${Math.round((lastSession.score / lastSession.total) * 100)}%`, borderRadius: 999, background: "var(--accent)" }} />
+                      </div>
+                      <span style={{ fontSize: 13.5, color: "var(--text-2)" }}>{lastSession.summary?.slice(0, 40) || "Анализ завершён"}</span>
+                      <span className="font-display" style={{ fontWeight: 700, fontSize: 15, color: "var(--text)" }}>{lastSession.score}/{lastSession.total}</span>
                     </div>
-                    <span style={{ fontSize: 14, color: "var(--text-2)" }}>{lastSession.summary?.slice(0, 40) || "Анализ завершён"}</span>
-                    <span className="font-display" style={{ fontWeight: 700, fontSize: 16, color: "var(--text)" }}>{lastSession.score}/{lastSession.total}</span>
-                  </div>
-                )}
+                  )}
+                </motion.div>
 
                 {/* TWO-COLUMN BODY */}
                 <div style={{ marginTop: 28, display: "grid", gap: 28 }} className="grid-cols-1 lg:grid-cols-12">
@@ -278,7 +280,6 @@ export const TopicPage = ({ id }: Props) => {
                             КАРТА ЗНАНИЙ <span style={{ color: "var(--text-3)" }}>· {total}</span>
                           </h2>
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontSize: 13, color: "var(--text-3)", fontWeight: 500 }}>нажми → читай теорию</span>
                             <button
                               onClick={() => setShowAddSubtopic(v => !v)}
                               style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, cursor: "pointer", background: "var(--surface)", border: "1px solid var(--border)", color: "var(--text-2)", fontFamily: "inherit" }}
@@ -375,25 +376,6 @@ export const TopicPage = ({ id }: Props) => {
                             <span style={{ fontSize: 10, color: "var(--text-3)", fontWeight: 600 }}>{a.label}</span>
                           </div>
                         ))}
-                      </div>
-                    </div>
-
-                    {/* STATUS LEGEND */}
-                    <div style={{ padding: "18px 20px", borderRadius: 16, background: "var(--surface)", border: "1px solid var(--border)" }}>
-                      <h3 className="font-display" style={{ fontWeight: 600, fontSize: 12, letterSpacing: "0.07em", color: "var(--text-2)", margin: "0 0 14px" }}>СТАТУС</h3>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                        {STATUS_LEGEND.map(s => {
-                          const th = getTheme(s.key)
-                          return (
-                            <div key={s.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-                                <span style={{ width: 8, height: 8, borderRadius: "50%", background: th.dot, flexShrink: 0 }} />
-                                <span style={{ fontSize: 13.5, color: "var(--text-2)", fontWeight: 500 }}>{s.label}</span>
-                              </div>
-                              <span className="font-display" style={{ fontSize: 14, fontWeight: 700, color: "var(--text)" }}>{s.count}</span>
-                            </div>
-                          )
-                        })}
                       </div>
                     </div>
 
